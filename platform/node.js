@@ -11,13 +11,13 @@ err = function(msg){
 var Core = Class({
     toString: 'Parent',
     construct: function() {
-        console.log('Parent: Constructing');
+        log('Parent: Constructing');
     },
     destruct: function() {
-        console.log('Parent: Destructing');
+        log('Parent: Destructing');
     },
     doStuff: function() {
-        console.log('Parent: Doing stuff');
+        log('Parent: Doing stuff');
     }
 });
 
