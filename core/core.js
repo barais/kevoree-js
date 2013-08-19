@@ -9,15 +9,22 @@ err = function(msg){
 }
 
 Core = Class({
-    toString: 'Parent',
+    toString: 'Kevoree Core',
     construct: function() {
-        log('Parent: Constructing');
+        log('Kevoree Core: Constructing');
     },
     destruct: function() {
-        log('Parent: Destructing');
+        log('Kevoree Core : Destructing');
     },
-    doStuff: function() {
-        log('Parent: Doing stuff');
+    deploy: function(model,uuid,callback) {
+        log('Kevoree Core deploy model : starting');
+        log(model);
+    },
+    lock: function(){
+
+    },
+    unlock: function(){
+
     }
 });
 
