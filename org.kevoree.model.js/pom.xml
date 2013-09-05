@@ -11,7 +11,6 @@
     <properties>
         <metamodel.ecore>${basedir}/target/metamodel/kevoree.ecore</metamodel.ecore>
         <kmf.version>1.4.8</kmf.version>
-        <kevoree.version>2.0.12-SNAPSHOT</kevoree.version>
     </properties>
 
     <organization>
@@ -82,7 +81,7 @@
         <dependency>
 			<groupId>org.kevoree</groupId>
 		    <artifactId>org.kevoree.model</artifactId>
-		    <version>${kevoree.version}</version>
+		    <version>${project.version}</version>
             <classifier>sources</classifier>
 		</dependency>
     </dependencies>
