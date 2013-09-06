@@ -1,6 +1,7 @@
-var Class = require('./lib/Class.min.js');
+var Class = require('./lib/Class.min.js'),
+    Kevoree = require('../target/js/org.kevoree.platform.js.merged.js');
 
-log = function(msg){
+log = function(msg) {
     console.log(msg);
 }
 

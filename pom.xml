@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.kevoree.platform</groupId>
+    <artifactId>org.kevoree.platform.js</artifactId>
+    <packaging>jar</packaging>
+    <name>Kevoree :: Platform :: Javascript</name>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <properties>
+        <metamodel.ecore>metamodel/kevoree.ecore</metamodel.ecore>
+        <kmf.version>1.5.4-SNAPSHOT</kmf.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.kevoree.modeling</groupId>
+            <artifactId>org.kevoree.modeling.microframework</artifactId>
+            <version>${kmf.version}</version>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>kevoree-release</id>
+            <url>http://maven.kevoree.org/release/</url>
+        </repository>
+        <repository>
+            <id>kevoree-snapshots</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>plugin.kevoree-release</id>
+            <url>http://maven.kevoree.org/release/</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>plugin.kevoree-snapshots</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12.3</version>
+                <configuration>
+                    <argLine>-Xmx1024m</argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.kevoree.modeling</groupId>
+                <artifactId>org.kevoree.modeling.kotlin.generator.mavenplugin</artifactId>
+                <version>${kmf.version}</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>ModelGen</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <ecore>${metamodel.ecore}</ecore>
+                            <packagePrefix>org</packagePrefix>
+                            <clearOutput>false</clearOutput>
+                            <js>true</js>
+                            <events>true</events>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
