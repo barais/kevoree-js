@@ -2,15 +2,15 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.kevoree.platform</groupId>
-    <artifactId>org.kevoree.platform.js</artifactId>
+    <groupId>org.kevoree.js</groupId>
+    <artifactId>org.kevoree.js.root</artifactId>
     <packaging>pom</packaging>
-    <name>Kevoree :: Platform :: Javascript</name>
+    <name>Kevoree :: JavaScript :: Root</name>
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
-        <kmf.version>1.5.4-SNAPSHOT</kmf.version>
-        <kevoree.version>2.0.12-SNAPSHOT</kevoree.version>
+        <kmf.version>1.5.4</kmf.version>
+        <kevoree.version>2.0.12</kevoree.version>
     </properties>
 
     <modules>

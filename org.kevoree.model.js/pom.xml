@@ -4,7 +4,6 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kevoree</groupId>
     <artifactId>org.kevoree.model.js</artifactId>
-    <packaging>jar</packaging>
     <name>Kevoree :: Model :: Javascript</name>
     <version>2.0.12-SNAPSHOT</version>
 
@@ -13,8 +12,8 @@
     </properties>
 
     <parent>
-        <groupId>org.kevoree.platform</groupId>
-        <artifactId>org.kevoree.platform.js</artifactId>
+        <groupId>org.kevoree.js</groupId>
+        <artifactId>org.kevoree.js.root</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -26,11 +25,11 @@
             <version>${kmf.version}</version>
         </dependency>
         <dependency>
-			<groupId>org.kevoree</groupId>
-		    <artifactId>org.kevoree.model</artifactId>
-		    <version>${kevoree.version}</version>
+            <groupId>org.kevoree</groupId>
+            <artifactId>org.kevoree.model</artifactId>
+            <version>${kevoree.version}</version>
             <classifier>sources</classifier>
-		</dependency>
+        </dependency>
     </dependencies>
 
     <build>
@@ -53,7 +52,6 @@
                                     <version>${kevoree.version}</version>
                                     <classifier>sources</classifier>
                                     <type>jar</type>
-
                                     <outputDirectory>${basedir}/target/metamodel/</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
