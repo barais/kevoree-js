@@ -6,7 +6,13 @@ var factory = new model.org.kevoree.impl.DefaultKevoreeFactory();
 
 kevoree.start();
 var myModel = factory.createContainerRoot();
-kevoree.deploy(myModel, null, function (model) {
-    console.log("deployed = " + (myModel == model));
+
+kevoree.deploy(myModel, null, {
+    success: function (model) {
+        console.log("deployed = " + (myModel == model));
+    },
+    error: function (message) {
+        console.log("deployed failed: "+message);
+    }
 });
 

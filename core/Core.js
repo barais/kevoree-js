@@ -1,6 +1,7 @@
 var Class = require('../lib/Class'),
     modelLib = require('../org.kevoree.model.js/target/js/org.kevoree.model.js.merged'),
-    Logger = require('./Logger');
+    Logger = require('./util/Logger'),
+    Util = require('./util/Util');
 
 /**
  * Kevoree Core
@@ -91,20 +92,22 @@ module.exports = Class({
                         break;
                 }
             }
+            // taking the given model as current one
             this.currentModel = model;
 
-            if (callback != null && callback != undefined) {
-                if (typeof(callback) == "function") {
-                    // a callback has been defined, call it with the new accepted model
-                    callback.call(this, this.currentModel);
-                } else {
-                    this.logger.error("callback parameter must be a function. Can't call it :/");
-                }
+            // check callback availability
+            if (Util.callable(callback.success)) {
+                callback.success.call(this, this.currentModel);
+            } else {
+                this.logger.error("callback parameter must be a function. Can't call it :/");
             }
         } else {
-            this.logger.error("model is not defined or null. Deploy aborted.");
+            if (Util.callable(callback.error)) {
+                callback.error.call(this, "model is not defined or null. Deploy aborted.");
+            }
             return;
         }
+
         this.logger.log('successfully deployed model');
     },
 

@@ -1,4 +1,4 @@
-var Class = require('../lib/Class');
+var Class = require('../../lib/Class');
 
 module.exports = Class({
     toString: 'Logger',
