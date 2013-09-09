@@ -14,9 +14,10 @@ module.exports = Class({
      */
     construct: function() {
         this.logger = new Logger(this);
-        this.logger.log('Constructing');
+        this.logger.log('initialization...');
         this.currentModel = null;
         this.factory = new modelLib.org.kevoree.impl.DefaultKevoreeFactory();
+        this.compare = new modelLib.org.kevoree.compare.DefaultModelCompare();
     },
 
     /**
@@ -31,14 +32,15 @@ module.exports = Class({
      */
     start: function () {
         this.currentModel = this.factory.createContainerRoot();
-        this.logger.log(this.currentModel);
+        this.logger.log('Started');
     },
 
     /**
      * Stops Kevoree Core
      */
     stop: function () {
-
+        this.currentModel = null;
+        this.logger.log('Stopped');
     },
 
     /**
@@ -57,9 +59,53 @@ module.exports = Class({
      * @param callback
      */
     deploy: function(model, uuid, callback) {
-        this.logger.log('Kevoree Core deploy model : process started...');
-        // TODO
-        this.logger.log('Kevoree Core deploy model : success!');
+        this.logger.log('deploy process started...');
+        if (model != undefined && model != null) {
+            // given model is defined and not null
+            var traces = this.compare.diff(this.currentModel, model).get_traces();
+
+            // TODO
+            for (var i=0; i < traces.size(); i++) {
+                var trace = JSON.parse(traces.get(i));
+                switch (trace.traceType) {
+                    case modelLib.org.kevoree.modeling.api.util.ActionType.$SET:
+                        this.logger.log("trace action type SET");
+                        break;
+                    case modelLib.org.kevoree.modeling.api.util.ActionType.$ADD:
+                        this.logger.log("trace action type ADD");
+                        break;
+                    case modelLib.org.kevoree.modeling.api.util.ActionType.$REMOVE:
+                        this.logger.log("trace action type REMOVE");
+                        break;
+                    case modelLib.org.kevoree.modeling.api.util.ActionType.$ADD_ALL:
+                        this.logger.log("trace action type ADD ALL");
+                        break;
+                    case modelLib.org.kevoree.modeling.api.util.ActionType.$REMOVE_ALL:
+                        this.logger.log("trace action type REMOVE ALL");
+                        break;
+                    case modelLib.org.kevoree.modeling.api.util.ActionType.$RENEW_INDEX:
+                        this.logger.log("trace action type RENEW INDEX");
+                        break;
+                    default:
+                        this.logger.log("default trace type");
+                        break;
+                }
+            }
+            this.currentModel = model;
+
+            if (callback != null && callback != undefined) {
+                if (typeof(callback) == "function") {
+                    // a callback has been defined, call it with the new accepted model
+                    callback.call(this, this.currentModel);
+                } else {
+                    this.logger.error("callback parameter must be a function. Can't call it :/");
+                }
+            }
+        } else {
+            this.logger.error("model is not defined or null. Deploy aborted.");
+            return;
+        }
+        this.logger.log('successfully deployed model');
     },
 
     /**

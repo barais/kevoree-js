@@ -3,8 +3,8 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kevoree.js</groupId>
-    <artifactId>org.kevoree.js.platform.browser</artifactId>
-    <name>Kevoree :: Platform :: Browser</name>
+    <artifactId>org.kevoree.js.platform.nodejs</artifactId>
+    <name>Kevoree :: Platform :: NodeJS</name>
 
     <parent>
         <groupId>org.kevoree.js</groupId>
@@ -28,12 +28,10 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <executable>browserify</executable>
+                    <executable>node</executable>
                     <!-- optional -->
                     <arguments>
                         <argument>main.js</argument>
-                        <argument>-o</argument>
-                        <argument>target/kevoree.browser.js</argument>
                     </arguments>
                 </configuration>
             </plugin>

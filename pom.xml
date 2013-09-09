@@ -9,13 +9,14 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
-        <kmf.version>1.5.4</kmf.version>
+        <kmf.version>1.5.4-SNAPSHOT</kmf.version>
         <kevoree.version>2.0.12</kevoree.version>
     </properties>
 
     <modules>
         <module>org.kevoree.model.js</module>
         <module>platform/browser</module>
+        <module>platform/nodejs</module>
     </modules>
 
     <organization>
