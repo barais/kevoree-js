@@ -31,9 +31,9 @@
                 <configuration>
                     <executable>browserify</executable>
                     <!-- optional -->
-                    <workingDirectory>/tmp</workingDirectory>
                     <arguments>
                         <argument>main.js</argument>
+                        <argument>-o</argument>
                         <argument>target/kevoree.browser.js</argument>
                     </arguments>
                 </configuration>

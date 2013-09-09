@@ -1,6 +1,6 @@
-var coreModule  = require('../../core/core.js');
+var Core  = require('../../core/Core.js');
 
-var kevoree = new coreModule.Core();
+var kevoree = new Core();
 
 kevoree.deploy();
 
