@@ -15,6 +15,7 @@
 
     <modules>
         <module>org.kevoree.model.js</module>
+        <module>platform/browser</module>
     </modules>
 
     <organization>
@@ -55,9 +56,9 @@
             <timezone>+2</timezone>
         </developer>
         <developer>
-            <name>Gregory Nain</name>
-            <id>gregory.nain</id>
-            <email>gregory.nain@uni.lu</email>
+            <name>Maxime Tricoire</name>
+            <id>maxime.tricoire</id>
+            <email>max.tricoire@gmail.com</email>
             <roles>
                 <role>developer</role>
             </roles>
@@ -73,29 +74,15 @@
             <timezone>+2</timezone>
         </developer>
         <developer>
-            <name>Maxime Tricoire</name>
-            <id>maxime.tricoire</id>
-            <email>max.tricoire@gmail.com</email>
+            <name>Gregory Nain</name>
+            <id>gregory.nain</id>
+            <email>gregory.nain@uni.lu</email>
             <roles>
                 <role>developer</role>
             </roles>
             <timezone>+2</timezone>
         </developer>
     </developers>
-
-    <repositories>
-        <repository>
-            <id>kevoree-oss</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>plugin.kevoree-oss</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <distributionManagement>
         <repository>
