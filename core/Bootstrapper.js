@@ -46,38 +46,38 @@ module.exports = Class({
                 for (var i=0; i < deployUnits.size(); i++) {
                     var packageName = deployUnits.get(i).getUnitName(),
                         packageVersion = deployUnits.get(i).getVersion(),
-                        NodeClass = (function(name, version, logger) {
-                            npm.load({}, function (err) {
-                                if (err) {
-                                    logger.log('Unable to load npm module');
-                                    if (Util.callable(callback)) {
-                                        callback.call(this, new Error('Bootstrap failure'));
-                                        return;
-                                    }
+                        that = this;
+
+                    npm.load({}, function (err) {
+                        if (err) {
+                            that.logger.log('Unable to load npm module');
+                            if (Util.callable(callback)) {
+                                callback.call(this, new Error('Bootstrap failure'));
+                                return;
+                            }
+                        }
+
+                        // load success
+                        npm.commands.install([packageName+'@'+packageVersion], function (er) {
+                            if (er) {
+                                that.logger.log('npm failed to install package '+packageName+':'+packageVersion);
+                                if (Util.callable(callback)) {
+                                    callback.call(this, new Error("Bootstrap failure"));
+                                    return;
                                 }
+                            }
 
-                                // load success
-                                npm.commands.install([name+'@'+version], function (er) {
-                                    if (er) {
-                                        logger.log('npm failed to install package '+name+':'+version);
-                                        if (Util.callable(callback)) {
-                                            callback.call(this, new Error("Bootstrap failure"));
-                                            return;
-                                        }
-                                    }
-
-                                    // install sucess
-                                    if (Util.callable(callback)) {
-                                        callback.call(this, null, {
-                                            startNode: function () {
-                                                console.log("TODO: not implemented yet!");
-                                            }
-                                        });
-                                        return;
+                            // install sucess
+                            if (Util.callable(callback)) {
+                                callback.call(this, null, {
+                                    startNode: function () {
+                                        console.log("TODO: not implemented yet!");
                                     }
                                 });
-                            });
-                        })(packageName, packageVersion, this.logger);
+                                return;
+                            }
+                        });
+                    });
                 }
             } else {
                 if (Util.callable(callback)) {
