@@ -42,26 +42,23 @@ module.exports = Class({
      * @param model
      */
     start: function (nodeName, model) {
+        this.logger.log("starting '"+nodeName+"' bootstrapping...");
         this.currentModel = model; // TODO improve that by saving old model or smthg like that
         if (nodeName != undefined && nodeName != null) {
             this.nodeName = nodeName;
-
-            var foundNode = this.currentModel.findNodesByID(this.nodeName);
-            if (foundNode != null && foundNode != undefined) {
-                var nodeInstance = this.bootstrapper.bootstrapNodeType(this.nodeName, this.currentModel);
-                if (nodeInstance != undefined && nodeInstance != null) {
-                    nodeInstance.startNode(); // TODO
-                } else {
-                    throw "Unable to install TypeDefinition '"+foundNode.getTypeDefinition().getName()+"'! Start process aborted.";
+            var that = this;
+            this.bootstrapper.bootstrapNodeType(this.nodeName, this.currentModel, function (err, nodeInstance) {
+                if (err) {
+                    that.logger.error(err.message);
+                    that.logger.error("Unable to bootstrap '"+nodeName+"'! Start process aborted.");
+                    return;
                 }
-
-            } else {
-                this.logger.error("Unable to find '"+nodeName+"' in node instances. Start process aborted");
-                return;
-            }
+                that.nodeInstance = nodeInstance;
+                nodeInstance.startNode(); // TODO
+            });
 
         } else {
-            throw "Unable to bootstrap Kevoree Core: 'nodeName' & 'groupName' are null or undefined"
+            throw new Error("Unable to bootstrap Kevoree Core: 'nodeName' & 'groupName' are null or undefined");
         }
     },
 

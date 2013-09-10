@@ -1,5 +1,7 @@
 var Class = require('../lib/Class'),
-    Logger = require('./util/Logger');
+    Logger = require('./util/Logger'),
+    Util = require('./util/Util'),
+    npm = require('npm');
 
 /**
  *
@@ -12,7 +14,7 @@ module.exports = Class({
      *
      */
     construct: function () {
-
+        this.logger = new Logger(this);
     },
 
     /**
@@ -33,10 +35,61 @@ module.exports = Class({
      *
      * @param nodeName
      * @param model
-     * @returns {NodeType}
+     * @param callback
      */
-    bootstrapNodeType: function (nodeName, model) {
-        // TODO
-        return null;
+    bootstrapNodeType: function (nodeName, model, callback) {
+        var nodeInstance = model.findNodesByID(nodeName);
+        if (nodeInstance != undefined && nodeInstance != null) {
+            var deployUnits = nodeInstance.getTypeDefinition().getDeployUnits();
+            if (deployUnits.size() > 0) {
+                console.log("Deploy Units:");
+                for (var i=0; i < deployUnits.size(); i++) {
+                    var packageName = deployUnits.get(i).getUnitName(),
+                        packageVersion = deployUnits.get(i).getVersion(),
+                        NodeClass = (function(name, version, logger) {
+                            npm.load({}, function (err) {
+                                if (err) {
+                                    logger.log('Unable to load npm module');
+                                    if (Util.callable(callback)) {
+                                        callback.call(this, new Error('Bootstrap failure'));
+                                        return;
+                                    }
+                                }
+
+                                // load success
+                                npm.commands.install([name+'@'+version], function (er) {
+                                    if (er) {
+                                        logger.log('npm failed to install package '+name+':'+version);
+                                        if (Util.callable(callback)) {
+                                            callback.call(this, new Error("Bootstrap failure"));
+                                            return;
+                                        }
+                                    }
+
+                                    // install sucess
+                                    if (Util.callable(callback)) {
+                                        callback.call(this, null, {
+                                            startNode: function () {
+                                                console.log("TODO: not implemented yet!");
+                                            }
+                                        });
+                                        return;
+                                    }
+                                });
+                            });
+                        })(packageName, packageVersion, this.logger);
+                }
+            } else {
+                if (Util.callable(callback)) {
+                    callback.call(this, new Error("'"+nodeName+"' NodeType deploy units not found. Have you forgotten to merge nodetype library ?"));
+                    return;
+                }
+            }
+        } else {
+            if (Util.callable(callback)) {
+                callback.call(this, new Error("Unable to find '"+nodeName+"' in the given model."));
+                return;
+            }
+        }
     }
 });
