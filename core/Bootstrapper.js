@@ -69,11 +69,14 @@ module.exports = Class({
 
                             // install sucess
                             if (Util.callable(callback)) {
-                                callback.call(this, null, {
+                                // TODO var NodeClass = require(packageName);
+                                // fake node class because there is no kevoree node in NPM yet
+                                var NodeClass = {
                                     startNode: function () {
-                                        console.log("TODO: not implemented yet!");
+                                        console.log("TODO not implemented yet");
                                     }
-                                });
+                                };
+                                callback.call(this, null, NodeClass);
                                 return;
                             }
                         });
