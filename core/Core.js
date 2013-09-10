@@ -1,7 +1,8 @@
-var Class = require('../lib/Class'),
-    modelLib = require('../org.kevoree.model.js/target/js/org.kevoree.model.js.merged'),
-    Logger = require('./util/Logger'),
-    Util = require('./util/Util');
+var Class           = require('../lib/Class'),
+    kLib            = require('../org.kevoree.model.js/target/js/org.kevoree.model.js.merged'),
+    Bootstrapper    = require('./Bootstrapper'),
+    Logger          = require('./util/Logger'),
+    Util            = require('./util/Util');
 
 /**
  * Kevoree Core
@@ -16,9 +17,16 @@ module.exports = Class({
     construct: function() {
         this.logger = new Logger(this);
         this.logger.log('initialization...');
-        this.currentModel = null;
-        this.factory = new modelLib.org.kevoree.impl.DefaultKevoreeFactory();
-        this.compare = new modelLib.org.kevoree.compare.DefaultModelCompare();
+
+        this.factory = new kLib.org.kevoree.impl.DefaultKevoreeFactory();
+        this.compare = new kLib.org.kevoree.compare.DefaultModelCompare();
+
+        // TODO keep track of models in a list
+        // create a new empty model container
+        this.currentModel = this.factory.createContainerRoot();
+        this.nodeName = null;
+        this.nodeInstance = null;
+        this.bootstrapper = new Bootstrapper();
     },
 
     /**
@@ -30,10 +38,31 @@ module.exports = Class({
 
     /**
      * Starts Kevoree Core
+     * @param nodeName
+     * @param model
      */
-    start: function () {
-        this.currentModel = this.factory.createContainerRoot();
-        this.logger.log('Started');
+    start: function (nodeName, model) {
+        this.currentModel = model; // TODO improve that by saving old model or smthg like that
+        if (nodeName != undefined && nodeName != null) {
+            this.nodeName = nodeName;
+
+            var foundNode = this.currentModel.findNodesByID(this.nodeName);
+            if (foundNode != null && foundNode != undefined) {
+                var nodeInstance = this.bootstrapper.bootstrapNodeType(this.nodeName, this.currentModel);
+                if (nodeInstance != undefined && nodeInstance != null) {
+                    nodeInstance.startNode(); // TODO
+                } else {
+                    throw "Unable to install TypeDefinition '"+foundNode.getTypeDefinition().getName()+"'! Start process aborted.";
+                }
+
+            } else {
+                this.logger.error("Unable to find '"+nodeName+"' in node instances. Start process aborted");
+                return;
+            }
+
+        } else {
+            throw "Unable to bootstrap Kevoree Core: 'nodeName' & 'groupName' are null or undefined"
+        }
     },
 
     /**
@@ -66,34 +95,43 @@ module.exports = Class({
             var traces = this.compare.diff(this.currentModel, model).get_traces();
 
             // TODO
+            var tracesArray = [];
             for (var i=0; i < traces.size(); i++) {
                 var trace = JSON.parse(traces.get(i));
                 switch (trace.traceType) {
-                    case modelLib.org.kevoree.modeling.api.util.ActionType.$SET:
-                        this.logger.log("trace action type SET");
+                    case kLib.org.kevoree.modeling.api.util.ActionType.$SET:
+                        tracesArray.push("SET");
                         break;
-                    case modelLib.org.kevoree.modeling.api.util.ActionType.$ADD:
-                        this.logger.log("trace action type ADD");
+
+                    case kLib.org.kevoree.modeling.api.util.ActionType.$ADD:
+                        tracesArray.push("ADD");
                         break;
-                    case modelLib.org.kevoree.modeling.api.util.ActionType.$REMOVE:
-                        this.logger.log("trace action type REMOVE");
+
+                    case kLib.org.kevoree.modeling.api.util.ActionType.$REMOVE:
+                        tracesArray.push("REMOVE");
                         break;
-                    case modelLib.org.kevoree.modeling.api.util.ActionType.$ADD_ALL:
-                        this.logger.log("trace action type ADD ALL");
+
+                    case kLib.org.kevoree.modeling.api.util.ActionType.$ADD_ALL:
+                        tracesArray.push("ADD ALL");
                         break;
-                    case modelLib.org.kevoree.modeling.api.util.ActionType.$REMOVE_ALL:
-                        this.logger.log("trace action type REMOVE ALL");
+
+                    case kLib.org.kevoree.modeling.api.util.ActionType.$REMOVE_ALL:
+                        tracesArray.push("REMOVE ALL");
                         break;
-                    case modelLib.org.kevoree.modeling.api.util.ActionType.$RENEW_INDEX:
-                        this.logger.log("trace action type RENEW INDEX");
+
+                    case kLib.org.kevoree.modeling.api.util.ActionType.$RENEW_INDEX:
+                        tracesArray.push("RENEW INDEX");
                         break;
+
                     default:
-                        this.logger.log("default trace type");
+                        tracesArray.push("!UNKNOWN TRACE!");
                         break;
                 }
             }
             // taking the given model as current one
             this.currentModel = model;
+            this.logger.log('traces ['+tracesArray.join(', ')+']');
+            this.logger.log('successfully deployed model');
 
             // check callback availability
             if (Util.callable(callback.success)) {
@@ -107,8 +145,6 @@ module.exports = Class({
             }
             return;
         }
-
-        this.logger.log('successfully deployed model');
     },
 
     /**

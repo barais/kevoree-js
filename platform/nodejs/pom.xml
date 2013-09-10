@@ -31,7 +31,7 @@
                     <executable>node</executable>
                     <!-- optional -->
                     <arguments>
-                        <argument>main.js</argument>
+                        <argument>KevoreeNodeJSRuntime.js</argument>
                     </arguments>
                 </configuration>
             </plugin>
