@@ -2,7 +2,7 @@ var Core    = require('../../core/Core'),
     kLib    = require('../../org.kevoree.model.js/target/js/org.kevoree.model.js.merged'),
     config  = require('./config.json');
 
-var kevoreeCore = new Core();
+var kevoreeCore = new Core(__dirname);
 var jsonLoader  = new kLib.org.kevoree.loader.JSONModelLoader();
 
 var nodeName    = config.nodeName,

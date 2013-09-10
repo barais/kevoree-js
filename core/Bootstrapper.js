@@ -1,7 +1,8 @@
-var Class = require('../lib/Class'),
-    Logger = require('./util/Logger'),
-    Util = require('./util/Util'),
-    npm = require('npm');
+var Class   = require('../lib/Class'),
+    Logger  = require('./util/Logger'),
+    Util    = require('./util/Util'),
+    npm     = require('npm'),
+    path    = require('path');
 
 /**
  *
@@ -13,7 +14,8 @@ module.exports = Class({
     /**
      *
      */
-    construct: function () {
+    construct: function (modulesPath) {
+        this.modulesPath = modulesPath;
         this.logger = new Logger(this);
     },
 
@@ -58,7 +60,7 @@ module.exports = Class({
                         }
 
                         // load success
-                        npm.commands.install([packageName+'@'+packageVersion], function (er) {
+                        npm.commands.install(that.modulesPath, [packageName+'@'+packageVersion], function (er) {
                             if (er) {
                                 that.logger.log('npm failed to install package '+packageName+':'+packageVersion);
                                 if (Util.callable(callback)) {
@@ -69,13 +71,7 @@ module.exports = Class({
 
                             // install sucess
                             if (Util.callable(callback)) {
-                                // TODO var NodeClass = require(packageName);
-                                // fake node class because there is no kevoree node in NPM yet
-                                var NodeClass = {
-                                    startNode: function () {
-                                        console.log("TODO not implemented yet");
-                                    }
-                                };
+                                var NodeClass = require(path.resolve(that.modulesPath, 'node_modules', packageName));
                                 callback.call(this, null, NodeClass);
                                 return;
                             }

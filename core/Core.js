@@ -6,6 +6,7 @@ var Class           = require('../lib/Class'),
 
 /**
  * Kevoree Core
+ *
  * @type {*}
  */
 module.exports = Class({
@@ -14,7 +15,7 @@ module.exports = Class({
     /**
      * Core constructor
      */
-    construct: function() {
+    construct: function(modulesPath) {
         this.logger = new Logger(this);
         this.logger.log('initialization...');
 
@@ -26,7 +27,7 @@ module.exports = Class({
         this.currentModel = this.factory.createContainerRoot();
         this.nodeName = null;
         this.nodeInstance = null;
-        this.bootstrapper = new Bootstrapper();
+        this.bootstrapper = new Bootstrapper(modulesPath);
     },
 
     /**
@@ -47,14 +48,14 @@ module.exports = Class({
         if (nodeName != undefined && nodeName != null) {
             this.nodeName = nodeName;
             var that = this;
-            this.bootstrapper.bootstrapNodeType(this.nodeName, this.currentModel, function (err, nodeInstance) {
+            this.bootstrapper.bootstrapNodeType(this.nodeName, this.currentModel, function (err, NodeClass) {
                 if (err) {
                     that.logger.error(err.message);
                     that.logger.error("Unable to bootstrap '"+nodeName+"'! Start process aborted.");
                     return;
                 }
-                that.nodeInstance = nodeInstance;
-                nodeInstance.startNode(); // TODO
+                that.nodeInstance = new NodeClass();
+                that.nodeInstance.startNode(); // TODO
             });
 
         } else {
