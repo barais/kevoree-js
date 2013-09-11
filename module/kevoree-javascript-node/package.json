@@ -1,0 +1,22 @@
+{
+  "name": "kevoree-javascript-node",
+  "version": "0.0.6",
+  "main": "./kevoree-javascript-node.js",
+  "description": "A Kevoree platform to run Javascript code",
+  "keywords": [
+    "kevoree",
+    "platform",
+    "node"
+  ],
+  "author": "Maxime Tricoire <max.tricoire@gmail.com>",
+  "contributors": [],
+  "bugs": {},
+  "license": "MIT",
+  "repository": {},
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
