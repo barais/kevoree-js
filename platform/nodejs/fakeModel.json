@@ -40,7 +40,7 @@
         {
             "eClass": "org.kevoree.NodeType",
             "abstract": "false",
-            "bean": "kevoree-javascript-node",
+            "bean": "kevoree-node",
             "name": "JavascriptNode",
             "factoryBean": "org.kevoree.library.defaultNodeTypes.JavascriptNodeFactory",
             "deployUnits": [
@@ -158,11 +158,11 @@
         {
             "eClass": "org.kevoree.DeployUnit",
             "groupName": "",
-            "unitName": "kevoree-javascript-node",
+            "unitName": "kevoree-node",
             "generated_KMF_ID": "142023381378461125966",
             "hashcode": "201309061152488",
             "type": "node_module",
-            "version": "0.0.7",
+            "version": "0.0.1",
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
             ]

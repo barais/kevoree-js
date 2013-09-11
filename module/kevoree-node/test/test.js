@@ -1,5 +1,5 @@
 var assert = require("assert");
-var JSNode = require('../kevoree-javascript-node');
+var JSNode = require('../kevoree-node');
 
 describe('Kevoree Javascript Node', function () {
     var node = new JSNode();
