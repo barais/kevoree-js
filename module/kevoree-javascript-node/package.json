@@ -10,9 +10,14 @@
   ],
   "author": "Maxime Tricoire <max.tricoire@gmail.com>",
   "contributors": [],
-  "bugs": {},
+  "bugs": {
+    "url": "https://github.com/dukeboard/kevoree-js/issues"
+    },
   "license": "MIT",
-  "repository": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dukeboard/kevoree-js"
+  },
   "dependencies": {},
   "devDependencies": {},
   "optionalDependencies": {},
