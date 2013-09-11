@@ -5,23 +5,6 @@
         Logger          = require('./util/Logger'),
         Util            = require('./util/Util');
 
-    if (typeof(Array.prototype.add) != 'function') {
-        // using some JS magic to create a new add(obj) method for Array objects
-        // that will delete automatically the first item in the array when an 11th item
-        // is going to be pushed inside => Array MAX_LENGTH = 10
-        Array.prototype.add = function add(model) {
-            if (this.length == 10) this.shift();
-            this.push(model);
-        }
-    }
-    if (typeof(Array.prototype.contains) != 'function') {
-        // using some JS magic to create a new contains(obj) method for Array objects
-        // that will tells wether or not an obj is already added in the current array
-        Array.prototype.contains = function contains(model) {
-            return (this.indexOf(model) > -1);
-        }
-    }
-
     /**
      * Kevoree Core
      *
@@ -63,7 +46,7 @@
          */
         start: function (nodeName, model, callback) {
             this.logger.log("starting '"+nodeName+"' bootstrapping...");
-            this.models.add(this.currentModel);
+            pushModel(this.models, this.currentModel);
             this.currentModel = model;
             if (nodeName != undefined && nodeName != null) {
                 this.nodeName = nodeName;
@@ -110,58 +93,43 @@
          * @param uuid
          * @param callback
          */
-        deploy: function(model, uuid, callback) {
+        deploy: function (model, uuid, callback) {
             this.logger.log('deploy process started...');
             if (model != undefined && model != null) {
-                // given model is defined and not null
-                var diffSeq = this.compare.diff(this.currentModel, model),
-                    traces = diffSeq.get_traces();
+                if (this.nodeInstance != undefined && this.nodeInstance != null) {
+                    // given model is defined and not null
+                    var diffSeq = this.compare.diff(this.currentModel, model),
+                        traces = diffSeq.get_traces();
 
-                // TODO
-                var tracesArray = [];
-                for (var i=0; i < traces.size(); i++) {
-                    var trace = JSON.parse(traces.get(i));
-                    switch (trace.traceType) {
-                        case kLib.org.kevoree.modeling.api.util.ActionType.$SET:
-                            tracesArray.push("SET");
-                            break;
+                    // TODO
+                    for (var i=0; i < traces.size(); i++) {
+                        var trace = JSON.parse(traces.get(i));
+                        var cmd = this.nodeInstance.processTrace(trace);
+                        if (typeof(cmd) == 'function') {
+                            // adaptation is possible, do it
+                            cmd.call(this.nodeInstance);
 
-                        case kLib.org.kevoree.modeling.api.util.ActionType.$ADD:
-                            tracesArray.push("ADD");
-                            break;
+                        } else {
+                            // unable to process this trace, rollback
+                            // TODO
 
-                        case kLib.org.kevoree.modeling.api.util.ActionType.$REMOVE:
-                            tracesArray.push("REMOVE");
-                            break;
-
-                        case kLib.org.kevoree.modeling.api.util.ActionType.$ADD_ALL:
-                            tracesArray.push("ADD ALL");
-                            break;
-
-                        case kLib.org.kevoree.modeling.api.util.ActionType.$REMOVE_ALL:
-                            tracesArray.push("REMOVE ALL");
-                            break;
-
-                        case kLib.org.kevoree.modeling.api.util.ActionType.$RENEW_INDEX:
-                            tracesArray.push("RENEW INDEX");
-                            break;
-
-                        default:
-                            tracesArray.push("!UNKNOWN TRACE!");
-                            break;
+                            if (Util.callable(callback)) {
+                                callback.call(this, new Error("unable to process an adaptation trace. Rollback!"));
+                            }
+                            return;
+                        }
                     }
-                }
-                // taking the given model as current one
-                if (!this.models.contains(this.currentModel)) this.models.add(this.currentModel);
-                this.currentModel = model;
-                this.logger.log('traces ['+tracesArray.join(', ')+']');
-                this.logger.log('successfully deployed model');
+                    // taking the given model as current one
+                    if (!containsModel(this.models, this.currentModel)) pushModel(this.models, this.currentModel);
+                    this.currentModel = model;
+                    this.logger.log('successfully deployed model');
 
-                // check callback availability
-                if (Util.callable(callback)) {
-                    callback.call(this, null, this.currentModel);
-                } else {
-                    this.logger.error("callback parameter undefined. You should give a callback function.");
+                    // check callback availability
+                    if (Util.callable(callback)) {
+                        callback.call(this, null, this.currentModel);
+                    } else {
+                        this.logger.error("callback parameter undefined. You should give a callback function.");
+                    }
                 }
             } else {
                 if (Util.callable(callback)) {
@@ -185,4 +153,15 @@
             // TODO
         }
     });
+
+    // utility function to ensure cached model list won't go over 10 items
+    var pushModel = function pushModel(array, model) {
+        if (array.length == 10) this.shift();
+        array.push(model);
+    }
+
+    // utility function to know if a model is currently already in the array
+    var containsModel = function containsModel(array, model) {
+        return (array.indexOf(model) > -1);
+    }
 })();

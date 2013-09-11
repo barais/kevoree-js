@@ -1,4 +1,5 @@
 {
     "nodeName":     "node0",
+    "groupName":    "sync",
     "model":        "./fakeModel.json"
 }

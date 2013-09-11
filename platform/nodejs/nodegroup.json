@@ -1,15 +1,106 @@
 {
     "eClass": "org.kevoree.ContainerRoot",
-    "generated_KMF_ID": "179562011378812933701",
+    "generated_KMF_ID": "138986941378813344431",
+    "nodes": [
+        {
+            "eClass": "org.kevoree.ContainerNode",
+            "name": "node0",
+            "started": "true",
+            "metaData": "x=445,y=139",
+            "typeDefinition": [
+                "typeDefinitions[JavascriptNode]"
+            ],
+            "dictionary": [
+                {
+                    "eClass": "org.kevoree.Dictionary",
+                    "generated_KMF_ID": "0.7758599456865341378909270128",
+                    "values": [
+                        {
+                            "eClass": "org.kevoree.DictionaryValue",
+                            "generated_KMF_ID": "0.60735594294965271378909273197",
+                            "value": "WARN",
+                            "attribute": [
+                                "typeDefinitions[JavascriptNode]/dictionaryType[313116901378461125995]/attributes[coreLogLevel]"
+                            ]
+                        },
+                        {
+                            "eClass": "org.kevoree.DictionaryValue",
+                            "generated_KMF_ID": "0.226756065385416151378909273197",
+                            "value": "INFO",
+                            "attribute": [
+                                "typeDefinitions[JavascriptNode]/dictionaryType[313116901378461125995]/attributes[logLevel]"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
     "typeDefinitions": [
         {
-            "eClass": "org.kevoree.ComponentType",
+            "eClass": "org.kevoree.GroupType",
             "abstract": "false",
-            "bean": "kevoree-comp-helloworld",
-            "name": "HelloWorld",
-            "factoryBean": "org.kevoree.library.HelloWorldFactory",
+            "bean": "kevoree-group-websocket",
+            "name": "WebSocketGroup",
+            "factoryBean": "org.kevoree.library.WebSocketGroupFactory",
             "deployUnits": [
-                "deployUnits[140688931378812933702]"
+                "deployUnits[89918001378813344621]"
+            ],
+            "dictionaryType": [
+                {
+                    "eClass": "org.kevoree.DictionaryType",
+                    "generated_KMF_ID": "267671911378812807634",
+                    "attributes": [
+                        {
+                            "eClass": "org.kevoree.DictionaryAttribute",
+                            "fragmentDependant": "true",
+                            "optional": "true",
+                            "name": "port",
+                            "state": "false"
+                        },
+                        {
+                            "eClass": "org.kevoree.DictionaryAttribute",
+                            "fragmentDependant": "false",
+                            "optional": "false",
+                            "name": "ssl",
+                            "state": "false",
+                            "datatype": "enum=true,false"
+                        },
+                        {
+                            "eClass": "org.kevoree.DictionaryAttribute",
+                            "fragmentDependant": "true",
+                            "optional": "true",
+                            "name": "ip",
+                            "state": "false"
+                        }
+                    ],
+                    "defaultValues": [
+                        {
+                            "eClass": "org.kevoree.DictionaryValue",
+                            "generated_KMF_ID": "119116231378812807634",
+                            "value": "8000",
+                            "attribute": [
+                                "typeDefinitions[WebSocketGroup]/dictionaryType[267671911378812807634]/attributes[port]"
+                            ]
+                        },
+                        {
+                            "eClass": "org.kevoree.DictionaryValue",
+                            "generated_KMF_ID": "252579701378812807634",
+                            "value": "false",
+                            "attribute": [
+                                "typeDefinitions[WebSocketGroup]/dictionaryType[267671911378812807634]/attributes[ssl]"
+                            ]
+                        },
+                        {
+                            "eClass": "org.kevoree.DictionaryValue",
+                            "generated_KMF_ID": "129125821378812807634",
+                            "value": "0.0.0.0",
+                            "attribute": [
+                                "typeDefinitions[WebSocketGroup]/dictionaryType[267671911378812807634]/attributes[ip]"
+                            ]
+                        }
+                    ]
+                }
             ]
         },
         {
@@ -19,7 +110,7 @@
             "name": "JavascriptNode",
             "factoryBean": "org.kevoree.library.defaultNodeTypes.JavascriptNodeFactory",
             "deployUnits": [
-                "deployUnits[250004321378812933703]"
+                "deployUnits[142023381378461125966]"
             ],
             "managedPrimitiveTypes": [
                 "adaptationPrimitiveTypes[UpdateFragmentBinding]",
@@ -109,10 +200,6 @@
     "repositories": [
         {
             "eClass": "org.kevoree.Repository",
-            "url": "http://maven.kevoree.org/release"
-        },
-        {
-            "eClass": "org.kevoree.Repository",
             "url": "http://repo.maven.apache.org/maven2"
         },
         {
@@ -124,34 +211,25 @@
             "url": "https://oss.sonatype.org/content/repositories/snapshots"
         }
     ],
-    "dataTypes": [
-        {
-            "eClass": "org.kevoree.TypedElement",
-            "name": "java.lang.String"
-        }
-    ],
     "libraries": [
         {
             "eClass": "org.kevoree.TypeLibrary",
             "name": "Javascript",
             "subTypes": [
                 "typeDefinitions[JavascriptNode]",
-                "typeDefinitions[HelloWorld]"
+                "typeDefinitions[WebSocketGroup]"
             ]
         }
     ],
     "deployUnits": [
         {
             "eClass": "org.kevoree.DeployUnit",
-            "groupName": "org.kevoree.corelibrary.javase",
-            "unitName": "kevoree-comp-helloworld",
-            "generated_KMF_ID": "140688931378812933702",
-            "hashcode": "201309101335619",
-            "type": "jar",
+            "groupName": "",
+            "unitName": "kevoree-group-websocket",
+            "generated_KMF_ID": "89918001378813344621",
+            "hashcode": "201309101342309",
+            "type": "node_module",
             "version": "0.0.1",
-            "requiredLibs": [
-                "deployUnits[250004321378812933703]"
-            ],
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
             ]
@@ -160,12 +238,64 @@
             "eClass": "org.kevoree.DeployUnit",
             "groupName": "",
             "unitName": "kevoree-node",
-            "generated_KMF_ID": "250004321378812933703",
-            "hashcode": "201309101332175",
-            "type": "jar",
-            "version": "0.0.1",
+            "generated_KMF_ID": "142023381378461125966",
+            "hashcode": "201309061152488",
+            "type": "node_module",
+            "version": "0.0.2",
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
+            ]
+        }
+    ],
+    "groups": [
+        {
+            "eClass": "org.kevoree.Group",
+            "name": "sync",
+            "started": "true",
+            "metaData": "x=138,y=109",
+            "typeDefinition": [
+                "typeDefinitions[WebSocketGroup]"
+            ],
+            "subNodes": [
+                "nodes[node0]"
+            ],
+            "dictionary": [
+                {
+                    "eClass": "org.kevoree.Dictionary",
+                    "generated_KMF_ID": "0.22895467001944781378909271335",
+                    "values": [
+                        {
+                            "eClass": "org.kevoree.DictionaryValue",
+                            "generated_KMF_ID": "0.58561423048377041378909273197",
+                            "value": "false",
+                            "attribute": [
+                                "typeDefinitions[WebSocketGroup]/dictionaryType[267671911378812807634]/attributes[ssl]"
+                            ]
+                        },
+                        {
+                            "eClass": "org.kevoree.DictionaryValue",
+                            "generated_KMF_ID": "0.33476619888097051378909273197",
+                            "value": "8000",
+                            "attribute": [
+                                "typeDefinitions[WebSocketGroup]/dictionaryType[267671911378812807634]/attributes[port]"
+                            ],
+                            "targetNode": [
+                                "nodes[node0]"
+                            ]
+                        },
+                        {
+                            "eClass": "org.kevoree.DictionaryValue",
+                            "generated_KMF_ID": "0.26305797277018431378909273198",
+                            "value": "0.0.0.0",
+                            "attribute": [
+                                "typeDefinitions[WebSocketGroup]/dictionaryType[267671911378812807634]/attributes[ip]"
+                            ],
+                            "targetNode": [
+                                "nodes[node0]"
+                            ]
+                        }
+                    ]
+                }
             ]
         }
     ],
