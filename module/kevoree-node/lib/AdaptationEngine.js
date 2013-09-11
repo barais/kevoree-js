@@ -6,35 +6,27 @@
         toString: 'AdaptionEngine',
 
         processTrace: function (trace) {
-            // TODO
             switch (trace.traceType) {
-                case kLib.org.kevoree.modeling.api.util.ActionType.$SET:
-                    break;
-
                 case kLib.org.kevoree.modeling.api.util.ActionType.$ADD:
-                    break;
+                    //return processAdds(trace);
 
+                // TODO
+                case kLib.org.kevoree.modeling.api.util.ActionType.$SET:
                 case kLib.org.kevoree.modeling.api.util.ActionType.$REMOVE:
-                    break;
-
                 case kLib.org.kevoree.modeling.api.util.ActionType.$ADD_ALL:
-                    break;
-
                 case kLib.org.kevoree.modeling.api.util.ActionType.$REMOVE_ALL:
-                    break;
-
                 case kLib.org.kevoree.modeling.api.util.ActionType.$RENEW_INDEX:
-                    break;
-
                 default:
-                    break;
-            }
-
-            return function () {
-                console.log("TODO ADAPTATION!!!");
+                    return function () {
+                        console.log(JSON.stringify(trace, null, 2));
+                    }
             }
         }
     });
+
+    var processAdds = function processAdds(trace) {
+
+    }
 
     module.exports = AdaptationEngine;
 })();

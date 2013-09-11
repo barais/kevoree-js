@@ -7,6 +7,7 @@
 
         construct: function () {
             this.adaptationEngine = new AdaptationEngine();
+            this.kCore = null;
         },
 
         startNode: function () {
@@ -19,6 +20,14 @@
 
         updateNode: function () {
             console.log("Kevoree JavascriptNode updated.");
+        },
+
+        setKevoreeCore: function (kCore) {
+            this.kCore = kCore;
+        },
+
+        getKevoreeCore: function () {
+            return this.kCore;
         },
 
         processTrace: function (trace) {

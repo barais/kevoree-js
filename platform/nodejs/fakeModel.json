@@ -6,7 +6,7 @@
             "eClass": "org.kevoree.ContainerNode",
             "name": "node0",
             "started": "true",
-            "metaData": "x=206,y=105",
+            "metaData": "x=445,y=139",
             "typeDefinition": [
                 "typeDefinitions[JavascriptNode]"
             ],
@@ -162,7 +162,7 @@
             "generated_KMF_ID": "142023381378461125966",
             "hashcode": "201309061152488",
             "type": "node_module",
-            "version": "0.0.2",
+            "version": "0.0.3",
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
             ]

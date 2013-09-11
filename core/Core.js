@@ -59,6 +59,7 @@
                         }
                     }
                     that.nodeInstance = new NodeClass();
+                    that.nodeInstance.setKevoreeCore(that);
                     that.nodeInstance.startNode();
                     if (Util.callable(callback)) callback.call(this, null);
                 });
@@ -104,15 +105,13 @@
                     // TODO
                     for (var i=0; i < traces.size(); i++) {
                         var trace = JSON.parse(traces.get(i));
-                        var cmd = this.nodeInstance.processTrace(trace);
+                        var cmd = this.nodeInstance.processTrace(trace, model);
                         if (typeof(cmd) == 'function') {
                             // adaptation is possible, do it
                             cmd.call(this.nodeInstance);
 
                         } else {
                             // unable to process this trace, rollback
-                            // TODO
-
                             if (Util.callable(callback)) {
                                 callback.call(this, new Error("unable to process an adaptation trace. Rollback!"));
                             }
@@ -151,6 +150,20 @@
          */
         unlock: function() {
             // TODO
+        },
+
+        getCurrentModel: function () {
+            return this.currentModel;
+        },
+
+        getPreviousModel: function () {
+            var model = null;
+            if (this.models.length > 0) model = this.models[this.models.length-1];
+            return model;
+        },
+
+        getPreviousModels: function () {
+            return this.models;
         }
     });
 
