@@ -1,17 +1,20 @@
 ;(function () {
-	function JavascriptNode() {
-		this.startNode = function () {
-			console.log("Kevoree JavascriptNode started.");
-		}
+	var Class = require('./lib/Class');
 
-		this.stopNode = function () {
-			console.log("Kevoree JavascriptNode stopped.");
-		}
+    var JavascriptNode = Class({
+        toString: 'JavascriptNode',
+        startNode: function () {
+            console.log("Kevoree JavascriptNode started.");
+        },
 
-		this.updateNode = function () {
-			console.log("Kevoree JavascriptNode updated.");
-		}
-	};
+        stopNode: function () {
+            console.log("Kevoree JavascriptNode stopped.");
+        },
+
+        updateNode: function () {
+            console.log("Kevoree JavascriptNode updated.");
+        }
+    });
 
 	module.exports = JavascriptNode;
 })();
