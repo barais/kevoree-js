@@ -64,7 +64,7 @@
         start: function (nodeName, model, callback) {
             this.logger.log("starting '"+nodeName+"' bootstrapping...");
             this.models.add(this.currentModel);
-            this.currentModel = model; // TODO improve that by saving old model or smthg like that
+            this.currentModel = model;
             if (nodeName != undefined && nodeName != null) {
                 this.nodeName = nodeName;
                 var that = this;
@@ -76,7 +76,7 @@
                         }
                     }
                     that.nodeInstance = new NodeClass();
-                    that.nodeInstance.startNode(); // TODO
+                    that.nodeInstance.startNode();
                     if (Util.callable(callback)) callback.call(this, null);
                 });
 
