@@ -29,6 +29,7 @@
             this.models = [];
             this.nodeName = null;
             this.nodeInstance = null;
+            this.modulesPath = modulesPath;
             this.bootstrapper = new Bootstrapper(modulesPath);
         },
 
@@ -105,29 +106,29 @@
                     // TODO
                     for (var i=0; i < traces.size(); i++) {
                         var trace = JSON.parse(traces.get(i));
-                        var cmd = this.nodeInstance.processTrace(trace, model);
-                        if (typeof(cmd) == 'function') {
-                            // adaptation is possible, do it
-                            cmd.call(this.nodeInstance);
+                        var adaptation = this.nodeInstance.processTrace(trace, model);
+                        (function (trace, adaptation, core) {
+                            if (adaptation != undefined && adaptation != null) {
+                                // adaptation is possible, try to do it
+                                adaptation.execute(function (er) {
+                                    if (er) {
+                                        // something went wrong while executing adaptation primitive
+                                        // TODO undo() and undo() all other adaptation primitives
+                                        core.logger.error(er.message);
+                                        core.logger.error('unable to execute AdaptionPrimitive '+adaptation.toString());
+                                        return;
+                                    }
+                                    core.logger.log('Adaption '+adaptation.toString()+' succeed!');
+                                });
 
-                        } else {
-                            // unable to process this trace, rollback
-                            if (Util.callable(callback)) {
-                                callback.call(this, new Error("unable to process an adaptation trace. Rollback!"));
+                            } else {
+                                // unable to process this trace, rollback
+                                if (Util.callable(callback)) {
+                                    callback.call(core, new Error("unable to process an adaptation trace. Rollback!"));
+                                }
+                                return;
                             }
-                            return;
-                        }
-                    }
-                    // taking the given model as current one
-                    if (!containsModel(this.models, this.currentModel)) pushModel(this.models, this.currentModel);
-                    this.currentModel = model;
-                    this.logger.log('successfully deployed model');
-
-                    // check callback availability
-                    if (Util.callable(callback)) {
-                        callback.call(this, null, this.currentModel);
-                    } else {
-                        this.logger.error("callback parameter undefined. You should give a callback function.");
+                        })(trace, adaptation, this);
                     }
                 }
             } else {
@@ -164,6 +165,10 @@
 
         getPreviousModels: function () {
             return this.models;
+        },
+
+        getModulesPath: function () {
+            return this.modulesPath;
         }
     });
 

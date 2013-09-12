@@ -33,6 +33,23 @@
                         }
                     ]
                 }
+            ],
+            "components": [
+                {
+                    "eClass": "org.kevoree.ComponentInstance",
+                    "name": "comp0",
+                    "started": "true",
+                    "metaData": "x=266,y=52",
+                    "typeDefinition": [
+                        "typeDefinitions[HelloWorld]"
+                    ],
+                    "dictionary": [
+                        {
+                            "eClass": "org.kevoree.Dictionary",
+                            "generated_KMF_ID": "0.86965738283470271378980404483"
+                        }
+                    ]
+                }
             ]
         }
     ],
@@ -195,6 +212,24 @@
                     ]
                 }
             ]
+        },
+        {
+            "eClass": "org.kevoree.ComponentType",
+            "abstract": "false",
+            "bean": "kevoree-comp-helloworld",
+            "name": "HelloWorld",
+            "factoryBean": "org.kevoree.library.HelloWorldFactory",
+            "deployUnits": [
+                "deployUnits[142023381378461125333]"
+            ],
+            "dictionaryType": [
+                {
+                    "eClass": "org.kevoree.DictionaryType",
+                    "generated_KMF_ID": "313116901378461125442",
+                    "attributes": [],
+                    "defaultValues": []
+                }
+            ]
         }
     ],
     "repositories": [
@@ -217,7 +252,8 @@
             "name": "Javascript",
             "subTypes": [
                 "typeDefinitions[JavascriptNode]",
-                "typeDefinitions[WebSocketGroup]"
+                "typeDefinitions[WebSocketGroup]",
+                "typeDefinitions[HelloWorld]"
             ]
         }
     ],
@@ -241,7 +277,19 @@
             "generated_KMF_ID": "142023381378461125966",
             "hashcode": "201309061152488",
             "type": "node_module",
-            "version": "0.0.3",
+            "version": "0.0.4",
+            "targetNodeType": [
+                "typeDefinitions[JavascriptNode]"
+            ]
+        },
+        {
+            "eClass": "org.kevoree.DeployUnit",
+            "groupName": "",
+            "unitName": "kevoree-comp-helloworld",
+            "generated_KMF_ID": "142023381378461125333",
+            "hashcode": "201309061152442",
+            "type": "node_module",
+            "version": "0.0.1",
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
             ]
