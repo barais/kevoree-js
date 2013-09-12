@@ -1,5 +1,7 @@
 {
     "nodeName":     "node0",
     "groupName":    "sync",
-    "model":        "./fakeModel.json"
+    "model":        "./fakeModel.json",
+
+    "logLevel": "debug"
 }

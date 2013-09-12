@@ -1,19 +1,25 @@
 ;(function () {
-    var Class   = require('./Class'),
-        kLib    = require('./org.kevoree.model.js.merged');
+    var Class           = require('./Class'),
+        kLib            = require('./org.kevoree.model.js.merged'),
+        InstanceManager = require('./InstanceManager');
 
+
+    /**
+     * AdaptationEngine knows each AdaptationPrimitive command available
+     * for JavascriptNode.
+     * Plus, it handles instances and deploy units references
+     *
+     * @type {AdaptationEngine}
+     */
     var AdaptationEngine = Class({
         toString: 'AdaptionEngine',
 
         construct: function (node) {
             this.node = node;
-            this.adaptationsCache = {};
-            this.adaptationsList = [
-                // TODO add adaptation command file in adaptations/ folder
-                // and its name here without.js
-                'AddInstance',
-                'Noop'
-            ];
+            this.instanceManager = new InstanceManager();
+
+            // cache commands once loaded to prevent using require() multiple times
+            this.commandsCache = {};
         },
 
         /**
@@ -21,9 +27,10 @@
          * Returns a command to execute in order to do the adaptation logic
          * @param trace
          * @param model
-         * @returns {Function}
+         * @returns {AdaptationPrimitive}
          */
         processTrace: function (trace, model) {
+            var AdaptationPrimitive, cmd;
             switch (trace.traceType) {
                 case kLib.org.kevoree.modeling.api.util.ActionType.$ADD:
                     if (trace.typename) {
@@ -32,10 +39,21 @@
                             case 'org.kevoree.Node':
                             case 'org.kevoree.ComponentInstance':
                             case 'org.kevoree.Channel':
-                                var adaptation = this.getAdaptation('AddInstance');
+                                AdaptationPrimitive = this.getCommand('AddInstance');
+                                cmd = new AdaptationPrimitive(this.node, this.instanceManager);
                                 var instance = model.findByPath(trace.previouspath);
-                                adaptation.setTypeDefinition(instance.getTypeDefinition());
-                                return adaptation;
+                                cmd.setInstance(instance);
+                                return cmd;
+                        }
+
+                    } else if (trace.refname) {
+                        switch (trace.refname) {
+                            case 'org.kevoree.DeployUnits':
+                                AdaptationPrimitive = this.getCommand('AddDeployUnit');
+                                cmd = new AdaptationPrimitive(this.node, this.instanceManager);
+                                var deployUnit  = model.findByPath(trace.previouspath);
+                                cmd.setDeployUnit(deployUnit);
+                                return cmd;
                         }
                     }
 
@@ -46,16 +64,23 @@
                 case kLib.org.kevoree.modeling.api.util.ActionType.$REMOVE_ALL:
                 case kLib.org.kevoree.modeling.api.util.ActionType.$RENEW_INDEX:
                 default:
-                    console.log(JSON.stringify(trace, null, 2));
-                    return this.getAdaptation('Noop');
+                    //console.log(JSON.stringify(trace, null, 2));
+                    var AdaptationPrimitive = this.getCommand('Noop');
+                    var cmd = new AdaptationPrimitive(this.node, this.instanceManager);
+                    return cmd;
             }
         },
 
-        getAdaptation: function (name) {
-            if (this.adaptationsCache[name]) return this.adaptationsCache[name];
-            var AdaptationObject = require('./adaptations/'+name+'.js');
-            this.adaptationsCache[name] = new AdaptationObject(this.node);
-            return this.adaptationsCache[name];
+        /**
+         * Load or retrieve from cache command by name
+         * @param name
+         * @returns {AdaptationPrimitive}
+         */
+        getCommand: function (name) {
+            if (this.commandsCache[name]) return this.commandsCache[name];
+
+            this.commandsCache[name] = require('./adaptations/'+name+'.js');
+            return this.commandsCache[name];
         }
     });
 

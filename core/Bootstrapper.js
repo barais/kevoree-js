@@ -1,6 +1,6 @@
 ;(function () {
     var Class   = require('../lib/Class'),
-        Logger  = require('./util/Logger'),
+        Log     = require('log'),
         Util    = require('./util/Util'),
         npm     = require('npm'),
         path    = require('path');
@@ -17,7 +17,7 @@
          */
         construct: function (modulesPath) {
             this.modulesPath = modulesPath;
-            this.logger = new Logger(this);
+            this.logger = new Log(this.toString());
         },
 
         /**
@@ -53,7 +53,7 @@
 
                     npm.load({}, function (err) {
                         if (err) {
-                            that.logger.log('Unable to load npm module');
+                            that.logger.debug('Unable to load npm module');
                             if (Util.callable(callback)) {
                                 callback.call(this, new Error('Bootstrap failure'));
                                 return;
@@ -63,7 +63,7 @@
                         // load success
                         npm.commands.install(that.modulesPath, [packageName+'@'+packageVersion], function (er) {
                             if (er) {
-                                that.logger.log('npm failed to install package '+packageName+':'+packageVersion);
+                                that.logger.debug('npm failed to install package %s:%s', packageName, packageVersion);
                                 if (Util.callable(callback)) {
                                     callback.call(this, new Error("Bootstrap failure"));
                                     return;

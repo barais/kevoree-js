@@ -7,66 +7,54 @@
      * AddInstance Adaptation command
      * @param trace diff trace associated to this command
      * @param model model to deploy
+     * @type {AddInstance}
      */
     module.exports = AdaptationPrimitive.extend({
         toString: 'AddInstance Adaptation',
 
-        setTypeDefinition: function (td) {
-            this.typeDef = td;
+        setInstance: function (inst) {
+            this.instance = inst;
         },
 
-        execute: function (callback) {
-            console.log("AddInstance Primitive started....");
-            if (callback == undefined || callback == null || typeof(callback) != 'function') {
-                console.error("AddInstance error: execute method need a callback function as last parameter");
+        execute: function (_super, callback) {
+            _super.call(this, callback);
+
+            var moduleName = this.instanceManager.getDeployUnit(this.instance.getTypeDefinition().getDeployUnits().get(0).getGenerated_KMF_ID()); // TODO OMG THIS IS UGLY : change that to chack if there is JavascriptNode in deployUnit targetNodeType
+            if (moduleName != undefined && moduleName != null) {
+                // this TypeDef module has already been installed
+                // we can create instance
+                var modulesPath = this.node.getKevoreeCore().getModulesPath();
+                var InstanceClass = require(path.resolve(modulesPath, 'node_modules', moduleName));
+                var instance = new InstanceClass();
+                this.instanceManager.addInstance(this.instance.getName(), instance);
+                instance.start();
+                callback.call(this, null);
                 return;
-            }
-
-            var deployUnits = this.typeDef.getDeployUnits(),
-                that = this;
-            if (deployUnits.size() > 0) {
-                // TODO FIX THIS
-                var du = deployUnits.get(0);
-                if (du != undefined && du != null) {
-                    var packageName     = du.getUnitName(),
-                        packageVersion  = du.getVersion();
-
-                    // install deployUnit
-                    npm.load({}, function (err) {
-                        if (err) {
-                            // npm load error
-                            callback.call(that, new Error('AddInstance error: unable to load npm module'));
-                            return;
-                        }
-
-                        // load success
-                        var modulesPath = that.node.getKevoreeCore().getModulesPath();
-                        npm.commands.install(modulesPath, [packageName+'@'+packageVersion], function (er) {
-                            if (er) {
-                                // failed to load package:version
-
-                                callback.call(that, new Error('AddInstance failed to load '+packageName+':'+packageVersion));
-                                return;
-                            }
-
-                            // install sucess
-                            var InstanceClass = require(path.resolve(modulesPath, 'node_modules', packageName));
-                            var instance = new InstanceClass();
-                            instance.start();
-                            callback.call(that, null);
-                            return;
-                        });
-                    });
-                }
 
             } else {
-                // TODO error no deploy unit to install instance
-                callback.call(this, new Error('AddInstance error: no deploy unit found to install '+td.getName()));
-                return;
+                // this TypeDef module hasn't been installed yet : try to do it
+                var AddDeployUnit = require('./AddDeployUnit');
+                var cmd = new AddDeployUnit(this.node, this.instanceManager);
+                var that = this;
+
+                cmd.setDeployUnit(this.instance.getTypeDefinition().getDeployUnits().get(0)); // TODO OMG THIS IS UGLY : change that to check if there is JavascriptNode in deployUnit targetNodeType
+                cmd.execute(function (er) {
+                    if (er) {
+                        // something went wrong while trying to install deployUnit
+                        callback.call(that, new Error(er.message));
+                        return;
+                    }
+
+                    // deployUnit successfully installed
+                    // execute AddInstance code
+                    that.execute(callback);
+                    return;
+                });
             }
         },
 
-        undo: function () {
+        undo: function (_super) {
+            _super.call(this);
             // TODO
         }
     });

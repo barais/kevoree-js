@@ -1,0 +1,8 @@
+{
+    "name": "kevoree-nodejs-runtime",
+    "version": "0.0.1",
+    "author": "Maxime Tricoire <max.tricoire@gmail.com>",
+    "scripts": {
+        "start": "node kevoree-nodejs-runtime.js"
+    }
+}

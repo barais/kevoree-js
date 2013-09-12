@@ -1,18 +1,24 @@
 ;(function () {
-	var Class = require('./lib/Class');
+	var Class   = require('./lib/Class'),
+        Log     = require('log');
 
     var WebSocketGroup = Class({
         toString: 'WebSocketGroup',
+
+        construct: function () {
+            this.logger = new Log(this.toString());
+        },
+
         start: function () {
-            console.log("WebSocketGroup started");
+            this.logger.debug("started");
         },
 
         stop: function () {
-            console.log("WebSocketGroup stopped");
+            this.logger.debug("stop");
         },
 
         update: function () {
-            console.log("WebSocketGroup updated");
+            this.logger.debug("updated");
         }
     });
 

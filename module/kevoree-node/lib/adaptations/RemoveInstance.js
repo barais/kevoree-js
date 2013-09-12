@@ -1,18 +1,23 @@
 ;(function () {
-    var AdaptationPrimitive = require('./AdaptationPrimitive');
+    var AdaptationPrimitive = require('./AdaptationPrimitive'),
+        npm                 = require('npm'),
+        path                = require('path');
 
     /**
-     * Noop Adaptation command
+     * RemoveInstance Adaptation command
      * @param trace diff trace associated to this command
      * @param model model to deploy
-     * @type {Noop}
      */
     module.exports = AdaptationPrimitive.extend({
-        toString: 'Noop Adaptation',
+        toString: 'AddInstance Adaptation',
+
+        setTypeDefinition: function (td) {
+            this.typeDef = td;
+        },
 
         execute: function (_super, callback) {
             _super.call(this, callback);
-            callback.call(this, null);
+            // TODO
         },
 
         undo: function (_super) {

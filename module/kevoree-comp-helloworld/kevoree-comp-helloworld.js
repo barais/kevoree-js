@@ -1,18 +1,24 @@
 ;(function () {
-	var Class = require('./lib/Class');
+	var Class   = require('./lib/Class'),
+        Log     = require('log');
 
     var HelloWorldComponent = Class({
         toString: 'HelloWorldComponent',
+
+        construct: function () {
+            this.logger = new Log(this.toString());
+        },
+
         start: function () {
-            console.log("Hello world!");
+            this.logger.debug("Hello World !");
         },
 
         stop: function () {
-            console.log("Bye bye world!");
+            this.logger.debug("Bye bye world !");
         },
 
         update: function () {
-            console.log("Hello new updated world!");
+            this.logger.debug("Hello new updated World !");
         }
     });
 

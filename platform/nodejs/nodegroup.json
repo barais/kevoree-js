@@ -277,7 +277,7 @@
             "generated_KMF_ID": "142023381378461125966",
             "hashcode": "201309061152488",
             "type": "node_module",
-            "version": "0.0.4",
+            "version": "0.0.5",
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
             ]

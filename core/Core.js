@@ -2,7 +2,7 @@
     var Class           = require('../lib/Class'),
         kLib            = require('../org.kevoree.model.js/target/js/org.kevoree.model.js.merged'),
         Bootstrapper    = require('./Bootstrapper'),
-        Logger          = require('./util/Logger'),
+        Log             = require('log'),
         Util            = require('./util/Util');
 
     /**
@@ -17,8 +17,8 @@
          * Core constructor
          */
         construct: function(modulesPath) {
-            this.logger = new Logger(this);
-            this.logger.log('initialization...');
+            this.logger = new Log(this.toString());
+            this.logger.debug('Initialization...');
 
             this.factory = new kLib.org.kevoree.impl.DefaultKevoreeFactory();
             this.compare = new kLib.org.kevoree.compare.DefaultModelCompare();
@@ -37,7 +37,7 @@
          * Destruct core instance
          */
         destruct: function() {
-            this.logger.log('Destructing');
+            this.logger.debug('Destructing');
         },
 
         /**
@@ -46,7 +46,7 @@
          * @param model
          */
         start: function (nodeName, model, callback) {
-            this.logger.log("starting '"+nodeName+"' bootstrapping...");
+            this.logger.debug("Starting '%s' bootstrapping...", nodeName);
             pushModel(this.models, this.currentModel);
             this.currentModel = model;
             if (nodeName != undefined && nodeName != null) {
@@ -77,7 +77,7 @@
          */
         stop: function () {
             this.currentModel = null;
-            this.logger.log('Stopped');
+            this.logger.debug('Stopped');
         },
 
         /**
@@ -96,7 +96,7 @@
          * @param callback
          */
         deploy: function (model, uuid, callback) {
-            this.logger.log('deploy process started...');
+            this.logger.debug('Deploy process started...');
             if (model != undefined && model != null) {
                 if (this.nodeInstance != undefined && this.nodeInstance != null) {
                     // given model is defined and not null
@@ -115,10 +115,11 @@
                                         // something went wrong while executing adaptation primitive
                                         // TODO undo() and undo() all other adaptation primitives
                                         core.logger.error(er.message);
-                                        core.logger.error('unable to execute AdaptionPrimitive '+adaptation.toString());
+                                        core.logger.error('Unable to execute AdaptionPrimitive %s', adaptation.toString());
                                         return;
                                     }
-                                    core.logger.log('Adaption '+adaptation.toString()+' succeed!');
+                                    // adaptation succeed : save adaption in a list
+                                    //core.logger.debug('Adaptation %s succeed!', adaptation.toString());
                                 });
 
                             } else {
