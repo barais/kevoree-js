@@ -56,7 +56,6 @@
             var cmdList = [];
             for (var i=0; i < traces.size(); i++) {
                 var trace = JSON.parse(traces.get(i));
-                console.log(trace);
                 cmdList.push(this.processTrace(trace, model));
             }
 
