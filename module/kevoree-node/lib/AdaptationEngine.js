@@ -93,7 +93,8 @@
 
                 case kLib.org.kevoree.modeling.api.util.ActionType.$SET:
                     if (trace.refname && trace.refname == "started") {
-                        AdaptationPrimitive = this.getCommand('StartInstance');
+                        var startOrStopInstance = (trace.content == 'true') ? 'StartInstance' : 'StopInstance';
+                        AdaptationPrimitive = this.getCommand(startOrStopInstance);
                         cmd = new AdaptationPrimitive(this.node, this.instanceManager);
                         var instance = model.findByPath(trace.src);
                         cmd.setInstance(instance);
