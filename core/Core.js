@@ -131,7 +131,13 @@
 
                         // adaptations succeed : woot
                         core.logger.debug("Model deployed successfully.");
+                        // save old model
+                        pushModel(core.models, core.currentModel);
+                        // set new model to be the current one
+                        core.currentModel = model;
+                        // all good :)
                         callback.call(core, null);
+                        return;
                     });
 
                 }
