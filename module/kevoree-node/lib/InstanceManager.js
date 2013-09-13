@@ -35,6 +35,10 @@
             return this.instances;
         },
 
+        getInstance: function (name) {
+            return this.instances[name];
+        },
+
         getDeployUnits: function () {
             return this.deployUnits;
         },

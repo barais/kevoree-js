@@ -1,7 +1,7 @@
 ;(function () {
     var AdaptationPrimitive = require('./AdaptationPrimitive'),
-        npm                 = require('npm'),
-        path                = require('path');
+        RemoveDeployUnit    = require('./RemoveDeployUnit'),
+        npm                 = require('npm');
 
     /**
      * AddDeployUnit Adaptation command
@@ -41,7 +41,7 @@
                     npm.commands.install(modulesPath, [packageName+'@'+packageVersion], function (er) {
                         if (er) {
                             // failed to load package:version
-                            callback.call(that, new Error('AddDeployUnit failed to load '+packageName+':'+packageVersion));
+                            callback.call(that, new Error('AddDeployUnit failed to install '+packageName+':'+packageVersion));
                             return;
                         }
 
@@ -60,8 +60,11 @@
 
         undo: function (_super, callback) {
             _super.call(this, callback);
-            // TODO
-            callback.call(this, null);
+
+            var cmd = new RemoveDeployUnit(this.node, this.instanceManager);
+            cmd.setDeployUnit(this.deployUnit);
+            cmd.execute(callback);
+            return;
         }
     });
 })();

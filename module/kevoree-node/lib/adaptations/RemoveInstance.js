@@ -1,5 +1,6 @@
 ;(function () {
     var AdaptationPrimitive = require('./AdaptationPrimitive'),
+        AddInstance         = require('./AddInstance'),
         npm                 = require('npm'),
         path                = require('path');
 
@@ -11,8 +12,8 @@
     module.exports = AdaptationPrimitive.extend({
         toString: 'RemoveInstance',
 
-        setTypeDefinition: function (td) {
-            this.typeDef = td;
+        setInstance: function (instance) {
+            this.instance = instance;
         },
 
         /**
@@ -22,13 +23,23 @@
          */
         execute: function (_super, callback) {
             _super.call(this, callback);
-            // TODO
+
+            var instance = this.instanceManager.getInstance(this.instance.getName());
+            if (instance != undefined && instance != null) {
+                instance.stop();
+                this.instanceManager.removeInstance(this.instance.getName());
+                callback.call(this, null);
+                return;
+            }
         },
 
         undo: function (_super, callback) {
             _super.call(this, callback);
-            // TODO
-            callback.call(this, null);
+
+            var cmd = new AddInstance(this.node, this.instanceManager);
+            cmd.setInstance(this.instance);
+            cmd.execute(callback);
+            return;
         }
     });
 })();

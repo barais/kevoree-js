@@ -1,5 +1,6 @@
 ;(function () {
     var AdaptationPrimitive = require('./AdaptationPrimitive'),
+        RemoveInstance      = require('./RemoveInstance'),
         npm                 = require('npm'),
         path                = require('path');
 
@@ -42,8 +43,11 @@
 
         undo: function (_super, callback) {
             _super.call(this, callback);
-            // TODO
-            callback.call(this, null);
+
+            var cmd = new RemoveInstance(this.node, this.instanceManager);
+            cmd.setInstance(this.instance);
+            cmd.execute(callback);
+            return;
         },
 
         findSuitableModuleName: function (typeDef) {
