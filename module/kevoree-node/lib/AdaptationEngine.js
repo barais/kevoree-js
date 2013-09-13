@@ -12,7 +12,20 @@
         ],
         ADD_DEPLOY_UNIT     = [
             'org.kevoree.DeployUnit'
-        ];
+        ],
+        COMMAND_RANK = {
+            "StopInstance":     0,
+            "RemoveBinding":    1,
+            "RemoveInstance":   2,
+            "RemoveTypeDef":    3,
+            "RemoveDeployUnit": 4,
+            "AddDeployUnit":    5,
+            "AddTypeDef":       6,
+            "AddInstance":      7,
+            "AddBinding":       8,
+            "UpdateDictionary": 9,
+            "StartInstance":    10
+        };
 
     /**
      * AdaptationEngine knows each AdaptationPrimitive command available
@@ -91,35 +104,13 @@
         },
 
         sortCommands: function (list) {
-            var noops           = [],
-                addInstances    = [],
-                addDeployUnits  = [],
-                removeInstances = [],
-                unknowns        = [];
+            list.sort(function (a, b) {
+                if (COMMAND_RANK[a.toString] > COMMAND_RANK[b.toString]) return 1;
+                else if (COMMAND_RANK[a.toString] < COMMAND_RANK[b.toString]) return -1;
+                else return 0;
+            });
 
-            for (var i in list) {
-                if (list[i] instanceof this.getCommand('Noop')) {
-                    noops.push(list[i]);
-
-                } else if (list[i] instanceof this.getCommand('AddInstance')) {
-                    addInstances.push(list[i]);
-
-                } else if (list[i] instanceof this.getCommand('AddDeployUnit')) {
-                    addDeployUnits.push(list[i]);
-
-                } else if (list[i] instanceof this.getCommand('RemoveInstance')) {
-                    removeInstances.push(list[i]);
-
-                } else {
-                    unknowns.push(list[i]);
-                }
-            }
-
-            return (((removeInstances
-                        .concat(addDeployUnits))
-                            .concat(addInstances))
-                                .concat(noops))
-                                    .concat(unknowns);
+            return list;
         },
 
         /**

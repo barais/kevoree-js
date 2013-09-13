@@ -26,9 +26,12 @@
 
             var instance = this.instanceManager.getInstance(this.instance.getName());
             if (instance != undefined && instance != null) {
-                instance.stop();
                 this.instanceManager.removeInstance(this.instance.getName());
                 callback.call(this, null);
+                return;
+
+            } else {
+                callback.call(this, new Error("RemoveInstance error: unable to remove instance "+this.instance.getName()));
                 return;
             }
         },

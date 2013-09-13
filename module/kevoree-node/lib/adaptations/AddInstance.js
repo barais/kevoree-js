@@ -30,7 +30,6 @@
                 var InstanceClass = require(path.resolve(modulesPath, 'node_modules', moduleName));
                 var instance = new InstanceClass();
                 this.instanceManager.addInstance(this.instance.getName(), instance);
-                instance.start();
                 callback.call(this, null);
                 return;
 
