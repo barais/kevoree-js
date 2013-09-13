@@ -5,6 +5,8 @@
     /**
      * Abstract AdaptationPrimitive command
      *
+     * @param node JavascriptNode context
+     * @param manager InstanceManager to handle deployUnit & instance refs
      * @type {AdaptationPrimitive}
      */
     module.exports = Class({

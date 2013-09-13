@@ -5,9 +5,8 @@
 
     /**
      * AddDeployUnit Adaptation command
-     * @param trace diff trace associated to this command
-     * @param model model to deploy
-     * @type {AddDeployUnit}
+     *
+     * @type {AddDeployUnit} extends AdaptationPrimitive
      */
     module.exports = AdaptationPrimitive.extend({
         toString: 'AddDeployUnit',
@@ -16,6 +15,11 @@
             this.deployUnit = du;
         },
 
+        /**
+         *
+         * @param _super AdaptationPrimitive parent
+         * @param callback function: if this function first parameter != null it means that there is an error
+         */
         execute: function (_super, callback) {
             _super.call(this, callback);
 
