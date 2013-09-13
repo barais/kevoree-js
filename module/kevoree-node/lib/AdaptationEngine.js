@@ -105,8 +105,8 @@
 
         sortCommands: function (list) {
             list.sort(function (a, b) {
-                if (COMMAND_RANK[a.toString] > COMMAND_RANK[b.toString]) return 1;
-                else if (COMMAND_RANK[a.toString] < COMMAND_RANK[b.toString]) return -1;
+                if (COMMAND_RANK[a.toString()] > COMMAND_RANK[b.toString()]) return 1;
+                else if (COMMAND_RANK[a.toString()] < COMMAND_RANK[b.toString()]) return -1;
                 else return 0;
             });
 
