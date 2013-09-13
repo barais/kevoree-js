@@ -1,5 +1,5 @@
 ;(function () {
-    var Class   = require('../Class'),
+    var Class   = require('pseudoclass'),
         Log     = require('log');
 
     /**

@@ -1,6 +1,6 @@
 ;(function () {
-    var Class           = require('./Class'),
-        kLib            = require('./org.kevoree.model.js.merged'),
+    var Class           = require('pseudoclass'),
+        kLib            = require('kevoree-library'),
         InstanceManager = require('./InstanceManager');
 
     // CONSTANTS

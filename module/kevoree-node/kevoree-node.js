@@ -1,5 +1,5 @@
 ;(function () {
-	var Class               = require('./lib/Class'),
+	var Class               = require('pseudoclass'),
         AdaptationEngine    = require('./lib/AdaptationEngine'),
         Log                 = require('log');
 

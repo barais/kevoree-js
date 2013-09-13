@@ -1,5 +1,5 @@
 ;(function () {
-    var Class   = require('../lib/Class'),
+    var Class   = require('pseudoclass'),
         Log     = require('log'),
         Util    = require('./util/Util'),
         npm     = require('npm'),

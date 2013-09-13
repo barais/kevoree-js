@@ -1,6 +1,6 @@
 ;(function () {
-    var Core    = require('../../core/Core'),
-        kLib    = require('../../org.kevoree.model.js/target/js/org.kevoree.model.js.merged'),
+    var Core    = require('kevoree-core'),
+        kLib    = require('kevoree-library'),
         config  = require('./config.json');
 
     var kevoreeCore = new Core(__dirname);
@@ -33,7 +33,7 @@
             }
 
             // deploy success
-            
+
         });
     });
 })();

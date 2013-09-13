@@ -1,6 +1,6 @@
 ;(function () {
-    var Class           = require('../lib/Class'),
-        kLib            = require('../org.kevoree.model.js/target/js/org.kevoree.model.js.merged'),
+    var Class           = require('pseudoclass'),
+        kLib            = require('kevoree-library'),
         Bootstrapper    = require('./Bootstrapper'),
         Log             = require('log'),
         Util            = require('./util/Util'),

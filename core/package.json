@@ -1,12 +1,31 @@
 {
     "name": "kevoree-core",
+    "version": "0.0.1",
     "description": "Kevoree Core",
     "author": "Maxime Tricoire <max.tricoire@gmail.com>",
+    "main": "./kevoree-core.js",
+    "keywords": [
+      "kevoree",
+      "core",
+      "platform"
+    ],
+    "contributors": [],
+    "bugs": {
+        "url": "https://github.com/dukeboard/kevoree-js/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dukeboard/kevoree-js"
+    },
+    "devDependencies": {},
+    "optionalDependencies": {},
     "dependencies": {
+        "kevoree-library": "0.0.1",
         "npm": "1.3.11",
         "path": "0.4.9",
         "log": "1.4.0",
-        "async": "0.2.9"
+        "async": "0.2.9",
+        "pseudoclass": "0.2.6"
     },
     "license": "LGPL-3.0",
     "engines": {
