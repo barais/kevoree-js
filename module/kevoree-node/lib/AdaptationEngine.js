@@ -56,6 +56,7 @@
             var cmdList = [];
             for (var i=0; i < traces.size(); i++) {
                 var trace = JSON.parse(traces.get(i));
+                console.log(trace);
                 cmdList.push(this.processTrace(trace, model));
             }
 
@@ -91,6 +92,14 @@
                     }
 
                 case kLib.org.kevoree.modeling.api.util.ActionType.$SET:
+                    if (trace.refname && trace.refname == "started") {
+                        AdaptationPrimitive = this.getCommand('StartInstance');
+                        cmd = new AdaptationPrimitive(this.node, this.instanceManager);
+                        var instance = model.findByPath(trace.src);
+                        cmd.setInstance(instance);
+                        return cmd;
+                    }
+
                 case kLib.org.kevoree.modeling.api.util.ActionType.$REMOVE:
                 case kLib.org.kevoree.modeling.api.util.ActionType.$ADD_ALL:
                 case kLib.org.kevoree.modeling.api.util.ActionType.$REMOVE_ALL:
