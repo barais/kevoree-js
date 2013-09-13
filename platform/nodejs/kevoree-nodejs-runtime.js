@@ -33,7 +33,7 @@
             }
 
             // deploy success
-            console.log("deploy success youpi");
+            
         });
     });
 })();

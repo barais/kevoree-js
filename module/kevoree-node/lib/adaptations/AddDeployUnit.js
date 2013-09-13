@@ -54,9 +54,10 @@
             }
         },
 
-        undo: function (_super) {
-            _super.call(this);
+        undo: function (_super, callback) {
+            _super.call(this, callback);
             // TODO
+            callback.call(this, null);
         }
     });
 })();

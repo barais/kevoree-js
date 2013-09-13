@@ -107,8 +107,17 @@
                     var adaptations = this.nodeInstance.processTraces(traces, model);
 
                     // list of adaptation commands retrieved
-                    var core = this;
+                    var core = this,
+                        cmdStack = [];
+
+                    // executeCommand: function that save cmd to stack and executes it
                     var executeCommand = function executeCommand(cmd, iteratorCallback) {
+                        // save the cmd to be processed in a stack using unshift
+                        // in order to add the last processed cmd at the beginning of the array
+                        // => cmdStack[0] = more recently executed cmd
+                        cmdStack.unshift(cmd);
+
+                        // execute cmd
                         cmd.execute(function (err) {
                             if (err) {
                                 iteratorCallback(err);
@@ -119,13 +128,40 @@
                             iteratorCallback();
                         });
                     };
+
+                    // rollbackCommand: function that calls undo() on cmds in the stack
+                    var rollbackCommand = function rollbackCommand(cmd, iteratorCallback) {
+                        cmd.undo(function (err) {
+                            if (err) {
+                                iteratorCallback(err);
+                                return;
+                            }
+
+                            // undo succeed
+                            iteratorCallback();
+                        });
+                    };
+
                     async.eachSeries(adaptations, executeCommand, function (err) {
                         if (err) {
                             // something went wrong while processing adaptations
                             core.logger.error(err.message);
-                            callback.call(core, new Error("Something went wrong while processing adaptations. Rollback..."));
-                            // rollback
-                            // TODO
+
+                            // rollback process
+                            async.eachSeries(cmdStack, rollbackCommand, function (er) {
+                                if (er) {
+                                    // something went wrong while rollbacking
+                                    core.logger.error(er.message);
+                                    callback.call(core, new Error("Something went wrong while rollbacking..."));
+                                    return;
+                                }
+
+                                // rollback succeed
+                                callback.call(core, null);
+                                return;
+                            });
+
+                            callback.call(core, new Error("Something went wrong while processing adaptations. Rollback"));
                             return;
                         }
 

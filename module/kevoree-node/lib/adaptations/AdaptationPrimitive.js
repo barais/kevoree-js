@@ -35,6 +35,11 @@
         /**
          * Undo the process done by execute()
          */
-        undo: function () {}
+        undo: function (callback) {
+            if (callback == undefined || callback == null || typeof(callback) != 'function') {
+                this.logger.error("Undo method need a callback function as last parameter");
+                return;
+            }
+        }
     });
 })();
