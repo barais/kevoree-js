@@ -265,7 +265,7 @@
             "generated_KMF_ID": "89918001378813344621",
             "hashcode": "201309101342309",
             "type": "node_module",
-            "version": "0.0.1",
+            "version": "0.0.2",
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
             ]
@@ -277,7 +277,7 @@
             "generated_KMF_ID": "142023381378461125966",
             "hashcode": "201309061152488",
             "type": "node_module",
-            "version": "0.0.5",
+            "version": "0.0.6",
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
             ]
@@ -289,7 +289,7 @@
             "generated_KMF_ID": "142023381378461125333",
             "hashcode": "201309061152442",
             "type": "node_module",
-            "version": "0.0.1",
+            "version": "0.0.2",
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
             ]

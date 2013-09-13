@@ -8,7 +8,7 @@
      * @type {AdaptationPrimitive}
      */
     module.exports = Class({
-        toString: 'Adaptation Primitive',
+        toString: 'AdaptationPrimitive',
 
         /**
          * Construct an AdaptationPrimitive object

@@ -9,7 +9,7 @@
      * @param model model to deploy
      */
     module.exports = AdaptationPrimitive.extend({
-        toString: 'AddInstance Adaptation',
+        toString: 'RemoveInstance',
 
         setTypeDefinition: function (td) {
             this.typeDef = td;

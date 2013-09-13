@@ -3,7 +3,8 @@
         kLib            = require('../org.kevoree.model.js/target/js/org.kevoree.model.js.merged'),
         Bootstrapper    = require('./Bootstrapper'),
         Log             = require('log'),
-        Util            = require('./util/Util');
+        Util            = require('./util/Util'),
+        async           = require('async');
 
     /**
      * Kevoree Core
@@ -103,34 +104,36 @@
                     var diffSeq = this.compare.diff(this.currentModel, model),
                         traces = diffSeq.get_traces();
 
-                    // TODO
-                    for (var i=0; i < traces.size(); i++) {
-                        var trace = JSON.parse(traces.get(i));
-                        var adaptation = this.nodeInstance.processTrace(trace, model);
-                        (function (trace, adaptation, core) {
-                            if (adaptation != undefined && adaptation != null) {
-                                // adaptation is possible, try to do it
-                                adaptation.execute(function (er) {
-                                    if (er) {
-                                        // something went wrong while executing adaptation primitive
-                                        // TODO undo() and undo() all other adaptation primitives
-                                        core.logger.error(er.message);
-                                        core.logger.error('Unable to execute AdaptionPrimitive %s', adaptation.toString());
-                                        return;
-                                    }
-                                    // adaptation succeed : save adaption in a list
-                                    //core.logger.debug('Adaptation %s succeed!', adaptation.toString());
-                                });
+                    var adaptations = this.nodeInstance.processTraces(traces, model);
 
-                            } else {
-                                // unable to process this trace, rollback
-                                if (Util.callable(callback)) {
-                                    callback.call(core, new Error("unable to process an adaptation trace. Rollback!"));
-                                }
+                    // list of adaptation commands retrieved
+                    var core = this;
+                    var executeCommand = function executeCommand(cmd, iteratorCallback) {
+                        cmd.execute(function (err) {
+                            if (err) {
+                                iteratorCallback(err);
                                 return;
                             }
-                        })(trace, adaptation, this);
-                    }
+
+                            // adaptation succeed
+                            iteratorCallback();
+                        });
+                    };
+                    async.eachSeries(adaptations, executeCommand, function (err) {
+                        if (err) {
+                            // something went wrong while processing adaptations
+                            core.logger.error(err.message);
+                            callback.call(core, new Error("Something went wrong while processing adaptations. Rollback..."));
+                            // rollback
+                            // TODO
+                            return;
+                        }
+
+                        // adaptations succeed : woot
+                        core.logger.debug("Model deployed successfully.");
+                        callback.call(core, null);
+                    });
+
                 }
             } else {
                 if (Util.callable(callback)) {
@@ -182,5 +185,9 @@
     // utility function to know if a model is currently already in the array
     var containsModel = function containsModel(array, model) {
         return (array.indexOf(model) > -1);
+    }
+
+    var doAdaptation = function doAdaptation(err) {
+
     }
 })();

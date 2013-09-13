@@ -3,6 +3,16 @@
         kLib            = require('./org.kevoree.model.js.merged'),
         InstanceManager = require('./InstanceManager');
 
+    // CONSTANTS
+    var ADD_INSTANCE_TRACE  = [
+            'org.kevoree.Group',
+            'org.kevoree.Node',
+            'org.kevoree.ComponentInstance',
+            'org.kevoree.Channel'
+        ],
+        ADD_DEPLOY_UNIT     = [
+            'org.kevoree.DeployUnit'
+        ];
 
     /**
      * AdaptationEngine knows each AdaptationPrimitive command available
@@ -12,7 +22,7 @@
      * @type {AdaptationEngine}
      */
     var AdaptationEngine = Class({
-        toString: 'AdaptionEngine',
+        toString: 'AdaptationEngine',
 
         construct: function (node) {
             this.node = node;
@@ -23,41 +33,50 @@
         },
 
         /**
-         * Process the trace to find the right adaptation primitive command
+         * Process traces to find the right adaptation primitive command
          * Returns a command to execute in order to do the adaptation logic
-         * @param trace
+         * @param traces
          * @param model
+         * @returns {Array}
+         */
+        processTraces: function (traces, model) {
+            var cmdList = [];
+            for (var i=0; i < traces.size(); i++) {
+                var trace = JSON.parse(traces.get(i));
+                cmdList.push(this.processTrace(trace, model));
+            }
+
+            return this.sortCommands(cmdList);
+        },
+
+        /**
+         *
+         * @param trace
          * @returns {AdaptationPrimitive}
          */
         processTrace: function (trace, model) {
-            var AdaptationPrimitive, cmd;
+            var cmd = null;
+
             switch (trace.traceType) {
                 case kLib.org.kevoree.modeling.api.util.ActionType.$ADD:
                     if (trace.typename) {
-                        switch (trace.typename) {
-                            case 'org.kevoree.Group':
-                            case 'org.kevoree.Node':
-                            case 'org.kevoree.ComponentInstance':
-                            case 'org.kevoree.Channel':
-                                AdaptationPrimitive = this.getCommand('AddInstance');
-                                cmd = new AdaptationPrimitive(this.node, this.instanceManager);
-                                var instance = model.findByPath(trace.previouspath);
-                                cmd.setInstance(instance);
-                                return cmd;
-                        }
 
-                    } else if (trace.refname) {
-                        switch (trace.refname) {
-                            case 'org.kevoree.DeployUnits':
-                                AdaptationPrimitive = this.getCommand('AddDeployUnit');
-                                cmd = new AdaptationPrimitive(this.node, this.instanceManager);
-                                var deployUnit  = model.findByPath(trace.previouspath);
-                                cmd.setDeployUnit(deployUnit);
-                                return cmd;
+                        if (ADD_INSTANCE_TRACE.indexOf(trace.typename) != -1) {
+                            AdaptationPrimitive = this.getCommand('AddInstance');
+                            cmd = new AdaptationPrimitive(this.node, this.instanceManager);
+                            var instance = model.findByPath(trace.previouspath);
+                            cmd.setInstance(instance);
+                            return cmd;
+
+                        } else if (ADD_DEPLOY_UNIT.indexOf(trace.typename) != -1) {
+                            AdaptationPrimitive = this.getCommand('AddDeployUnit');
+                            cmd = new AdaptationPrimitive(this.node, this.instanceManager);
+                            var deployUnit  = model.findByPath(trace.previouspath);
+                            cmd.setDeployUnit(deployUnit);
+                            return cmd;
                         }
                     }
 
-                // TODO
                 case kLib.org.kevoree.modeling.api.util.ActionType.$SET:
                 case kLib.org.kevoree.modeling.api.util.ActionType.$REMOVE:
                 case kLib.org.kevoree.modeling.api.util.ActionType.$ADD_ALL:
@@ -66,9 +85,41 @@
                 default:
                     //console.log(JSON.stringify(trace, null, 2));
                     var AdaptationPrimitive = this.getCommand('Noop');
-                    var cmd = new AdaptationPrimitive(this.node, this.instanceManager);
+                    cmd = new AdaptationPrimitive(this.node, this.instanceManager);
                     return cmd;
             }
+        },
+
+        sortCommands: function (list) {
+            var noops           = [],
+                addInstances    = [],
+                addDeployUnits  = [],
+                removeInstances = [],
+                unknowns        = [];
+
+            for (var i in list) {
+                if (list[i] instanceof this.getCommand('Noop')) {
+                    noops.push(list[i]);
+
+                } else if (list[i] instanceof this.getCommand('AddInstance')) {
+                    addInstances.push(list[i]);
+
+                } else if (list[i] instanceof this.getCommand('AddDeployUnit')) {
+                    addDeployUnits.push(list[i]);
+
+                } else if (list[i] instanceof this.getCommand('RemoveInstance')) {
+                    removeInstances.push(list[i]);
+
+                } else {
+                    unknowns.push(list[i]);
+                }
+            }
+
+            return (((removeInstances
+                        .concat(addDeployUnits))
+                            .concat(addInstances))
+                                .concat(noops))
+                                    .concat(unknowns);
         },
 
         /**

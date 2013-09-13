@@ -8,7 +8,7 @@
      * @type {Noop}
      */
     module.exports = AdaptationPrimitive.extend({
-        toString: 'Noop Adaptation',
+        toString: 'Noop',
 
         execute: function (_super, callback) {
             _super.call(this, callback);

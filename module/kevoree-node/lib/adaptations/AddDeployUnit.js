@@ -10,7 +10,7 @@
      * @type {AddDeployUnit}
      */
     module.exports = AdaptationPrimitive.extend({
-        toString: 'AddDeployUnit Adaptation',
+        toString: 'AddDeployUnit',
 
         setDeployUnit: function (du) {
             this.deployUnit = du;
