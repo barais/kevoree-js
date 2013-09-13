@@ -4,5 +4,6 @@
     "author": "Maxime Tricoire <max.tricoire@gmail.com>",
     "scripts": {
         "start": "node kevoree-nodejs-runtime.js"
-    }
+    },
+    "license": "LGPL-3.0"
 }
