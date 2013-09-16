@@ -1,7 +1,11 @@
 ;(function () {
     var Core    = require('kevoree-core'),
         kLib    = require('kevoree-library'),
-        config  = require('./config.json');
+        config  = require('./config.json'),
+        log     = require('npmlog');
+
+    log.heading = 'kevoree';
+    var TAG     = 'KevoreeNodeJSRuntime';
 
     var kevoreeCore = new Core(__dirname);
     var jsonLoader  = new kLib.org.kevoree.loader.JSONModelLoader();
@@ -15,7 +19,6 @@
     // an instance of nodeName in the given model => if there is no instance add it
     // Same goes for the group
     // !!for now I use a trustable model, but in the future this can't be enough!!
-
     kevoreeCore.on('started', function () {
         var groupName   = config.groupName,
             model2JSON  = require('./nodegroup.json'),
@@ -33,7 +36,7 @@
     });
 
     kevoreeCore.on('error', function (err) {
-        console.error(err.message);
+        log.error(TAG, err.stack);
         // try to stop Kevoree Core on error
         kevoreeCore.stop();
     });
