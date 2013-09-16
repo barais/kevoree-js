@@ -1,10 +1,12 @@
 ;(function () {
     var Class           = require('pseudoclass'),
         kLib            = require('kevoree-library'),
-        InstanceManager = require('./InstanceManager');
+        InstanceManager = require('./InstanceManager'),
+        log             = require('npmlog');
 
     // CONSTANTS
-    var ADD_INSTANCE_TRACE  = [
+    var TAG = 'AdaptationEngine',
+        ADD_INSTANCE_TRACE  = [
             'org.kevoree.Group',
             'org.kevoree.Node',
             'org.kevoree.ComponentInstance',
@@ -35,9 +37,12 @@
      * @type {AdaptationEngine}
      */
     var AdaptationEngine = Class({
-        toString: 'AdaptationEngine',
+        toString: TAG,
 
         construct: function (node) {
+            log.heading = 'kevoree';
+            //log.level = 'silly'; // TODO CHANGE THAT
+
             this.node = node;
             this.instanceManager = new InstanceManager();
 
@@ -56,6 +61,7 @@
             var cmdList = [];
             for (var i=0; i < traces.size(); i++) {
                 var trace = JSON.parse(traces.get(i));
+                log.silly(TAG, trace);
                 cmdList.push(this.processTrace(trace, model));
             }
 
