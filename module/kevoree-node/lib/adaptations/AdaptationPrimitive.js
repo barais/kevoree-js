@@ -1,6 +1,8 @@
 ;(function () {
     var Class   = require('pseudoclass'),
-        Log     = require('log');
+        log     = require('npmlog'),
+
+        TAG     = 'AdaptationPrimitive';
 
     /**
      * Abstract AdaptationPrimitive command
@@ -10,7 +12,7 @@
      * @type {AdaptationPrimitive}
      */
     module.exports = Class({
-        toString: 'AdaptationPrimitive',
+        toString: TAG,
 
         /**
          * Construct an AdaptationPrimitive object
@@ -18,7 +20,8 @@
          * @param manager InstanceManager
          */
         construct: function (node, manager) {
-            this.logger = new Log(this.toString());
+            log.heading = 'kevoree';
+
             this.node = node;
             this.instanceManager = manager;
         },
@@ -29,7 +32,7 @@
          */
         execute: function (callback) {
             if (callback == undefined || callback == null || typeof(callback) != 'function') {
-                this.logger.error("Execute method need a callback function as last parameter");
+                log.error(TAG, "Execute method need a callback function as last parameter");
                 return;
             }
         },
@@ -39,7 +42,7 @@
          */
         undo: function (callback) {
             if (callback == undefined || callback == null || typeof(callback) != 'function') {
-                this.logger.error("Undo method need a callback function as last parameter");
+                log.error(TAG, "Undo method need a callback function as last parameter");
                 return;
             }
         }

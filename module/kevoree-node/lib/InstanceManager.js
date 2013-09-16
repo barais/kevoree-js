@@ -1,12 +1,10 @@
 ;(function () {
-    var Class   = require('pseudoclass'),
-        Log     = require('log');
+    var Class   = require('pseudoclass');
 
     var InstanceManager = Class({
         toString: 'InstanceManager',
-        construct: function () {
-            this.logger = new Log(this.toString());
 
+        construct: function () {
             this.instances = {};
             this.deployUnits = {};
         },

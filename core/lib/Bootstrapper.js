@@ -1,37 +1,25 @@
 ;(function () {
     var Class   = require('pseudoclass'),
-        Log     = require('log'),
-        Util    = require('./util/Util'),
+        log     = require('npmlog'),
+        Util    = require('./../util/Util'),
         npm     = require('npm'),
-        path    = require('path');
+        path    = require('path'),
+
+        TAG     = 'Bootstrapper';
 
     /**
      *
      * @type {*}
      */
     module.exports = Class({
-        toString: 'Bootstrapper',
+        toString: TAG,
 
         /**
          *
          */
         construct: function (modulesPath) {
             this.modulesPath = modulesPath;
-            this.logger = new Log(this.toString());
-        },
-
-        /**
-         *
-         */
-        destruct: function () {
-
-        },
-
-        /**
-         *
-         */
-        init: function () {
-
+            log.heading = 'kevoree';
         },
 
         /**
@@ -53,7 +41,7 @@
 
                     npm.load({}, function (err) {
                         if (err) {
-                            that.logger.debug('Unable to load npm module');
+                            log.error(TAG, 'Unable to load npm module');
                             if (Util.callable(callback)) {
                                 callback.call(this, new Error('Bootstrap failure'));
                                 return;
@@ -63,7 +51,7 @@
                         // load success
                         npm.commands.install(that.modulesPath, [packageName+'@'+packageVersion], function (er) {
                             if (er) {
-                                that.logger.debug('npm failed to install package %s:%s', packageName, packageVersion);
+                                log.error(TAG, 'npm failed to install package %s:%s', packageName, packageVersion);
                                 if (Util.callable(callback)) {
                                     callback.call(this, new Error("Bootstrap failure"));
                                     return;

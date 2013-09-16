@@ -1,10 +1,13 @@
 ;(function () {
     var Class           = require('pseudoclass'),
         kLib            = require('kevoree-library'),
-        Bootstrapper    = require('./Bootstrapper'),
-        Log             = require('log'),
+        log             = require('npmlog'),
+        async           = require('async'),
+
         Util            = require('./util/Util'),
-        async           = require('async');
+        Bootstrapper    = require('./lib/Bootstrapper'),
+
+        TAG             = 'KevoreeCore';
 
     /**
      * Kevoree Core
@@ -12,14 +15,14 @@
      * @type {*}
      */
     module.exports = Class({
-        toString: 'Kevoree Core',
+        toString: TAG,
 
         /**
          * Core constructor
          */
         construct: function(modulesPath) {
-            this.logger = new Log(this.toString());
-            this.logger.debug('Initialization...');
+            log.heading = 'kevoree';
+            log.silly(TAG, 'Initialization...');
 
             this.factory = new kLib.org.kevoree.impl.DefaultKevoreeFactory();
             this.compare = new kLib.org.kevoree.compare.DefaultModelCompare();
@@ -38,7 +41,7 @@
          * Destruct core instance
          */
         destruct: function() {
-            this.logger.debug('Destructing');
+            log.silly(TAG, 'Destructing...');
         },
 
         /**
@@ -47,7 +50,7 @@
          * @param model
          */
         start: function (nodeName, model, callback) {
-            this.logger.debug("Starting '%s' bootstrapping...", nodeName);
+            log.info(TAG, "Starting '%s' bootstrapping...", nodeName);
             pushModel(this.models, this.currentModel);
             this.currentModel = model;
             if (nodeName != undefined && nodeName != null) {
@@ -55,7 +58,7 @@
                 var that = this;
                 this.bootstrapper.bootstrapNodeType(this.nodeName, this.currentModel, function (err, NodeClass) {
                     if (err) {
-                        that.logger.error(err.message);
+                        log.error(TAG, err.stack);
                         if (Util.callable(callback)) {
                             callback.call(this, new Error("Unable to bootstrap '"+nodeName+"'! Start process aborted."));
                         }
@@ -78,7 +81,7 @@
          */
         stop: function () {
             this.currentModel = null;
-            this.logger.debug('Stopped');
+            log.silly(TAG, 'Stopped');
         },
 
         /**
@@ -97,7 +100,7 @@
          * @param callback
          */
         deploy: function (model, uuid, callback) {
-            this.logger.debug('Deploy process started...');
+            log.info(TAG, 'Deploy process started...');
             if (model != undefined && model != null) {
                 if (this.nodeInstance != undefined && this.nodeInstance != null) {
                     // given model is defined and not null
@@ -145,13 +148,13 @@
                     async.eachSeries(adaptations, executeCommand, function (err) {
                         if (err) {
                             // something went wrong while processing adaptations
-                            core.logger.error(err.message);
+                            log.error(TAG, err.stack);
 
                             // rollback process
                             async.eachSeries(cmdStack, rollbackCommand, function (er) {
                                 if (er) {
                                     // something went wrong while rollbacking
-                                    core.logger.error(er.message);
+                                    log.error(TAG, er.stack);
                                     callback.call(core, new Error("Something went wrong while rollbacking..."));
                                     return;
                                 }
@@ -166,7 +169,7 @@
                         }
 
                         // adaptations succeed : woot
-                        core.logger.debug("Model deployed successfully.");
+                        log.verbose(TAG, "Model deployed successfully.");
                         // save old model
                         pushModel(core.models, core.currentModel);
                         // set new model to be the current one

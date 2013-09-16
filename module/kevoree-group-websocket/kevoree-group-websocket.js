@@ -1,24 +1,26 @@
 ;(function () {
 	var Class   = require('pseudoclass'),
-        Log     = require('log');
+        log     = require('npmlog'),
+
+        TAG     = 'WebSocketGroup';
 
     var WebSocketGroup = Class({
-        toString: 'WebSocketGroup',
+        toString: TAG,
 
         construct: function () {
-            this.logger = new Log(this.toString());
+            log.heading = 'kevoree';
         },
 
         start: function () {
-            this.logger.debug("started");
+            log.info(TAG, 'started');
         },
 
         stop: function () {
-            this.logger.debug("stop");
+            log.info(TAG, 'stopped');
         },
 
         update: function () {
-            this.logger.debug("updated");
+            log.info(TAG, 'updated');
         },
 
         setKevoreeCore: function (core) {

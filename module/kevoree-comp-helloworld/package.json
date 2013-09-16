@@ -18,7 +18,7 @@
         "url": "https://github.com/dukeboard/kevoree-js"
     },
     "dependencies": {
-        "log": "1.4.0",
+        "npmlog": "0.0.4",
         "pseudoclass": "0.2.6"
     },
     "devDependencies": {},

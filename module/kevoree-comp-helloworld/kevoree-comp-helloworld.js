@@ -1,24 +1,26 @@
 ;(function () {
 	var Class   = require('pseudoclass'),
-        Log     = require('log');
+        log     = require('npmlog'),
+
+        TAG     = 'HelloWorldComponent';
 
     var HelloWorldComponent = Class({
-        toString: 'HelloWorldComponent',
+        toString: TAG,
 
         construct: function () {
-            this.logger = new Log(this.toString());
+            log.heading = 'kevoree';
         },
 
         start: function () {
-            this.logger.debug("Hello World !");
+            log.info(TAG, "Hello World !");
         },
 
         stop: function () {
-            this.logger.debug("Bye bye world !");
+            log.info(TAG, "Bye bye world !");
         },
 
         update: function () {
-            this.logger.debug("Hello new updated World !");
+            log.info(TAG, "Hello new updated World !");
         },
 
         setKevoreeCore: function (core) {
