@@ -1,38 +1,17 @@
 ;(function () {
-	var Class               = require('pseudoclass'),
+	var AbstractNode        = require('kevoree-entities').AbstractNode,
         AdaptationEngine    = require('./lib/AdaptationEngine'),
         log                 = require('npmlog'),
 
         TAG                 = 'JavascriptNode';
 
-    var JavascriptNode = Class({
+    var JavascriptNode = AbstractNode.extend({
         toString: TAG,
 
         construct: function () {
             log.heading = 'kevoree';
 
             this.adaptationEngine = new AdaptationEngine(this);
-            this.kCore = null;
-        },
-
-        startNode: function () {
-            log.info(TAG, 'started');
-        },
-
-        stopNode: function () {
-            log.info(TAG, 'stopped');
-        },
-
-        updateNode: function () {
-            log.info(TAG, 'updated');
-        },
-
-        setKevoreeCore: function (kCore) {
-            this.kCore = kCore;
-        },
-
-        getKevoreeCore: function () {
-            return this.kCore;
         },
 
         /**

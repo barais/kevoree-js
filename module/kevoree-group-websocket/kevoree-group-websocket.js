@@ -1,30 +1,14 @@
 ;(function () {
-	var Class   = require('pseudoclass'),
-        log     = require('npmlog'),
+	var AbstractGroup   = require('kevoree-entities').AbstractGroup,
+        log             = require('npmlog'),
 
         TAG     = 'WebSocketGroup';
 
-    var WebSocketGroup = Class({
+    var WebSocketGroup = AbstractGroup.extend({
         toString: TAG,
 
         construct: function () {
             log.heading = 'kevoree';
-        },
-
-        start: function () {
-            log.info(TAG, 'started');
-        },
-
-        stop: function () {
-            log.info(TAG, 'stopped');
-        },
-
-        update: function () {
-            log.info(TAG, 'updated');
-        },
-
-        setKevoreeCore: function (core) {
-            this.kCore = core;
         }
     });
 

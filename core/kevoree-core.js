@@ -60,14 +60,14 @@
                 if (nodeName != undefined && nodeName != null) {
                     this.nodeName = nodeName;
                     var that = this;
-                    this.bootstrapper.bootstrapNodeType(this.nodeName, this.currentModel, function (err, NodeClass) {
+                    this.bootstrapper.bootstrapNodeType(this.nodeName, this.currentModel, function (err, AbstractNode) {
                         if (err) {
                             log.error(TAG, err.stack);
                             that.emitter.emit('error', new Error("Unable to bootstrap '"+nodeName+"'! Start process aborted."));
                         }
-                        that.nodeInstance = new NodeClass();
+                        that.nodeInstance = new AbstractNode();
                         that.nodeInstance.setKevoreeCore(that);
-                        that.nodeInstance.startNode();
+                        that.nodeInstance.start();
 
                         // starting loop function
                         that.intervalId = setInterval(function () {}, 10);

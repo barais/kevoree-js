@@ -60,8 +60,8 @@
 
                             // install sucess
                             if (Util.callable(callback)) {
-                                var NodeClass = require(path.resolve(that.modulesPath, 'node_modules', packageName));
-                                callback.call(this, null, NodeClass);
+                                var AbstractNode = require(path.resolve(that.modulesPath, 'node_modules', packageName));
+                                callback.call(this, null, AbstractNode);
                                 return;
                             }
                         });
