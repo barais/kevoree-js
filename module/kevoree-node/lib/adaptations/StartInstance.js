@@ -14,6 +14,7 @@
 
             var instance = this.instanceManager.getInstance(this.instance.getName());
             if (instance != undefined && instance != null) {
+                instance.setKevoreeCore(this.node.getKevoreeCore());
                 instance.start();
                 callback.call(this, null);
                 return;

@@ -30,7 +30,7 @@
     /**
      * AdaptationEngine knows each AdaptationPrimitive command available
      * for JavascriptNode.
-     * Plus, it handles instances and deploy units references
+     * Plus, it handles instances and deploy unit references
      *
      * @type {AdaptationEngine}
      */

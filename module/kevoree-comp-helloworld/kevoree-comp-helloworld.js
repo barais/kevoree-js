@@ -19,6 +19,10 @@
 
         update: function () {
             this.logger.debug("Hello new updated World !");
+        },
+
+        setKevoreeCore: function (core) {
+            this.kCore = core;
         }
     });
 
