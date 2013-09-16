@@ -16,24 +16,28 @@
     // Same goes for the group
     // !!for now I use a trustable model, but in the future this can't be enough!!
 
-    kevoreeCore.start(nodeName, model, function (err) {
-        if (err) {
-            console.error(err.message);
-            return;
-        }
-
+    kevoreeCore.on('started', function () {
         var groupName   = config.groupName,
             model2JSON  = require('./nodegroup.json'),
             model2      = jsonLoader.loadModelFromString(JSON.stringify(model2JSON)).get(0);
 
-        kevoreeCore.deploy(model2, null, function (er, model) {
-            if (er) {
-                console.error(er.message);
-                return;
-            }
-
-            // deploy success
-
-        });
+        kevoreeCore.deploy(model2, null);
     });
+
+    kevoreeCore.on('deployed', function (err, model) {
+        // deploy success
+    });
+
+    kevoreeCore.on('stopped', function (err, model) {
+        // deploy success
+    });
+
+    kevoreeCore.on('error', function (err) {
+        console.error(err.message);
+        // try to stop Kevoree Core on error
+        kevoreeCore.stop();
+    });
+
+    // start Kevoree Core
+    kevoreeCore.start(nodeName, model);
 })();

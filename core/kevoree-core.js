@@ -3,6 +3,7 @@
         kLib            = require('kevoree-library'),
         log             = require('npmlog'),
         async           = require('async'),
+        EventEmitter    = require('events').EventEmitter,
 
         Util            = require('./util/Util'),
         Bootstrapper    = require('./lib/Bootstrapper'),
@@ -27,7 +28,6 @@
             this.factory = new kLib.org.kevoree.impl.DefaultKevoreeFactory();
             this.compare = new kLib.org.kevoree.compare.DefaultModelCompare();
 
-            // TODO keep track of models in a list
             // create a new empty model container
             this.currentModel = this.factory.createContainerRoot();
             this.models = [];
@@ -35,6 +35,9 @@
             this.nodeInstance = null;
             this.modulesPath = modulesPath;
             this.bootstrapper = new Bootstrapper(modulesPath);
+            this.intervalId = null;
+
+            this.emitter = new EventEmitter();
         },
 
         /**
@@ -49,30 +52,37 @@
          * @param nodeName
          * @param model
          */
-        start: function (nodeName, model, callback) {
-            log.info(TAG, "Starting '%s' bootstrapping...", nodeName);
-            pushModel(this.models, this.currentModel);
-            this.currentModel = model;
-            if (nodeName != undefined && nodeName != null) {
-                this.nodeName = nodeName;
-                var that = this;
-                this.bootstrapper.bootstrapNodeType(this.nodeName, this.currentModel, function (err, NodeClass) {
-                    if (err) {
-                        log.error(TAG, err.stack);
-                        if (Util.callable(callback)) {
-                            callback.call(this, new Error("Unable to bootstrap '"+nodeName+"'! Start process aborted."));
+        start: function (nodeName, model) {
+            if (this.intervalId == null) {
+                log.info(TAG, "Starting '%s' bootstrapping...", nodeName);
+                pushModel(this.models, this.currentModel);
+                this.currentModel = model;
+                if (nodeName != undefined && nodeName != null) {
+                    this.nodeName = nodeName;
+                    var that = this;
+                    this.bootstrapper.bootstrapNodeType(this.nodeName, this.currentModel, function (err, NodeClass) {
+                        if (err) {
+                            log.error(TAG, err.stack);
+                            that.emitter.emit('error', new Error("Unable to bootstrap '"+nodeName+"'! Start process aborted."));
                         }
-                    }
-                    that.nodeInstance = new NodeClass();
-                    that.nodeInstance.setKevoreeCore(that);
-                    that.nodeInstance.startNode();
-                    if (Util.callable(callback)) callback.call(this, null);
-                });
+                        that.nodeInstance = new NodeClass();
+                        that.nodeInstance.setKevoreeCore(that);
+                        that.nodeInstance.startNode();
 
-            } else {
-                if (Util.callable(callback)) {
-                    callback.call(this, new Error("Unable to bootstrap Kevoree Core: 'nodeName' & 'groupName' are null or undefined"));
+                        // starting loop function
+                        that.intervalId = setInterval(function () {}, 10);
+
+                        that.emitter.emit('started');
+                        return;
+                    });
+
+                } else {
+                    this.emitter.emit('error', new Error("Unable to bootstrap Kevoree Core: 'nodeName' & 'groupName' are null or undefined"));
+                    return;
                 }
+            } else {
+                this.emitter.emit('error', new Error("Core already started"));
+                return;
             }
         },
 
@@ -80,6 +90,13 @@
          * Stops Kevoree Core
          */
         stop: function () {
+            if (this.intervalId != null) {
+                if (this.nodeInstance != null) {
+                    this.nodeInstance.stopNode();
+                }
+                clearInterval(this.intervalId);
+            }
+
             this.currentModel = null;
             log.silly(TAG, 'Stopped');
         },
@@ -99,7 +116,7 @@
          * @param uuid
          * @param callback
          */
-        deploy: function (model, uuid, callback) {
+        deploy: function (model, uuid) {
             log.info(TAG, 'Deploy process started...');
             if (model != undefined && model != null) {
                 if (this.nodeInstance != undefined && this.nodeInstance != null) {
@@ -155,16 +172,16 @@
                                 if (er) {
                                     // something went wrong while rollbacking
                                     log.error(TAG, er.stack);
-                                    callback.call(core, new Error("Something went wrong while rollbacking..."));
+                                    core.emitter.emit('error', new Error("Something went wrong while rollbacking..."));
                                     return;
                                 }
 
                                 // rollback succeed
-                                callback.call(core, null);
+                                core.emitter.emit('rollback');
                                 return;
                             });
 
-                            callback.call(core, new Error("Something went wrong while processing adaptations. Rollback"));
+                            core.emitter.emit('error', new Error("Something went wrong while processing adaptations. Rollback"));
                             return;
                         }
 
@@ -175,15 +192,13 @@
                         // set new model to be the current one
                         core.currentModel = model;
                         // all good :)
-                        callback.call(core, null);
+                        core.emitter.emit('deployed', core.currentModel);
                         return;
                     });
 
                 }
             } else {
-                if (Util.callable(callback)) {
-                    callback.call(this, new Error("model is not defined or null. Deploy aborted."));
-                }
+                this.emitter.emit('error', new Error("model is not defined or null. Deploy aborted."));
                 return;
             }
         },
@@ -218,6 +233,10 @@
 
         getModulesPath: function () {
             return this.modulesPath;
+        },
+
+        on: function (event, callback) {
+            this.emitter.addListener(event, callback);
         }
     });
 
