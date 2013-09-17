@@ -1,64 +1,66 @@
-;(function () {
-    var AdaptationPrimitive = require('./AdaptationPrimitive'),
-        log                 = require('npmlog'),
+var AdaptationPrimitive = require('./AdaptationPrimitive'),
+    log                 = require('npmlog'),
 
-        TAG                 = 'UpdateDictionary';
+    TAG                 = 'UpdateDictionary';
 
-    module.exports = AdaptationPrimitive.extend({
-        toString: TAG,
+module.exports = AdaptationPrimitive.extend({
+    toString: TAG,
 
-        setInstance: function (inst) {
-            this.instance = inst;
-        },
+    construct: function () {
+        this.oldDictionary = this.node.getDictionary().clone();
+    },
 
-        execute: function (_super, callback) {
-            _super.call(this, callback);
+    execute: function (_super, callback) {
+        _super.call(this, callback);
 
-            var dictionary = {};
+        var dicValue = this.adaptModel.findByPath(this.trace.srcPath),
+            instance = this.findEntityInstance();
 
-            // fill dictionary with default values if any
-            if (this.instance.getTypeDefinition().getDictionaryType() != null) {
-                var defaultValues = this.instance.getTypeDefinition().getDictionaryType().getDefaultValues();
-                if (defaultValues != null) {
-                    for (var i=0; i < defaultValues.size(); i++) {
-                        dictionary[defaultValues.get(i).getName()] = defaultValues.get(i).getValue();
+        if (instance != null) {
+            var dictionary = instance.getDictionary();
+            if (dicValue.attribute.fragmentDependant == true) {
+                if (dicValue.targetNode != null) {
+                    if (dicValue.targetNode.name == this.node.getName()) {
+                        dictionary.setEntry(dicValue.attribute.name, dicValue.value);
                     }
                 }
-            }
-
-            // fill dictionary with current instance attribute values
-            if (this.instance.getDictionary() != null) {
-                var values = this.instance.getDictionary().getValues();
-                for (var i=0; i < values.size(); i++) {
-                    var val = values.get(i);
-                    if (val.getAttribute().getFragmentDependant() == true) {
-                        var targetNode = val.getTargetNode();
-                        if (targetNode != null) {
-                            if (targetNode.getName() == this.node.getName()) {
-                                dictionary[val.getAttribute().getName()] = val.getValue();
-                            }
-                        }
-                    } else {
-                        dictionary[val.getAttribute().getName()] = val.getValue();
-                    }
-                }
-            }
-
-            var instance = this.instanceManager.getInstance(this.instance.getName());
-            if (instance != undefined && instance != null) {
-                instance.updateDictionary(dictionary);
-                callback.call(this, null);
-                return;
-
             } else {
-                callback.call(this, new Error("Unable to UpdateDictionary: instance does not exist"));
-                return;
+                dictionary.setEntry(dicValue.attribute.name, dicValue.value);
             }
-        },
-
-        undo: function (_super, callback) {
-            _super.call(this, callback);
-            callback.call(this, null);
         }
-    });
-})();
+
+        callback.call(this, null);
+
+        // NEED SOMETHING THERE because I can't get the related instance from mapper with the trace
+        // change kev metamodel ? oO
+
+        //callback.call(this, new Error('Unable to find entity instance for '+this.trace.srcPath));
+        return;
+    },
+
+    undo: function (_super, callback) {
+        _super.call(this, callback);
+
+//        var instance = this.findEntityInstance()
+//        if (instance != null) {
+//            var dictionary = instance.getDictionary();
+//            dictionary.setMap(this.oldDictionary);
+//            callback.call(this, null);
+//
+//        } else {
+//            callback.call(this, new Error('Unable to find entity instance for '+this.trace.srcPath));
+//        }
+
+        callback.call(this, null);
+    },
+
+    findEntityInstance: function () {
+        // this suxx a lot
+        for (var path in this.mapper.getMap()) {
+            if (this.trace.srcPath.startsWith(path)) {
+                return this.mapper.getObject(path);
+            }
+        }
+        return null;
+    }
+});

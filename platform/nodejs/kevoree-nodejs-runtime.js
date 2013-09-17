@@ -29,10 +29,11 @@
 
     kevoreeCore.on('deployed', function (err, model) {
         // deploy success
+
     });
 
     kevoreeCore.on('stopped', function (err, model) {
-        // deploy success
+        // kevoree core stopped
     });
 
     kevoreeCore.on('error', function (err) {

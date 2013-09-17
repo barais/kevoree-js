@@ -12,10 +12,6 @@
     module.exports = AdaptationPrimitive.extend({
         toString: 'RemoveInstance',
 
-        setInstance: function (instance) {
-            this.instance = instance;
-        },
-
         /**
          *
          * @param _super AdaptationPrimitive parent
@@ -24,14 +20,16 @@
         execute: function (_super, callback) {
             _super.call(this, callback);
 
-            var instance = this.instanceManager.getInstance(this.instance.getName());
+            var kInstance = this.adaptModel.findByPath(this.trace.previousPath);
+
+            var instance = this.mapper.getObject(kInstance.path());
             if (instance != undefined && instance != null) {
-                this.instanceManager.removeInstance(this.instance.getName());
+                this.mapper.removeEntry(kInstance.path());
                 callback.call(this, null);
                 return;
 
             } else {
-                callback.call(this, new Error("RemoveInstance error: unable to remove instance "+this.instance.getName()));
+                callback.call(this, new Error("RemoveInstance error: unable to remove instance "+kInstance.path()));
                 return;
             }
         },
@@ -39,8 +37,7 @@
         undo: function (_super, callback) {
             _super.call(this, callback);
 
-            var cmd = new AddInstance(this.node, this.instanceManager);
-            cmd.setInstance(this.instance);
+            var cmd = new AddInstance(this.node, this.mapper, this.adaptModel, this.trace);
             cmd.execute(callback);
             return;
         }

@@ -67,6 +67,7 @@
                         }
                         that.nodeInstance = new AbstractNode();
                         that.nodeInstance.setKevoreeCore(that);
+                        that.nodeInstance.setName(nodeName);
                         that.nodeInstance.start();
 
                         // starting loop function
@@ -92,7 +93,7 @@
         stop: function () {
             if (this.intervalId != undefined && this.intervalId != null) {
                 if (this.nodeInstance != null) {
-                    this.nodeInstance.stopNode();
+                    this.nodeInstance.stop();
                 }
                 clearInterval(this.intervalId);
                 this.intervalId = null;
@@ -122,10 +123,8 @@
                 if (model != undefined && model != null) {
                     if (this.nodeInstance != undefined && this.nodeInstance != null) {
                         // given model is defined and not null
-                        var diffSeq = this.compare.diff(this.currentModel, model),
-                            traces = diffSeq.get_traces();
-
-                        var adaptations = this.nodeInstance.processTraces(traces, model);
+                        var diffSeq = this.compare.diff(this.currentModel, model);
+                        var adaptations = this.nodeInstance.processTraces(diffSeq.traces, model);
 
                         // list of adaptation commands retrieved
                         var core = this,
@@ -163,6 +162,7 @@
                             });
                         };
 
+                        // execute each command synchronously
                         async.eachSeries(adaptations, executeCommand, function (err) {
                             if (err) {
                                 // something went wrong while processing adaptations

@@ -1,16 +1,18 @@
-;(function () {
-	var AbstractComponent   = require('kevoree-entities').AbstractComponent,
-        log                 = require('npmlog'),
+var AbstractComponent   = require('kevoree-entities').AbstractComponent,
+    log                 = require('npmlog'),
 
-        TAG     = 'HelloWorldComponent';
+    TAG     = 'HelloWorldComponent';
 
-    var HelloWorldComponent = AbstractComponent.extend({
-        toString: TAG,
+var HelloWorldComponent = AbstractComponent.extend({
+    toString: TAG,
 
-        construct: function () {
-            log.heading = 'kevoree';
-        }
-    });
+    construct: function () {
+        log.heading = 'kevoree';
+    },
 
-	module.exports = HelloWorldComponent;
-})();
+    start: function () {
+        log.info(TAG, 'Hello world!');
+    }
+});
+
+module.exports = HelloWorldComponent;

@@ -8,7 +8,7 @@
      * Abstract AdaptationPrimitive command
      *
      * @param node JavascriptNode context
-     * @param manager InstanceManager to handle deployUnit & instance refs
+     * @param mapper ModelObjectMapper that handles mapping betweend model objects and 'real-life' object
      * @type {AdaptationPrimitive}
      */
     module.exports = Class({
@@ -16,14 +16,19 @@
 
         /**
          * Construct an AdaptationPrimitive object
+         *
          * @param node KevoreeNode platform
-         * @param manager InstanceManager
+         * @param mapper ModelObjectMapper
+         * @param model model to deploy (that triggers adaptations)
+         * @param trace command related trace
          */
-        construct: function (node, manager) {
+        construct: function (node, mapper, model, trace) {
             log.heading = 'kevoree';
 
             this.node = node;
-            this.instanceManager = manager;
+            this.mapper = mapper;
+            this.adaptModel = model;
+            this.trace = trace;
         },
 
         /**

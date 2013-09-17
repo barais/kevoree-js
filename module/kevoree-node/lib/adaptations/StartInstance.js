@@ -1,37 +1,33 @@
-;(function () {
-    var AdaptationPrimitive = require('./AdaptationPrimitive'),
-        StopInstance        = require('./StopInstance');
+var AdaptationPrimitive = require('./AdaptationPrimitive'),
+    StopInstance        = require('./StopInstance');
 
-    module.exports = AdaptationPrimitive.extend({
-        toString: 'StartInstance',
+module.exports = AdaptationPrimitive.extend({
+    toString: 'StartInstance',
 
-        setInstance: function (inst) {
-            this.instance = inst;
-        },
+    execute: function (_super, callback) {
+        _super.call(this, callback);
 
-        execute: function (_super, callback) {
-            _super.call(this, callback);
+        var kInstance = this.adaptModel.findByPath(this.trace.srcPath);
 
-            var instance = this.instanceManager.getInstance(this.instance.getName());
-            if (instance != undefined && instance != null) {
-                instance.setKevoreeCore(this.node.getKevoreeCore());
-                instance.start();
-                callback.call(this, null);
-                return;
+        var instance = this.mapper.getObject(kInstance.path());
+        if (instance != undefined && instance != null) {
+            instance.setKevoreeCore(this.node.getKevoreeCore());
+            instance.start();
+            callback.call(this, null);
+            return;
 
-            } else {
-                callback.call(this, new Error("StartInstance error: unable to start instance "+this.instance.getName()));
-                return;
-            }
-        },
-
-        undo: function (_super, callback) {
-            _super.call(this, callback);
-
-            var cmd = new StopInstance(this.node, this.instanceManager);
-            cmd.setInstance(this.instance);
-            cmd.execute(callback);
+        } else {
+            callback.call(this, new Error("StartInstance error: unable to start instance "+kInstance.name));
             return;
         }
-    });
-})();
+    },
+
+    undo: function (_super, callback) {
+        _super.call(this, callback);
+
+        var cmd = new StopInstance(this.node, this.mapper, this.adaptModel, this.trace);
+        cmd.execute(callback);
+
+        return;
+    }
+});

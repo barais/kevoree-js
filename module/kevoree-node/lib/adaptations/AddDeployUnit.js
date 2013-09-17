@@ -11,10 +11,6 @@
     module.exports = AdaptationPrimitive.extend({
         toString: 'AddDeployUnit',
 
-        setDeployUnit: function (du) {
-            this.deployUnit = du;
-        },
-
         /**
          *
          * @param _super AdaptationPrimitive parent
@@ -23,11 +19,12 @@
         execute: function (_super, callback) {
             _super.call(this, callback);
 
-            var packageName     = this.deployUnit.getUnitName(),
-                packageVersion  = this.deployUnit.getVersion(),
+            var deployUnit = this.adaptModel.findByPath(this.trace.previousPath),
+                packageName     = deployUnit.unitName,
+                packageVersion  = deployUnit.version,
                 that            = this;
 
-            if (!this.instanceManager.hasDeployUnit(this.deployUnit.getGenerated_KMF_ID())) {
+            if (!this.mapper.hasObject(deployUnit.path())) {
                 // install deployUnit
                 npm.load({}, function (err) {
                     if (err) {
@@ -46,7 +43,7 @@
                         }
 
                         // install success: add deployUnit typeDef name & packageName into instanceManager map
-                        that.instanceManager.addDeployUnit(that.deployUnit.getGenerated_KMF_ID(), packageName);
+                        that.mapper.addEntry(deployUnit.path(), packageName);
                         callback.call(that, null);
                         return;
                     });
@@ -61,9 +58,9 @@
         undo: function (_super, callback) {
             _super.call(this, callback);
 
-            var cmd = new RemoveDeployUnit(this.node, this.instanceManager);
-            cmd.setDeployUnit(this.deployUnit);
+            var cmd = new RemoveDeployUnit(this.node, this.mapper, this.adaptModel, this.trace);
             cmd.execute(callback);
+
             return;
         }
     });

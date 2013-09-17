@@ -11,15 +11,12 @@
     module.exports = AdaptationPrimitive.extend({
         toString: 'RemoveDeployUnit',
 
-        setDeployUnit: function (du) {
-            this.deployUnit = du;
-        },
-
         execute: function (_super, callback) {
             _super.call(this, callback);
 
-            var packageName     = this.deployUnit.getUnitName(),
-                packageVersion  = this.deployUnit.getVersion(),
+            var deployUnit      = this.adaptModel.findByPath(this.trace.previousPath),
+                packageName     = deployUnit.unitName,
+                packageVersion  = deployUnit.version,
                 that            = this;
 
             // uninstall deploy unit
@@ -40,7 +37,7 @@
                     }
 
                     // uninstall success: add deployUnit typeDef name & packageName into instanceManager map
-                    that.instanceManager.removeDeployUnit(that.deployUnit.getGenerated_KMF_ID());
+                    that.mapper.removeEntry(deployUnit.path());
                     callback.call(that, null);
                     return;
                 });
@@ -50,9 +47,9 @@
         undo: function (_super, callback) {
             _super.call(this, callback);
 
-            var cmd = new AddDeployUnit(this.node, this.instanceManager);
-            cmd.setInstance(this.instance);
+            var cmd = new AddDeployUnit(this.node, this.mapper, this.adaptModel, this.trace);
             cmd.execute(callback);
+
             return;
         }
     });
