@@ -63,29 +63,6 @@
             "deployUnits": [
                 "deployUnits[142023381378461125966]"
             ],
-            "managedPrimitiveTypes": [
-                "adaptationPrimitiveTypes[UpdateFragmentBinding]",
-                "adaptationPrimitiveTypes[UpdateBinding]",
-                "adaptationPrimitiveTypes[UpdateDictionaryInstance]",
-                "adaptationPrimitiveTypes[RemoveThirdParty]",
-                "adaptationPrimitiveTypes[RemoveType]",
-                "adaptationPrimitiveTypes[RemoveInstance]",
-                "adaptationPrimitiveTypes[StartInstance]",
-                "adaptationPrimitiveTypes[UpdateType]",
-                "adaptationPrimitiveTypes[AddFragmentBinding]",
-                "adaptationPrimitiveTypes[StartThirdParty]",
-                "adaptationPrimitiveTypes[AddBinding]",
-                "adaptationPrimitiveTypes[RemoveBinding]",
-                "adaptationPrimitiveTypes[StopInstance]",
-                "adaptationPrimitiveTypes[UpdateDeployUnit]",
-                "adaptationPrimitiveTypes[UpdateInstance]",
-                "adaptationPrimitiveTypes[RemoveFragmentBinding]",
-                "adaptationPrimitiveTypes[RemoveDeployUnit]",
-                "adaptationPrimitiveTypes[AddDeployUnit]",
-                "adaptationPrimitiveTypes[AddThirdParty]",
-                "adaptationPrimitiveTypes[AddInstance]",
-                "adaptationPrimitiveTypes[AddType]"
-            ],
             "dictionaryType": [
                 {
                     "eClass": "org.kevoree.DictionaryType",
@@ -125,24 +102,6 @@
                                 "typeDefinitions[JavascriptNode]/dictionaryType[313116901378461125995]/attributes[logLevel]"
                             ]
                         }
-                    ]
-                }
-            ],
-            "managedPrimitiveTypeRefs": [
-                {
-                    "eClass": "org.kevoree.AdaptationPrimitiveTypeRef",
-                    "generated_KMF_ID": "170560411378461125996",
-                    "maxTime": "120000",
-                    "ref": [
-                        "adaptationPrimitiveTypes[UpdateDeployUnit]"
-                    ]
-                },
-                {
-                    "eClass": "org.kevoree.AdaptationPrimitiveTypeRef",
-                    "generated_KMF_ID": "205485371378461125996",
-                    "maxTime": "120000",
-                    "ref": [
-                        "adaptationPrimitiveTypes[AddDeployUnit]"
                     ]
                 }
             ]
@@ -232,20 +191,7 @@
             ]
         }
     ],
-    "repositories": [
-        {
-            "eClass": "org.kevoree.Repository",
-            "url": "http://repo.maven.apache.org/maven2"
-        },
-        {
-            "eClass": "org.kevoree.Repository",
-            "url": "https://oss.sonatype.org/content/groups/public/"
-        },
-        {
-            "eClass": "org.kevoree.Repository",
-            "url": "https://oss.sonatype.org/content/repositories/snapshots"
-        }
-    ],
+    "repositories": [],
     "libraries": [
         {
             "eClass": "org.kevoree.TypeLibrary",
@@ -345,92 +291,6 @@
                     ]
                 }
             ]
-        }
-    ],
-    "adaptationPrimitiveTypes": [
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "UpdateFragmentBinding"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "UpdateDictionaryInstance"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "UpdateBinding"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "RemoveThirdParty"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "RemoveInstance"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "RemoveType"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "StartInstance"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "UpdateType"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "AddFragmentBinding"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "StartThirdParty"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "AddBinding"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "RemoveBinding"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "StopInstance"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "UpdateDeployUnit"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "UpdateInstance"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "RemoveFragmentBinding"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "RemoveDeployUnit"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "AddDeployUnit"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "AddThirdParty"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "AddInstance"
-        },
-        {
-            "eClass": "org.kevoree.AdaptationPrimitiveType",
-            "name": "AddType"
         }
     ]
 }
