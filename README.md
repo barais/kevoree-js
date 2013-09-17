@@ -19,7 +19,7 @@
             </td>
         </tr>
         <tr>
-            <td>module/</td>
+            <td>library/</td>
             <td>
                 <table>
                     <thead>
@@ -77,7 +77,7 @@
             <td>org.kevoree.model.js/</td>
             <td>
                 Maven project allowing you to compile Kevoree model to JS easily<br/>
-                This project is used to update <strong>kevoree-library.js</strong> in <strong>module/kevoree-library</strong>
+                This project is used to update <strong>kevoree-library.js</strong> in <strong>library/kevoree-library</strong>
             </td>
         </tr>
     </tbody>
