@@ -27,30 +27,30 @@ module.exports = AdaptationPrimitive.extend({
             } else {
                 dictionary.setEntry(dicValue.attribute.name, dicValue.value);
             }
+
+            callback.call(this, null);
+            return;
         }
 
-        callback.call(this, null);
 
         // NEED SOMETHING THERE because I can't get the related instance from mapper with the trace
         // change kev metamodel ? oO
-
-        //callback.call(this, new Error('Unable to find entity instance for '+this.trace.srcPath));
+        callback.call(this, null);
         return;
     },
 
     undo: function (_super, callback) {
         _super.call(this, callback);
 
-//        var instance = this.findEntityInstance()
-//        if (instance != null) {
-//            var dictionary = instance.getDictionary();
-//            dictionary.setMap(this.oldDictionary);
-//            callback.call(this, null);
-//
-//        } else {
-//            callback.call(this, new Error('Unable to find entity instance for '+this.trace.srcPath));
-//        }
+        var instance = this.findEntityInstance()
+        if (instance != null) {
+            var dictionary = instance.getDictionary();
+            dictionary.setMap(this.oldDictionary);
+            callback.call(this, null);
 
+        }
+
+        // TODO handle default and stuff
         callback.call(this, null);
     },
 
