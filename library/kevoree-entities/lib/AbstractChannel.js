@@ -7,7 +7,11 @@
      * @type {AbstractChannel} extends KevoreeEntity
      */
     module.exports = KevoreeEntity.extend({
-        toString: 'AbstractChannel'
+        toString: 'AbstractChannel',
+
+        getModelEntity: function () {
+            return this.kCore.getCurrentModel().findHubsByID(this.name);
+        }
     });
 
 })();

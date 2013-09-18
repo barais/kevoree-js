@@ -7,7 +7,11 @@
      * @type {AbstractNode} extends KevoreeEntity
      */
     module.exports = KevoreeEntity.extend({
-        toString: 'AbstractNode'
+        toString: 'AbstractNode',
+
+        getModelEntity: function () {
+            return this.kCore.getCurrentModel().findNodesByID(this.name);
+        }
     });
 
 })();
