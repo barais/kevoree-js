@@ -48,6 +48,18 @@
                             "eClass": "org.kevoree.Dictionary",
                             "generated_KMF_ID": "0.86965738283470271378980404483"
                         }
+                    ],
+                    "provided": [
+                        {
+                            "eClass": "org.kevoree.Port",
+                            "generated_KMF_ID": "0.65337726869620381379498678145",
+                            "bindings": [
+                                "mBindings[0.72222582343965771379498684478]"
+                            ],
+                            "portTypeRef": [
+                                "typeDefinitions[HelloWorld]/provided[fake]"
+                            ]
+                        }
                     ]
                 }
             ]
@@ -188,6 +200,59 @@
                     "attributes": [],
                     "defaultValues": []
                 }
+            ],
+            "provided": [
+                {
+                    "eClass": "org.kevoree.PortTypeRef",
+                    "noDependency": "false",
+                    "optional": "false",
+                    "name": "fake",
+                    "ref": [
+                        "typeDefinitions[org.kevoree.framework.MessagePort]"
+                    ],
+                    "mappings": [
+                        {
+                            "eClass": "org.kevoree.PortTypeMapping",
+                            "generated_KMF_ID": "7277176861376380213846",
+                            "serviceMethodName": "process",
+                            "beanMethodName": "appendIncoming"
+                        },
+                        {
+                            "eClass": "org.kevoree.PortTypeMapping",
+                            "generated_KMF_ID": "8317789371376380213846",
+                            "serviceMethodName": "process",
+                            "beanMethodName": "appendIncoming"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "eClass": "org.kevoree.MessagePortType",
+            "abstract": "false",
+            "synchrone": "false",
+            "name": "org.kevoree.framework.MessagePort"
+        },
+        {
+            "eClass": "org.kevoree.ChannelType",
+            "upperFragments": "0",
+            "abstract": "false",
+            "upperBindings": "0",
+            "lowerBindings": "0",
+            "bean": "kevoree-chan-local",
+            "lowerFragments": "0",
+            "name": "LocalChannel",
+            "factoryBean": "org.kevoree.library.javase.basicGossiper.channel.LocalChannelFactory",
+            "deployUnits": [
+                "deployUnits[2755465601376380901387]"
+            ],
+            "dictionaryType": [
+                {
+                    "eClass": "org.kevoree.DictionaryType",
+                    "generated_KMF_ID": "16177067681376380901373",
+                    "attributes": [],
+                    "defaultValues": []
+                }
             ]
         }
     ],
@@ -238,6 +303,44 @@
             "version": "0.0.2",
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
+            ]
+        },
+        {
+            "eClass": "org.kevoree.DeployUnit",
+            "groupName": "",
+            "unitName": "kevoree-chan-local",
+            "generated_KMF_ID": "2755465601376380901387",
+            "hashcode": "201308131001248",
+            "type": "node_module",
+            "version": "0.0.1",
+            "targetNodeType": [
+                "typeDefinitions[JavascriptNode]"
+            ]
+        }
+    ],
+    "hubs": [
+        {
+            "eClass": "org.kevoree.Channel",
+            "name": "chan0",
+            "started": "true",
+            "metaData": "x=363,y=418",
+            "typeDefinition": [
+                "typeDefinitions[LocalChannel]"
+            ],
+            "bindings": [
+                "mBindings[0.72222582343965771379498684478]"
+            ]
+        }
+    ],
+    "mBindings": [
+        {
+            "eClass": "org.kevoree.MBinding",
+            "generated_KMF_ID": "0.72222582343965771379498684478",
+            "port": [
+                "nodes[node0]/components[comp0]/provided[0.65337726869620381379498678145]"
+            ],
+            "hub": [
+                "hubs[chan0]"
             ]
         }
     ],

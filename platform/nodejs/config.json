@@ -1,4 +1,4 @@
 {
     "nodeName":     "node0",
-    "model":        "./nodegroup.json"
+    "model":        "./testModel.json"
 }

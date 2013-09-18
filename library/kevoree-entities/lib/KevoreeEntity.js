@@ -24,6 +24,8 @@ module.exports = Class({
 
         this.kCore = null;
         this.dictionary = new Dictionary();
+        this.name = null;
+        this.nodeName = null;
     },
 
     start: function () {
@@ -50,7 +52,15 @@ module.exports = Class({
         return this.name;
     },
 
+    getNodeName: function () {
+        return this.nodeName;
+    },
+
     setName: function (name) {
         this.name = name;
+    },
+
+    setNodeName: function (name) {
+        this.nodeName = name;
     }
 });

@@ -1,5 +1,6 @@
 var AdaptationPrimitive = require('./AdaptationPrimitive'),
     RemoveInstance      = require('./RemoveInstance'),
+    kevoree             = require('kevoree-library').org.kevoree,
     npm                 = require('npm'),
     path                = require('path');
 
@@ -21,22 +22,30 @@ module.exports = AdaptationPrimitive.extend({
 
         var kInstance = this.adaptModel.findByPath(this.trace.previousPath);
 
-        if (kInstance.name != this.node.getName()) {
-            var moduleName = this.findSuitableModuleName(kInstance);
-            if (moduleName != undefined && moduleName != null) {
-                var modulesPath = this.node.getKevoreeCore().getModulesPath();
-                var InstanceClass = require(path.resolve(modulesPath, 'node_modules', moduleName));
-                var instance = new InstanceClass();
-                instance.setKevoreeCore(this.node.getKevoreeCore());
-                instance.setName(kInstance.name);
-                this.mapper.addEntry(kInstance.path(), instance);
-                callback.call(this, null);
-                return;
+        // inception check
+        if (kInstance && (kInstance.name != this.node.getName())) {
+            // platform related check
+            if (this.isRelatedToPlatform(kInstance)) {
+                var moduleName = this.findSuitableModuleName(kInstance);
+                if (moduleName != undefined && moduleName != null) {
+                    var modulesPath = this.node.getKevoreeCore().getModulesPath();
+                    var InstanceClass = require(path.resolve(modulesPath, 'node_modules', moduleName));
 
-            } else {
-                // there is no DeployUnit installed for this instance TypeDefinition
-                callback.call(this, new Error("No DeployUnit installed for "+this.instance.path()));
-                return;
+                    var instance = new InstanceClass();
+                    instance.setKevoreeCore(this.node.getKevoreeCore());
+                    instance.setName(kInstance.name);
+                    instance.setNodeName(this.node.getName());
+
+                    this.mapper.addEntry(kInstance.path(), instance);
+
+                    callback.call(this, null);
+                    return;
+
+                } else {
+                    // there is no DeployUnit installed for this instance TypeDefinition
+                    callback.call(this, new Error("No DeployUnit installed for "+this.instance.path()));
+                    return;
+                }
             }
         }
 
@@ -51,6 +60,34 @@ module.exports = AdaptationPrimitive.extend({
         return;
     },
 
+    isRelatedToPlatform: function (kInstance) {
+        if (isType(kInstance.typeDefinition, kevoree.impl.ComponentTypeImpl)) {
+            // if parent is this node platform: it's ok
+            return (kInstance.eContainer().name == this.node.getName());
+
+        } else if (isType(kInstance.typeDefinition, kevoree.impl.ChannelTypeImpl)) {
+            // if this channel has bindings with components hosted in this node platform: it's ok
+            var bindings = kInstance.bindings;
+            for (var i=0; i < bindings.size(); i++) {
+                if (bindings.get(i).port.eContainer().eContainer().name == this.node.getName()) return true;
+            }
+            return false;
+
+        } else if (isType(kInstance.typeDefinition, kevoree.impl.GroupTypeImpl)) {
+            var subNodes = kInstance.subNodes;
+            for (var i=0; i < subNodes.size(); i++) {
+                if (subNodes.get(i).name == this.node.name) return true;
+            }
+            return false;
+
+        } else if (isType(kInstance.typeDefinition, kevoree.impl.NodeTypeImpl)) {
+            // TODO
+            return true;
+        }
+
+        return false;
+    },
+
     findSuitableModuleName: function (kInstance) {
         // change that to check if there is a JavascriptNode targetNodeType
         // in any of this typeDef deployUnits
@@ -58,3 +95,15 @@ module.exports = AdaptationPrimitive.extend({
         return this.mapper.getObject(du.path());
     }
 });
+
+var isType = function (object, type) {
+    if (object === null || object === undefined) {
+        return false;
+    }
+
+    var proto = Object.getPrototypeOf(object);
+    if (proto == type.proto) {
+        return true;
+    }
+    return false;
+}
