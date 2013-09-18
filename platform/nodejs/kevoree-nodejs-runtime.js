@@ -1,47 +1,43 @@
-;(function () {
-    var Core    = require('kevoree-core'),
-        kLib    = require('kevoree-library'),
-        config  = require('./config.json'),
-        log     = require('npmlog');
+var Core            = require('kevoree-core'),
+    kLib            = require('kevoree-library'),
+    config          = require('./config.json'),
+    modelJson       = require(config.model),
+    NPMBootstrapper = require('kevoree-commons').NPMBootstrapper,
+    log             = require('npmlog');
 
-    log.heading = 'kevoree';
-    var TAG     = 'KevoreeNodeJSRuntime';
+var TAG             = 'KevoreeNodeJSRuntime',
+    kevoreeCore     = new Core(__dirname),
+    jsonLoader      = new kLib.org.kevoree.loader.JSONModelLoader(),
+    bootstrapper    = new NPMBootstrapper(__dirname),
+    nodeName        = config.nodeName;
 
-    var kevoreeCore = new Core(__dirname);
-    var jsonLoader  = new kLib.org.kevoree.loader.JSONModelLoader();
+// npmlog heading text
+log.heading = 'runtime';
 
-    var nodeName    = config.nodeName,
-        modelJSON   = require(config.model),
-        model       = jsonLoader.loadModelFromString(JSON.stringify(modelJSON)).get(0);
+kevoreeCore.on('started', function () {
+    var bootstrapModel = jsonLoader.loadModelFromString(JSON.stringify(modelJson)).get(0);
+    // TODO check if there is a JavascriptNode and a Group in this model
+    // otherwise there is no point in deploy this model cause it won't bootstrap
+    kevoreeCore.deploy(bootstrapModel);
+});
 
-    // TODO
-    // add some verifications over the fact that it is not 100% sure that there is
-    // an instance of nodeName in the given model => if there is no instance add it
-    // Same goes for the group
-    // !!for now I use a trustable model, but in the future this can't be enough!!
-    kevoreeCore.on('started', function () {
-        var groupName   = config.groupName,
-            model2JSON  = require('./nodegroup.json'),
-            model2      = jsonLoader.loadModelFromString(JSON.stringify(model2JSON)).get(0);
+kevoreeCore.on('deployed', function (err, model) {
+    // deploy success
 
-        kevoreeCore.deploy(model2, null);
-    });
+});
 
-    kevoreeCore.on('deployed', function (err, model) {
-        // deploy success
+kevoreeCore.on('stopped', function (err, model) {
+    // kevoree core stopped
+});
 
-    });
+kevoreeCore.on('error', function (err) {
+    log.error(TAG, err.stack);
+    // try to stop Kevoree Core on error
+    kevoreeCore.stop();
+});
 
-    kevoreeCore.on('stopped', function (err, model) {
-        // kevoree core stopped
-    });
+// set Kevoree bootstrapper
+kevoreeCore.setBootstrapper(bootstrapper);
 
-    kevoreeCore.on('error', function (err) {
-        log.error(TAG, err.stack);
-        // try to stop Kevoree Core on error
-        kevoreeCore.stop();
-    });
-
-    // start Kevoree Core
-    kevoreeCore.start(nodeName, model);
-})();
+// start Kevoree Core
+kevoreeCore.start(nodeName);

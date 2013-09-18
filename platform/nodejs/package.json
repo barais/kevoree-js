@@ -6,8 +6,9 @@
         "start": "node kevoree-nodejs-runtime.js"
     },
     "dependencies": {
-        "kevoree-core": "0.0.1",
+        "kevoree-core": "0.0.2",
         "kevoree-library": "0.0.2",
+        "kevoree-commons": "0.0.1",
         "npmlog": "0.0.4"
     },
     "license": "LGPL-3.0"

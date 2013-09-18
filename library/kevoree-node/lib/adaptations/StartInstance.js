@@ -9,17 +9,22 @@ module.exports = AdaptationPrimitive.extend({
 
         var kInstance = this.adaptModel.findByPath(this.trace.srcPath);
 
-        var instance = this.mapper.getObject(kInstance.path());
-        if (instance != undefined && instance != null) {
-            instance.setKevoreeCore(this.node.getKevoreeCore());
-            instance.start();
-            callback.call(this, null);
-            return;
+        if (kInstance.name != this.node.getName()) {
+            var instance = this.mapper.getObject(kInstance.path());
 
-        } else {
-            callback.call(this, new Error("StartInstance error: unable to start instance "+kInstance.name));
-            return;
+            if (instance != undefined && instance != null) {
+                instance.setKevoreeCore(this.node.getKevoreeCore());
+                instance.start();
+                callback.call(this, null);
+                return;
+
+            } else {
+                callback.call(this, new Error("StartInstance error: unable to start instance "+kInstance.name));
+                return;
+            }
         }
+
+        callback.call(this, null);
     },
 
     undo: function (_super, callback) {

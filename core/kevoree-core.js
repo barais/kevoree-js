@@ -4,10 +4,6 @@
         log             = require('npmlog'),
         async           = require('async'),
         EventEmitter    = require('events').EventEmitter,
-
-        Util            = require('./util/Util'),
-        Bootstrapper    = require('./lib/Bootstrapper'),
-
         TAG             = 'KevoreeCore';
 
     /**
@@ -26,16 +22,16 @@
             log.silly(TAG, 'Initialization...');
 
             this.factory = new kLib.org.kevoree.impl.DefaultKevoreeFactory();
+            this.loader  = new kLib.org.kevoree.loader.JSONModelLoader();
             this.compare = new kLib.org.kevoree.compare.DefaultModelCompare();
 
-            // create a new empty model container
-            this.currentModel = this.factory.createContainerRoot();
-            this.models = [];
-            this.nodeName = null;
-            this.nodeInstance = null;
-            this.modulesPath = modulesPath;
-            this.bootstrapper = new Bootstrapper(modulesPath);
-            this.intervalId = null;
+            this.currentModel   = null;
+            this.models         = [];
+            this.nodeName       = null;
+            this.nodeInstance   = null;
+            this.modulesPath    = modulesPath;
+            this.bootstrapper   = null;
+            this.intervalId     = null;
 
             this.emitter = new EventEmitter();
         },
@@ -50,41 +46,23 @@
         /**
          * Starts Kevoree Core
          * @param nodeName
-         * @param model
          */
-        start: function (nodeName, model) {
-            if (this.intervalId == null) {
-                log.info(TAG, "Starting '%s' bootstrapping...", nodeName);
-                pushModel(this.models, this.currentModel);
-                this.currentModel = model;
-                if (nodeName != undefined && nodeName != null) {
-                    this.nodeName = nodeName;
-                    var that = this;
-                    this.bootstrapper.bootstrapNodeType(this.nodeName, this.currentModel, function (err, AbstractNode) {
-                        if (err) {
-                            log.error(TAG, err.stack);
-                            that.emitter.emit('error', new Error("Unable to bootstrap '"+nodeName+"'! Start process aborted."));
-                        }
-                        that.nodeInstance = new AbstractNode();
-                        that.nodeInstance.setKevoreeCore(that);
-                        that.nodeInstance.setName(nodeName);
-                        that.nodeInstance.start();
+        start: function (nodeName) {
+            if (nodeName == undefined || nodeName.length == 0) nodeName = "node0";
 
-                        // starting loop function
-                        that.intervalId = setInterval(function () {}, 10);
+            this.nodeName = nodeName;
+            this.currentModel = this.factory.createContainerRoot();
 
-                        that.emitter.emit('started');
-                        return;
-                    });
+            // starting loop function
+            this.intervalId = setInterval(function () {}, 1e8);
 
-                } else {
-                    this.emitter.emit('error', new Error("Unable to bootstrap Kevoree Core: 'nodeName' & 'groupName' are null or undefined"));
-                    return;
-                }
-            } else {
-                this.emitter.emit('error', new Error("Core already started"));
-                return;
-            }
+            log.info(TAG, "Platform started: '%s'", nodeName);
+
+            this.emitter.emit('started');
+        },
+
+        setBootstrapper: function (bootstrapper) {
+            this.bootstrapper = bootstrapper;
         },
 
         /**
@@ -114,99 +92,138 @@
          * Get traces and call command (that can be redefined)
          *
          * @param model
-         * @param uuid
-         * @param callback
          */
-        deploy: function (model, uuid) {
-            if (this.intervalId != null) {
+        deploy: function (model) {
+            if (model.findNodesByID(this.nodeName) == null) {
+                this.emitter.emit('error', new Error('Deploy model failure: unable to find %s in given model', this.nodeName));
+                return;
+
+            } else {
                 log.info(TAG, 'Deploy process started...');
                 if (model != undefined && model != null) {
-                    if (this.nodeInstance != undefined && this.nodeInstance != null) {
-                        // given model is defined and not null
-                        var diffSeq = this.compare.diff(this.currentModel, model);
-                        var adaptations = this.nodeInstance.processTraces(diffSeq.traces, model);
+                    // check if there is an instance currently running
+                    // if not, it will try to run it
+                    var core = this;
+                    this.checkBootstrapNode(model, function (err) {
+                        if (err) {
+                            core.emitter.emit('error', err);
+                            return;
+                        }
 
-                        // list of adaptation commands retrieved
-                        var core = this,
-                            cmdStack = [];
+                        if (core.nodeInstance != undefined && core.nodeInstance != null) {
+                            // given model is defined and not null
+                            var diffSeq = core.compare.diff(core.currentModel, model);
+                            var adaptations = core.nodeInstance.processTraces(diffSeq.traces, model);
 
-                        // executeCommand: function that save cmd to stack and executes it
-                        var executeCommand = function executeCommand(cmd, iteratorCallback) {
-                            // save the cmd to be processed in a stack using unshift
-                            // in order to add the last processed cmd at the beginning of the array
-                            // => cmdStack[0] = more recently executed cmd
-                            cmdStack.unshift(cmd);
+                            // list of adaptation commands retrieved
+                            var cmdStack = [];
 
-                            // execute cmd
-                            cmd.execute(function (err) {
-                                if (err) {
-                                    iteratorCallback(err);
-                                    return;
-                                }
+                            // executeCommand: function that save cmd to stack and executes it
+                            var executeCommand = function executeCommand(cmd, iteratorCallback) {
+                                // save the cmd to be processed in a stack using unshift
+                                // in order to add the last processed cmd at the beginning of the array
+                                // => cmdStack[0] = more recently executed cmd
+                                cmdStack.unshift(cmd);
 
-                                // adaptation succeed
-                                iteratorCallback();
-                            });
-                        };
-
-                        // rollbackCommand: function that calls undo() on cmds in the stack
-                        var rollbackCommand = function rollbackCommand(cmd, iteratorCallback) {
-                            cmd.undo(function (err) {
-                                if (err) {
-                                    iteratorCallback(err);
-                                    return;
-                                }
-
-                                // undo succeed
-                                iteratorCallback();
-                            });
-                        };
-
-                        // execute each command synchronously
-                        async.eachSeries(adaptations, executeCommand, function (err) {
-                            if (err) {
-                                // something went wrong while processing adaptations
-                                log.error(TAG, err.stack);
-
-                                // rollback process
-                                async.eachSeries(cmdStack, rollbackCommand, function (er) {
-                                    if (er) {
-                                        // something went wrong while rollbacking
-                                        log.error(TAG, er.stack);
-                                        core.emitter.emit('error', new Error("Something went wrong while rollbacking..."));
+                                // execute cmd
+                                cmd.execute(function (err) {
+                                    if (err) {
+                                        iteratorCallback(err);
                                         return;
                                     }
 
-                                    // rollback succeed
-                                    core.emitter.emit('rollback');
-                                    return;
+                                    // adaptation succeed
+                                    iteratorCallback();
                                 });
+                            };
 
-                                core.emitter.emit('error', new Error("Something went wrong while processing adaptations. Rollback"));
+                            // rollbackCommand: function that calls undo() on cmds in the stack
+                            var rollbackCommand = function rollbackCommand(cmd, iteratorCallback) {
+                                cmd.undo(function (err) {
+                                    if (err) {
+                                        iteratorCallback(err);
+                                        return;
+                                    }
+
+                                    // undo succeed
+                                    iteratorCallback();
+                                });
+                            };
+
+                            // execute each command synchronously
+                            async.eachSeries(adaptations, executeCommand, function (err) {
+                                if (err) {
+                                    // something went wrong while processing adaptations
+                                    log.error(TAG, err.stack);
+
+                                    // rollback process
+                                    async.eachSeries(cmdStack, rollbackCommand, function (er) {
+                                        if (er) {
+                                            // something went wrong while rollbacking
+                                            log.error(TAG, er.stack);
+                                            core.emitter.emit('error', new Error("Something went wrong while rollbacking..."));
+                                            return;
+                                        }
+
+                                        // rollback succeed
+                                        core.emitter.emit('rollback');
+                                        return;
+                                    });
+
+                                    core.emitter.emit('error', new Error("Something went wrong while processing adaptations. Rollback"));
+                                    return;
+                                }
+
+                                // adaptations succeed : woot
+                                log.verbose(TAG, "Model deployed successfully.");
+                                // save old model
+                                pushInArray(core.models, core.currentModel);
+                                // set new model to be the current one
+                                core.currentModel = model;
+                                // all good :)
+                                core.emitter.emit('deployed', core.currentModel);
                                 return;
-                            }
+                            });
 
-                            // adaptations succeed : woot
-                            log.verbose(TAG, "Model deployed successfully.");
-                            // save old model
-                            pushModel(core.models, core.currentModel);
-                            // set new model to be the current one
-                            core.currentModel = model;
-                            // all good :)
-                            core.emitter.emit('deployed', core.currentModel);
+                        } else {
+                            core.emitter.emit('error', new Error("There is no instance to bootstrap on"));
                             return;
-                        });
-
-                    }
+                        }
+                    });
                 } else {
                     this.emitter.emit('error', new Error("model is not defined or null. Deploy aborted."));
                     return;
                 }
+            }
+        },
+
+        checkBootstrapNode: function (model, callback) {
+            callback = callback || function () {};
+
+            if (this.nodeInstance == undefined || this.nodeInstance == null) {
+                log.info(TAG, "Start '%s' bootstrapping...", this.nodeName);
+                var core = this;
+                this.bootstrapper.bootstrapNodeType(this.nodeName, model, function (err, AbstractNode) {
+                    if (err) {
+                        log.error(TAG, err.stack);
+                        callback.call(core, new Error("Unable to bootstrap '"+core.nodeName+"'! Start process aborted."));
+                        return;
+                    }
+
+                    core.nodeInstance = new AbstractNode();
+                    core.nodeInstance.setKevoreeCore(core);
+                    core.nodeInstance.setName(core.nodeName);
+                    core.nodeInstance.start();
+
+                    log.info(TAG, "'%s' instance started successfully", core.nodeName);
+
+                    callback.call(core, null);
+                    return
+                });
 
             } else {
-                // there is no platform started yet, deploy impossible
-                // TODO auto-start ?
-                this.emitter.emit('error', new Error("There is no platform started yet. Deploy impossible."));
+                callback.call(this, null);
+                return;
             }
         },
 
@@ -248,7 +265,7 @@
     });
 
     // utility function to ensure cached model list won't go over 10 items
-    var pushModel = function pushModel(array, model) {
+    var pushInArray = function pushInArray(array, model) {
         if (array.length == 10) this.shift();
         array.push(model);
     }

@@ -21,20 +21,26 @@ module.exports = AdaptationPrimitive.extend({
 
         var kInstance = this.adaptModel.findByPath(this.trace.previousPath);
 
-        var moduleName = this.findSuitableModuleName(kInstance);
-        if (moduleName != undefined && moduleName != null) {
-            var modulesPath = this.node.getKevoreeCore().getModulesPath();
-            var InstanceClass = require(path.resolve(modulesPath, 'node_modules', moduleName));
-            var instance = new InstanceClass();
-            this.mapper.addEntry(kInstance.path(), instance);
-            callback.call(this, null);
-            return;
+        if (kInstance.name != this.node.getName()) {
+            var moduleName = this.findSuitableModuleName(kInstance);
+            if (moduleName != undefined && moduleName != null) {
+                var modulesPath = this.node.getKevoreeCore().getModulesPath();
+                var InstanceClass = require(path.resolve(modulesPath, 'node_modules', moduleName));
+                var instance = new InstanceClass();
+                instance.setKevoreeCore(this.node.getKevoreeCore());
+                instance.setName(kInstance.name);
+                this.mapper.addEntry(kInstance.path(), instance);
+                callback.call(this, null);
+                return;
 
-        } else {
-            // there is no DeployUnit installed for this instance TypeDefinition
-            callback.call(this, new Error("No DeployUnit installed for "+this.instance.path()));
-            return;
+            } else {
+                // there is no DeployUnit installed for this instance TypeDefinition
+                callback.call(this, new Error("No DeployUnit installed for "+this.instance.path()));
+                return;
+            }
         }
+
+        callback.call(this, null);
     },
 
     undo: function (_super, callback) {

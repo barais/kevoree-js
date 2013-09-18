@@ -1,0 +1,3 @@
+# Kevoree Common #
+
+Shared libraries

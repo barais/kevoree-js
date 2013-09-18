@@ -26,7 +26,8 @@ var TAG = 'AdaptationEngine',
         "AddInstance":      7,
         "AddBinding":       8,
         "UpdateDictionary": 9,
-        "StartInstance":    10
+        "StartInstance":    10,
+        "Noop":             11
     };
 
 /**
