@@ -27,7 +27,7 @@ var TAG = 'AdaptationEngine',
         "AddBinding":       8,
         "UpdateDictionary": 9,
         "StartInstance":    10,
-        "Noop":             11
+        "Noop":             42
     };
 
 /**
@@ -73,14 +73,23 @@ var AdaptationEngine = Class({
      * @returns {AdaptationPrimitive}
      */
     processTrace: function (trace, model) {
+        //console.log(JSON.stringify(JSON.parse(trace), null, 2));
+
         // ADD TRACES HANDLING
         if (isType(trace, kLib.org.kevoree.modeling.api.trace.ModelAddTrace)) {
             if (ADD_INSTANCE_TRACE.indexOf(trace.typeName) != -1) {
+                // Add instance
                 AdaptationPrimitive = this.getCommand('AddInstance');
                 return new AdaptationPrimitive(this.node, this.modelObjMapper, model, trace);
 
             } else if (ADD_DEPLOY_UNIT.indexOf(trace.typeName) != -1) {
+                // Add deploy unit
                 AdaptationPrimitive = this.getCommand('AddDeployUnit');
+                return new AdaptationPrimitive(this.node, this.modelObjMapper, model, trace);
+
+            } else if (trace.refName == 'mBindings') {
+                // Add binding
+                AdaptationPrimitive = this.getCommand('AddBinding');
                 return new AdaptationPrimitive(this.node, this.modelObjMapper, model, trace);
             }
 

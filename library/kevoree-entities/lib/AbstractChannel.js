@@ -1,17 +1,40 @@
-;(function () {
-    var KevoreeEntity = require('./KevoreeEntity');
+var KevoreeEntity = require('./KevoreeEntity');
 
-    /**
-     * AbstractChannel entity
-     *
-     * @type {AbstractChannel} extends KevoreeEntity
-     */
-    module.exports = KevoreeEntity.extend({
-        toString: 'AbstractChannel',
+/**
+ * AbstractChannel entity
+ *
+ * @type {AbstractChannel} extends KevoreeEntity
+ */
+module.exports = KevoreeEntity.extend({
+    toString: 'AbstractChannel',
 
-        getModelEntity: function () {
-            return this.kCore.getCurrentModel().findHubsByID(this.name);
+    construct: function () {
+        this.remoteNodes = {};
+        this.inputs = {};
+    },
+
+    internalSend: function (portPath, msg) {
+        var remoteNodeNames = this.remoteNodes[portPath];
+        for (var remoteNodeName in remoteNodeNames) {
+            this.onSend(remoteNodeName, msg);
         }
-    });
+    },
 
-})();
+    onSend: function (remoteNodeName, msg) {
+
+    },
+
+    remoteCallback: function (msg) {
+        for (var name in this.inputs) {
+            this.inputs[name].getCallback().call(this, msg);
+        }
+    },
+
+    addInternalRemoteNodes: function (portPath, remoteNodes) {
+        this.remoteNodes[portPath] = remoteNodes;
+    },
+
+    addInternalInputPort: function (port) {
+        this.inputs[port.getName()] = port;
+    }
+});

@@ -12,6 +12,11 @@ var LocalChannel = AbstractChannel.extend({
 
     start: function () {
         log.info(TAG, 'TODO channel');
+    },
+
+    onSend: function (remoteNodeName, msg) {
+        // directly dispatching message locally
+        this.remoteCallback(msg);
     }
 });
 

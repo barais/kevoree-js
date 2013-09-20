@@ -1,6 +1,7 @@
 var AdaptationPrimitive = require('./AdaptationPrimitive'),
     RemoveInstance      = require('./RemoveInstance'),
     kevoree             = require('kevoree-library').org.kevoree,
+    Port                = require('kevoree-entities').Port,
     npm                 = require('npm'),
     path                = require('path');
 
@@ -34,7 +35,10 @@ module.exports = AdaptationPrimitive.extend({
                     var instance = new InstanceClass();
                     instance.setKevoreeCore(this.node.getKevoreeCore());
                     instance.setName(kInstance.name);
+                    instance.setPath(kInstance.path());
                     instance.setNodeName(this.node.getName());
+
+                    this.doSpecificTypeProcess(kInstance);
 
                     this.mapper.addEntry(kInstance.path(), instance);
 
@@ -71,14 +75,12 @@ module.exports = AdaptationPrimitive.extend({
             for (var i=0; i < bindings.size(); i++) {
                 if (bindings.get(i).port.eContainer().eContainer().name == this.node.getName()) return true;
             }
-            return false;
 
         } else if (isType(kInstance.typeDefinition, kevoree.impl.GroupTypeImpl)) {
             var subNodes = kInstance.subNodes;
             for (var i=0; i < subNodes.size(); i++) {
                 if (subNodes.get(i).name == this.node.name) return true;
             }
-            return false;
 
         } else if (isType(kInstance.typeDefinition, kevoree.impl.NodeTypeImpl)) {
             // TODO
@@ -93,6 +95,28 @@ module.exports = AdaptationPrimitive.extend({
         // in any of this typeDef deployUnits
         var du = kInstance.typeDefinition.deployUnits.get(0); // TODO OMG THIS IS UGLY
         return this.mapper.getObject(du.path());
+    },
+
+    doSpecificTypeProcess: function (kInstance) {
+        if (isType(kInstance.typeDefinition, kevoree.impl.ComponentTypeImpl)) {
+            var provided = kInstance.provided;
+            for (var i=0; i < provided.size(); i++) {
+                this.mapper.addEntry(provided.get(i).path(), new Port(provided.get(i).portTypeRef.name, provided.get(i).path()));
+            }
+
+            var required = kInstance.required;
+            for (var i=0; i < required.size(); i++) {
+                this.mapper.addEntry(required.get(i).path(), new Port(required.get(i).portTypeRef.name, required.get(i).path()));
+            }
+
+        } else if (isType(kInstance.typeDefinition, kevoree.impl.ChannelTypeImpl)) {
+
+        } else if (isType(kInstance.typeDefinition, kevoree.impl.GroupTypeImpl)) {
+
+
+        } else if (isType(kInstance.typeDefinition, kevoree.impl.NodeTypeImpl)) {
+
+        }
     }
 });
 

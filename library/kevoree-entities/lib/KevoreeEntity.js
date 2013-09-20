@@ -25,6 +25,7 @@ module.exports = Class({
         this.kCore = null;
         this.dictionary = new Dictionary();
         this.name = null;
+        this.path = null;
         this.nodeName = null;
     },
 
@@ -60,7 +61,19 @@ module.exports = Class({
         this.name = name;
     },
 
+    setPath: function (path) {
+        this.path = path;
+    },
+
+    getPath: function () {
+        return this.path;
+    },
+
     setNodeName: function (name) {
         this.nodeName = name;
+    },
+
+    getModelEntity: function () {
+        return this.kCore.getCurrentModel().findByPath(this.path);
     }
 });
