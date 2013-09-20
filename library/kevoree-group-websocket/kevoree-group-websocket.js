@@ -56,6 +56,14 @@ var WebSocketGroup = AbstractGroup.extend({
         this.start();
     },
 
+    push: function (model, targetNodeName) {
+        //
+    },
+
+    pull: function (targetNodeName) {
+        // TODO
+    },
+
     checkNoMultipleMasterServer: function () {
         var group = this.getModelEntity();
         if (group != null) {
