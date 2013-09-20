@@ -3,16 +3,13 @@ var Core            = require('kevoree-core'),
     config          = require('./config.json'),
     modelJson       = require(config.model),
     NPMBootstrapper = require('kevoree-commons').NPMBootstrapper,
-    log             = require('npmlog');
+    KevoreeLogger   = require('kevoree-utils').KevoreeLogger;
 
-var TAG             = 'KevoreeNodeJSRuntime',
-    kevoreeCore     = new Core(__dirname),
+var log             = new KevoreeLogger('KevoreeNodeJSRuntime'),
+    kevoreeCore     = new Core(__dirname, log),
     jsonLoader      = new kLib.org.kevoree.loader.JSONModelLoader(),
     bootstrapper    = new NPMBootstrapper(__dirname),
     nodeName        = config.nodeName;
-
-// npmlog heading text
-log.heading = 'runtime';
 
 kevoreeCore.on('started', function () {
     var bootstrapModel = jsonLoader.loadModelFromString(JSON.stringify(modelJson)).get(0);
@@ -31,7 +28,7 @@ kevoreeCore.on('stopped', function (err, model) {
 });
 
 kevoreeCore.on('error', function (err) {
-    log.error(TAG, err.stack);
+    log.error(err.stack);
     // try to stop Kevoree Core on error
     kevoreeCore.stop();
 });

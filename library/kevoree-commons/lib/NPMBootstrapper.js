@@ -1,23 +1,21 @@
-var Class   = require('pseudoclass'),
-    log     = require('npmlog'),
-    npm     = require('npm'),
-    path    = require('path'),
-
-    TAG     = 'NPMBootstrapper';
+var Class           = require('pseudoclass'),
+    KevoreeLogger   = require('kevoree-utils').KevoreeLogger,
+    npm             = require('npm'),
+    path            = require('path');
 
 /**
  *
  * @type {NPMBootstrapper}
  */
 module.exports = Class({
-    toString: TAG,
+    toString: "NPMBootstrapper",
 
     /**
      *
      */
     construct: function (modulesPath) {
         this.modulesPath = modulesPath;
-        log.heading = 'kevoree';
+        this.log = new KevoreeLogger(this.toString());
     },
 
     /**
@@ -41,7 +39,7 @@ module.exports = Class({
 
                 npm.load({}, function (err) {
                     if (err) {
-                        log.error(TAG, 'Unable to load npm module');
+                        this.log.error('Unable to load npm module');
                         callback.call(that, new Error('Bootstrap failure'));
                         return;
                     }
@@ -49,7 +47,7 @@ module.exports = Class({
                     // load success
                     npm.commands.install(that.modulesPath, [packageName+'@'+packageVersion], function (er) {
                         if (er) {
-                            log.error(TAG, 'npm failed to install package %s:%s', packageName, packageVersion);
+                            this.log.error('npm failed to install package %s:%s', packageName, packageVersion);
                             callback.call(that, new Error("Bootstrap failure"));
                             return;
                         }

@@ -1,0 +1,1 @@
+module.exports.KevoreeLogger  = require('./lib/KevoreeLogger');

@@ -1,1 +1,1 @@
-module.exports.NPMBootstrapper = require('./lib/NPMBootstrapper');
+module.exports.NPMBootstrapper  = require('./lib/NPMBootstrapper');

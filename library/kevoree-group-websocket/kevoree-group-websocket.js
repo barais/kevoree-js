@@ -1,9 +1,8 @@
 var AbstractGroup   = require('kevoree-entities').AbstractGroup,
-    log             = require('npmlog'),
+    KevoreeLogger   = require('kevoree-utils').KevoreeLogger,
     WSClient        = require('ws'),
     WSServer        = require('ws').Server,
 
-    TAG         = 'WebSocketGroup',
     PULL        = 0,
     PUSH        = 1,
     REGISTER    = 3;
@@ -14,10 +13,10 @@ var AbstractGroup   = require('kevoree-entities').AbstractGroup,
  * @type {WebSocketGroup}
  */
 var WebSocketGroup = AbstractGroup.extend({
-    toString: TAG,
+    toString: 'WebSocketGroup',
 
     construct: function () {
-        log.heading = 'kevoree';
+        this.log = new KevoreeLogger(this.toString());
 
         this.server = null;
         this.client = null;
@@ -30,10 +29,10 @@ var WebSocketGroup = AbstractGroup.extend({
         this.checkNoMultipleMasterServer();
 
         if (this.dictionary.getValue('port') != undefined) {
-            this.server = startWSServer(this.dictionary.getValue('port'));
+            this.server = startWSServer(this.log, this.dictionary.getValue('port'));
         } else {
-            log.warn(TAG, "There is no 'port' attribute defined: trying with default 8000");
-            this.server = startWSServer(8000);
+            this.log.warn("There is no 'port' attribute defined: trying with default 8000");
+            this.server = startWSServer(this.log, 8000);
         }
     },
 
@@ -86,20 +85,20 @@ var WebSocketGroup = AbstractGroup.extend({
     }
 });
 
-var startWSServer = function startWSServer(port) {
+var startWSServer = function startWSServer(log, port) {
     // create a WebSocket server on specified port
     var server = new WSServer({port: port});
-    log.info(TAG, "WebSocket server started: %s:%s", server.options.host, port);
+    log.info("WebSocket server started: %s:%s", server.options.host, port);
 
     server.on('connection', function(ws) {
         ws.on('message', function(data, flag) {
             if (flag.binary == undefined) {
                 // received data is a String
-                log.info(TAG, "received %s", data);
+                log.info("received %s", data);
 
             } else {
                 // received data is binary
-                log.info(TAG, "received binary data");
+                log.info("received binary data");
             }
         });
     });

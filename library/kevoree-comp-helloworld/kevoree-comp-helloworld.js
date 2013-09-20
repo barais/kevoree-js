@@ -1,26 +1,27 @@
 var AbstractComponent   = require('kevoree-entities').AbstractComponent,
-    log                 = require('npmlog'),
-
-    TAG     = 'HelloWorldComponent';
+    KevoreeLogger       = require('kevoree-utils').KevoreeLogger;
 
 var HelloWorldComponent = AbstractComponent.extend({
-    toString: TAG,
+    toString: 'HelloWorldComponent',
 
     construct: function () {
-        log.heading = 'kevoree';
+        this.log = new KevoreeLogger(this.toString());
         this.id = null;
     },
 
     start: function () {
-        log.info(TAG, 'Hello world!');
-
         var self = this;
+
+        this.log.info('Hello world!');
+
         this.id = setInterval(function () {
+            // send a message through output port 'sendText' every 2 seconds
             self.send('sendText', "hello world "+(new Date));
         }, 2000);
 
+        // print messages to std output when received from input port 'fake'
         this.addInputPort("fake", function (msg) {
-            log.info(TAG, "Message received: %s", msg);
+            self.log.info("Message received: %s", msg);
         });
     },
 

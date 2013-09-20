@@ -1,9 +1,8 @@
 var Class           = require('pseudoclass'),
     kLib            = require('kevoree-library'),
-    log             = require('npmlog'),
+    KevoreeLogger   = require('kevoree-utils').KevoreeLogger,
     async           = require('async'),
-    EventEmitter    = require('events').EventEmitter,
-    TAG             = 'KevoreeCore';
+    EventEmitter    = require('events').EventEmitter;
 
 /**
  * Kevoree Core
@@ -11,14 +10,13 @@ var Class           = require('pseudoclass'),
  * @type {*}
  */
 module.exports = Class({
-    toString: TAG,
+    toString: 'KevoreeCore',
 
     /**
      * Core constructor
      */
-    construct: function(modulesPath) {
-        log.heading = 'kevoree';
-        log.silly(TAG, 'Initialization...');
+    construct: function(modulesPath, logger) {
+        this.log = (logger != undefined) ? logger : new KevoreeLogger(this.toString());
 
         this.factory = new kLib.org.kevoree.impl.DefaultKevoreeFactory();
         this.loader  = new kLib.org.kevoree.loader.JSONModelLoader();
@@ -39,7 +37,7 @@ module.exports = Class({
      * Destruct core instance
      */
     destruct: function() {
-        log.silly(TAG, 'Destructing...');
+        this.log.debug('Destructing...');
     },
 
     /**
@@ -55,7 +53,7 @@ module.exports = Class({
         // starting loop function
         this.intervalId = setInterval(function () {}, 1e8);
 
-        log.info(TAG, "Platform started: '%s'", nodeName);
+        this.log.info("Platform started: '%s'", nodeName);
 
         this.emitter.emit('started');
     },
@@ -75,7 +73,7 @@ module.exports = Class({
             clearInterval(this.intervalId);
             this.intervalId = null;
             this.currentModel = null;
-            log.silly(TAG, 'Stopped');
+            this.log.debug('Stopped');
         }
     },
 
@@ -98,7 +96,7 @@ module.exports = Class({
             return;
 
         } else {
-            log.info(TAG, 'Deploy process started...');
+            this.log.info('Deploy process started...');
             if (model != undefined && model != null) {
                 // check if there is an instance currently running
                 // if not, it will try to run it
@@ -153,13 +151,13 @@ module.exports = Class({
                         async.eachSeries(adaptations, executeCommand, function (err) {
                             if (err) {
                                 // something went wrong while processing adaptations
-                                log.error(TAG, err.stack);
+                                core.log.error(err.stack);
 
                                 // rollback process
                                 async.eachSeries(cmdStack, rollbackCommand, function (er) {
                                     if (er) {
                                         // something went wrong while rollbacking
-                                        log.error(TAG, er.stack);
+                                        core.log.error(er.stack);
                                         core.emitter.emit('error', new Error("Something went wrong while rollbacking..."));
                                         return;
                                     }
@@ -174,7 +172,7 @@ module.exports = Class({
                             }
 
                             // adaptations succeed : woot
-                            log.verbose(TAG, "Model deployed successfully.");
+                            core.log.debug("Model deployed successfully.");
                             // save old model
                             pushInArray(core.models, core.currentModel);
                             // set new model to be the current one
@@ -200,11 +198,11 @@ module.exports = Class({
         callback = callback || function () {};
 
         if (this.nodeInstance == undefined || this.nodeInstance == null) {
-            log.info(TAG, "Start '%s' bootstrapping...", this.nodeName);
+            this.log.info("Start '%s' bootstrapping...", this.nodeName);
             var core = this;
             this.bootstrapper.bootstrapNodeType(this.nodeName, model, function (err, AbstractNode) {
                 if (err) {
-                    log.error(TAG, err.stack);
+                    core.log.error(err.stack);
                     callback.call(core, new Error("Unable to bootstrap '"+core.nodeName+"'! Start process aborted."));
                     return;
                 }
@@ -214,7 +212,7 @@ module.exports = Class({
                 core.nodeInstance.setName(core.nodeName);
                 core.nodeInstance.start();
 
-                log.info(TAG, "'%s' instance started successfully", core.nodeName);
+                core.log.info("'%s' instance started successfully", core.nodeName);
 
                 callback.call(core, null);
                 return

@@ -1,14 +1,10 @@
 {
-    "name": "kevoree-nodejs-runtime",
+    "name": "kevoree-browser-runtime",
     "version": "0.0.1",
     "author": "Maxime Tricoire <max.tricoire@gmail.com>",
-    "scripts": {
-        "start": "node kevoree-nodejs-runtime.js"
-    },
     "dependencies": {
         "kevoree-core": "0.0.2",
         "kevoree-library": "0.0.2",
-        "kevoree-commons": "0.0.1",
         "kevoree-utils": "0.0.1"
     },
     "license": "LGPL-3.0"

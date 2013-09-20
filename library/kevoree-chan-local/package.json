@@ -19,8 +19,8 @@
     },
     "dependencies": {
         "kevoree-entities": "0.0.1",
-        "npmlog": "0.0.4",
-        "pseudoclass": "0.2.6"
+        "kevoree-utils":    "0.0.1",
+        "pseudoclass":      "0.2.6"
     },
     "devDependencies": {},
     "optionalDependencies": {},

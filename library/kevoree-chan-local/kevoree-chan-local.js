@@ -1,17 +1,15 @@
 var AbstractChannel = require('kevoree-entities').AbstractChannel,
-    log             = require('npmlog'),
-
-    TAG     = 'LocalChannel';
+    KevoreeLogger   = require('kevoree-utils').KevoreeLogger;
 
 var LocalChannel = AbstractChannel.extend({
-    toString: TAG,
+    toString: 'LocalChannel',
 
     construct: function () {
-        log.heading = 'kevoree';
+        this.log = new KevoreeLogger(this.toString());
     },
 
     start: function () {
-        log.info(TAG, 'TODO channel');
+        this.log.info('Local channel started');
     },
 
     onSend: function (remoteNodeName, msg) {
