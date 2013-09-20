@@ -16,7 +16,7 @@ var HelloWorldComponent = AbstractComponent.extend({
 
         var comp = this;
         this.id = setInterval(function () {
-            comp.getOutputPort('sendText').process("hello world "+(new Date));
+            comp.send('sendText', "hello world "+(new Date));
         }, 2000);
 
         this.addInputPort("fake", function (msg) {

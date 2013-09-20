@@ -23,8 +23,8 @@ module.exports = KevoreeEntity.extend({
         else log.error(TAG, "Unable to find provided port '%s' (AddBinding failed?)", name);
     },
 
-    getOutputPort: function (name) {
-        return this.outputs[name];
+    send: function (name, msg) {
+        this.outputs[name].process(msg);
     },
 
     addInternalInputPort: function (port) {
