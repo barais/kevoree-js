@@ -1,13 +1,15 @@
 var Core                    = require('kevoree-core'),
     JSONModelLoader         = require('kevoree-library').org.kevoree.loader.JSONModelLoader,
-    KevoreeBrowserLogger    = require('./lib/KevoreeBrowserLogger');
+    KevoreeBrowserLogger    = require('./lib/KevoreeBrowserLogger'),
+    HTTPBootstrapper        = require('./lib/HTTPBootstrapper');
 
 var log = new KevoreeBrowserLogger('Runtime');
 
 // init core objects
-var kevoreeCore = new Core(__dirname, log),
-    jsonLoader  = new JSONModelLoader(),
-    model       = jsonLoader.loadModelFromString(JSON.stringify(require('./model.json'))).get(0);
+var kevoreeCore     = new Core(__dirname, log),
+    jsonLoader      = new JSONModelLoader(),
+    model           = jsonLoader.loadModelFromString(JSON.stringify(require('./model.json'))).get(0),
+    bootstrapper    = new HTTPBootstrapper(__dirname);
 
 // init DOM objects
 var startBtn    = document.getElementById('start-btn'),
@@ -39,8 +41,8 @@ kevoreeCore.on('error', function (err) {
     }
 });
 
-// set Kevoree bootstrapper
-//kevoreeCore.setBootstrapper(bootstrapper);
+//set Kevoree bootstrapper
+kevoreeCore.setBootstrapper(bootstrapper);
 
 // start Kevoree Core
 startBtn.addEventListener('click', function () {
