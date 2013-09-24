@@ -1,116 +1,4 @@
 ;(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var process=require("__browserify_process");var Class   = require('pseudoclass'),
-    zlib    = require('zlib'),
-    http    = require('http'),
-    url     = require('url');
-//    tar     = require('tar');
-
-var HTTPBootstrapper = Class({
-    toString: 'HTTPBootstrapper',
-
-    construct: function (modulesPath) {
-        this.modulesPath = modulesPath;
-//        this.extracter = tar.Extract({ path: modulesPath});
-    },
-
-    bootstrapNodeType: function (nodeName, model, callback) {
-        var scope = this;
-        var options = {
-            host: 'registry.npmjs.org',
-            path: '/kevoree-node/-/kevoree-node-0.0.6.tgz',
-            port: 80,
-            headers: { 'accept-encoding': 'gzip,deflate' }
-        };
-
-//        gunzip.on('error', callback);
-//        this.extracter.on('error', callback);
-//        this.extracter.on('end', onTarballExtracted);
-
-        var req = http.get(options);
-        if (!req) callback(new Error('Unable to create request to server'));
-
-        req.on('error', function (err) {
-            callback(err);
-        });
-
-        req.on('close', function (err) {
-            callback(new Error("Something went wrong while downloading taball"));
-        });
-
-        req.on('response', function (res) {
-            if (res.statusCode !== 200) {
-                callback(new Error(res.statusCode + ' downloading tarball'))
-                return;
-            }
-
-            res.pipe(zlib.deflate).pipe(process.stdout);
-        });
-
-        function onTarballExtracted() {
-            console.log("tarball successfully extracted");
-            callback();
-        }
-    }
-});
-
-module.exports = HTTPBootstrapper;
-},{"__browserify_process":49,"http":28,"pseudoclass":10,"url":23,"zlib":32}],2:[function(require,module,exports){
-var KevoreeLogger = require('kevoree-utils').KevoreeLogger;
-
-var logDOM  = document.getElementById('log-console'),
-    ERROR   = 0,
-    WARN    = 1,
-    DEBUG   = 2,
-    INFO    = 3;
-
-var KevoreeBrowserLogger = KevoreeLogger.extend({
-    toString: 'KevoreeBrowserLogger',
-
-    info: function (_super, msg) {
-        addLogToDOM(INFO, this.tag+': '+msg);
-    },
-
-    warn: function (_super, msg) {
-        addLogToDOM(WARN, this.tag+': '+msg);
-    },
-
-    debug: function (_super, msg) {
-        addLogToDOM(DEBUG, this.tag+': '+msg);
-    },
-
-    error: function (_super, msg) {
-        addLogToDOM(ERROR, this.tag+': '+msg);
-    }
-});
-
-var addLogToDOM = function (level, msg) {
-    var li = document.createElement('li');
-
-    switch (level) {
-        // TODO add level
-        case DEBUG:
-            li.className += ' text-primary';
-            break;
-
-        case INFO:
-            li.className += ' text-success';
-            break;
-
-        case ERROR:
-            li.className += ' text-danger';
-            break;
-
-        case WARN:
-            li.className += ' text-warning';
-            break;
-    }
-
-    li.innerHTML = msg;
-    logDOM.appendChild(li);
-}
-
-module.exports = KevoreeBrowserLogger;
-},{"kevoree-utils":8}],3:[function(require,module,exports){
 var __dirname="/";var Core                    = require('kevoree-core'),
     JSONModelLoader         = require('kevoree-library').org.kevoree.loader.JSONModelLoader,
     KevoreeBrowserLogger    = require('./lib/KevoreeBrowserLogger'),
@@ -180,7 +68,127 @@ deployBtn.addEventListener('click', function () {
     } else log.warn("Can't deploy model: you must start Kevoree Runtime first.");
 });
 
-},{"./lib/HTTPBootstrapper":1,"./lib/KevoreeBrowserLogger":2,"./model.json":4,"kevoree-core":5,"kevoree-library":7}],4:[function(require,module,exports){
+},{"./lib/HTTPBootstrapper":2,"./lib/KevoreeBrowserLogger":3,"./model.json":4,"kevoree-core":5,"kevoree-library":7}],2:[function(require,module,exports){
+var Class   = require('pseudoclass'),
+    zlib    = require('zlib'),
+    http    = require('http'),
+    url     = require('url');
+//    tar     = require('tar');
+
+var HTTPBootstrapper = Class({
+    toString: 'HTTPBootstrapper',
+
+    construct: function (modulesPath) {
+        this.modulesPath = modulesPath;
+//        this.extracter = tar.Extract({ path: modulesPath});
+    },
+
+    bootstrapNodeType: function (nodeName, model, callback) {
+        var scope = this;
+        var options = {
+            host: 'registry.npmjs.org',
+            path: '/kevoree-node/-/kevoree-node-0.0.6.tgz',
+            port: 80,
+            headers: { 'accept-encoding': 'gzip,deflate' }
+        };
+
+        var req = new XMLHttpRequest();
+        req.open('GET', 'http://registry.npmjs.org/kevoree-node/-/kevoree-node-0.0.6.tgz', false);
+        req.send(null);
+        if (req.status == 200) {
+            console.log(req.responseText);
+            callback();
+        }
+
+//        gunzip.on('error', callback);
+//        this.extracter.on('error', callback);
+//        this.extracter.on('end', onTarballExtracted);
+
+//        var req = http.get(options);
+//        if (!req) callback(new Error('Unable to create request to server'));
+//
+//        req.on('error', function (err) {
+//            callback(err);
+//        });
+//
+//        req.on('close', function (err) {
+//            callback(new Error("Something went wrong while downloading taball"));
+//        });
+//
+//        req.on('response', function (res) {
+//            if (res.statusCode !== 200) {
+//                callback(new Error(res.statusCode + ' downloading tarball'))
+//                return;
+//            }
+//
+//            res.pipe(zlib.deflate).pipe(process.stdout);
+//        });
+//
+//        function onTarballExtracted() {
+//            console.log("tarball successfully extracted");
+//            callback();
+//        }
+    }
+});
+
+module.exports = HTTPBootstrapper;
+},{"http":28,"pseudoclass":10,"url":23,"zlib":32}],3:[function(require,module,exports){
+var KevoreeLogger = require('kevoree-utils').KevoreeLogger;
+
+var logDOM  = document.getElementById('log-console'),
+    ERROR   = 0,
+    WARN    = 1,
+    DEBUG   = 2,
+    INFO    = 3;
+
+var KevoreeBrowserLogger = KevoreeLogger.extend({
+    toString: 'KevoreeBrowserLogger',
+
+    info: function (_super, msg) {
+        addLogToDOM(INFO, this.tag+': '+msg);
+    },
+
+    warn: function (_super, msg) {
+        addLogToDOM(WARN, this.tag+': '+msg);
+    },
+
+    debug: function (_super, msg) {
+        addLogToDOM(DEBUG, this.tag+': '+msg);
+    },
+
+    error: function (_super, msg) {
+        addLogToDOM(ERROR, this.tag+': '+msg);
+    }
+});
+
+var addLogToDOM = function (level, msg) {
+    var li = document.createElement('li');
+
+    switch (level) {
+        // TODO add level
+        case DEBUG:
+            li.className += ' text-primary';
+            break;
+
+        case INFO:
+            li.className += ' text-success';
+            break;
+
+        case ERROR:
+            li.className += ' text-danger';
+            break;
+
+        case WARN:
+            li.className += ' text-warning';
+            break;
+    }
+
+    li.innerHTML = msg;
+    logDOM.appendChild(li);
+}
+
+module.exports = KevoreeBrowserLogger;
+},{"kevoree-utils":8}],4:[function(require,module,exports){
 module.exports={
     "eClass": "org.kevoree.ContainerRoot",
     "generated_KMF_ID": "101205821378461125909",
@@ -475,7 +483,7 @@ module.exports={
             "unitName": "kevoree-group-websocket",
             "generated_KMF_ID": "89918001378813344621",
             "hashcode": "201309101342309",
-            "type": "node_module",
+            "type": "npm",
             "version": "0.0.2",
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
@@ -487,7 +495,7 @@ module.exports={
             "unitName": "kevoree-node",
             "generated_KMF_ID": "142023381378461125966",
             "hashcode": "201309061152488",
-            "type": "node_module",
+            "type": "npm",
             "version": "0.0.6",
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
@@ -499,7 +507,7 @@ module.exports={
             "unitName": "kevoree-comp-helloworld",
             "generated_KMF_ID": "142023381378461125333",
             "hashcode": "201309061152442",
-            "type": "node_module",
+            "type": "npm",
             "version": "0.0.2",
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
@@ -511,7 +519,7 @@ module.exports={
             "unitName": "kevoree-chan-local",
             "generated_KMF_ID": "2755465601376380901387",
             "hashcode": "201308131001248",
-            "type": "node_module",
+            "type": "npm",
             "version": "0.0.1",
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
@@ -671,6 +679,10 @@ module.exports = Class({
 
     setBootstrapper: function (bootstrapper) {
         this.bootstrapper = bootstrapper;
+    },
+
+    getBootstrapper: function () {
+        return this.bootstrapper;
     },
 
     /**
@@ -37222,5 +37234,5 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}]},{},[3])
+},{}]},{},[1])
 ;

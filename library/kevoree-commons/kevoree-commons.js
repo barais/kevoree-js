@@ -1,1 +1,3 @@
-module.exports.NPMBootstrapper  = require('./lib/NPMBootstrapper');
+module.exports.Resolver         = require('./lib/Resolver');
+module.exports.Bootstrapper     = require('./lib/Bootstrapper');
+module.exports.KevoreeLogger    = require('./lib/KevoreeLogger');

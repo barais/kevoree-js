@@ -1,3 +1,0 @@
-# Kevoree Utils #
-
-Util libraries

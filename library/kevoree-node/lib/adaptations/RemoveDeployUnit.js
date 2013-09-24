@@ -1,6 +1,5 @@
 var AdaptationPrimitive = require('./AdaptationPrimitive'),
-    AddDeployUnit       = require('./AddDeployUnit'),
-    npm                 = require('npm');
+    AddDeployUnit       = require('./AddDeployUnit');
 
 /**
  * RemoveDeployUnit Adaptation
@@ -13,33 +12,19 @@ module.exports = AdaptationPrimitive.extend({
     execute: function (_super, callback) {
         _super.call(this, callback);
 
-        var deployUnit      = this.adaptModel.findByPath(this.trace.previousPath),
-            packageName     = deployUnit.unitName,
-            packageVersion  = deployUnit.version,
-            that            = this;
+        var deployUnit  = this.adaptModel.findByPath(this.trace.previousPath),
+            that        = this;
 
-        // uninstall deploy unit
-        npm.load({}, function (err) {
+        var bootstrapper = this.node.getKevoreeCore().getBootstrapper();
+        bootstrapper.uninstall(deployUnit, function (err) {
             if (err) {
-                // npm load error
-                callback.call(that, new Error('RemoveDeployUnit error: unable to load npm module'));
+                callback(err);
                 return;
             }
 
-            // load success
-            var modulesPath = that.node.getKevoreeCore().getModulesPath();
-            npm.commands.uninstall(modulesPath, [packageName+'@'+packageVersion], function (er) {
-                if (er) {
-                    // failed to load package:version
-                    callback.call(that, new Error('RemoveDeployUnit failed to uninstall '+packageName+':'+packageVersion));
-                    return;
-                }
-
-                // uninstall success: add deployUnit typeDef name & packageName into instanceManager map
-                that.mapper.removeEntry(deployUnit.path());
-                callback.call(that, null);
-                return;
-            });
+            that.mapper.removeEntry(deployUnit.path());
+            callback(null);
+            return;
         });
     },
 

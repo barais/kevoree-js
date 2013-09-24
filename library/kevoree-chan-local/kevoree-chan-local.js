@@ -1,5 +1,5 @@
 var AbstractChannel = require('kevoree-entities').AbstractChannel,
-    KevoreeLogger   = require('kevoree-utils').KevoreeLogger;
+    KevoreeLogger   = require('kevoree-commons').KevoreeLogger;
 
 var LocalChannel = AbstractChannel.extend({
     toString: 'LocalChannel',

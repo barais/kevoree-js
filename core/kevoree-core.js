@@ -1,6 +1,6 @@
 var Class           = require('pseudoclass'),
     kLib            = require('kevoree-library'),
-    KevoreeLogger   = require('kevoree-utils').KevoreeLogger,
+    KevoreeLogger   = require('kevoree-commons').KevoreeLogger,
     async           = require('async'),
     EventEmitter    = require('events').EventEmitter;
 
@@ -60,6 +60,10 @@ module.exports = Class({
 
     setBootstrapper: function (bootstrapper) {
         this.bootstrapper = bootstrapper;
+    },
+
+    getBootstrapper: function () {
+        return this.bootstrapper;
     },
 
     /**

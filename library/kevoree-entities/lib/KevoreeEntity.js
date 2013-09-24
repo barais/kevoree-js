@@ -1,5 +1,4 @@
 var Class       = require('pseudoclass'),
-    log         = require('npmlog'),
     Dictionary  = require('./Dictionary');
 
 /**
@@ -20,8 +19,6 @@ module.exports = Class({
     toString: 'KevoreeEntity',
 
     construct: function () {
-        log.heading = 'kevoree';
-
         this.kCore = null;
         this.dictionary = new Dictionary();
         this.name = null;
@@ -29,13 +26,9 @@ module.exports = Class({
         this.nodeName = null;
     },
 
-    start: function () {
-        log.silly(this.toString(), "start");
-    },
+    start: function () {},
 
-    stop: function () {
-        log.silly(this.toString(), "stop");
-    },
+    stop: function () {},
 
     setKevoreeCore: function (kCore) {
         this.kCore = kCore;

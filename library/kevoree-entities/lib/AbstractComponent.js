@@ -1,8 +1,5 @@
 var KevoreeEntity   = require('./KevoreeEntity'),
-    Port            = require('./Port'),
-    log             = require('npmlog'),
-
-    TAG = 'AbstractComponent';
+    Port            = require('./Port');
 
 /**
  * AbstractComponent entity
@@ -10,17 +7,16 @@ var KevoreeEntity   = require('./KevoreeEntity'),
  * @type {AbstractComponent} extends KevoreeEntity
  */
 module.exports = KevoreeEntity.extend({
-    toString: TAG,
+    toString: 'AbstractComponent',
 
     construct: function () {
-        log.heading = 'kevoree';
         this.inputs = {};
         this.outputs = {};
     },
 
     addInputPort: function (name, callback) {
         if (this.inputs[name]) this.inputs[name].setCallback(callback);
-        else log.error(TAG, "Unable to find provided port '%s' (AddBinding failed?)", name);
+        else console.error("Unable to find provided port '%s' (AddBinding failed?)", name);
     },
 
     send: function (name, msg) {

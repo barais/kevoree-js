@@ -1,7 +1,4 @@
-var Class   = require('pseudoclass'),
-    log     = require('npmlog'),
-
-    TAG     = 'AdaptationPrimitive';
+var Class   = require('pseudoclass');
 
 /**
  * Abstract AdaptationPrimitive command
@@ -11,7 +8,7 @@ var Class   = require('pseudoclass'),
  * @type {AdaptationPrimitive}
  */
 module.exports = Class({
-    toString: TAG,
+    toString: 'AdaptationPrimitive',
 
     /**
      * Construct an AdaptationPrimitive object
@@ -22,8 +19,6 @@ module.exports = Class({
      * @param trace command related trace
      */
     construct: function (node, mapper, model, trace) {
-        log.heading = 'kevoree';
-
         this.node = node;
         this.mapper = mapper;
         this.adaptModel = model;
@@ -36,7 +31,7 @@ module.exports = Class({
      */
     execute: function (callback) {
         if (callback == undefined || callback == null || typeof(callback) != 'function') {
-            log.error(TAG, "Execute method need a callback function as last parameter");
+            console.error("Execute method need a callback function as last parameter");
             return;
         }
     },
@@ -46,7 +41,7 @@ module.exports = Class({
      */
     undo: function (callback) {
         if (callback == undefined || callback == null || typeof(callback) != 'function') {
-            log.error(TAG, "Undo method need a callback function as last parameter");
+            console.error("Undo method need a callback function as last parameter");
             return;
         }
     }

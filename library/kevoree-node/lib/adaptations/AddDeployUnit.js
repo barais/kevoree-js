@@ -1,6 +1,5 @@
 var AdaptationPrimitive = require('./AdaptationPrimitive'),
-    RemoveDeployUnit    = require('./RemoveDeployUnit'),
-    npm                 = require('npm');
+    RemoveDeployUnit    = require('./RemoveDeployUnit');
 
 /**
  * AddDeployUnit Adaptation command
@@ -19,34 +18,22 @@ module.exports = AdaptationPrimitive.extend({
         _super.call(this, callback);
 
         var deployUnit = this.adaptModel.findByPath(this.trace.previousPath),
-            packageName     = deployUnit.unitName,
-            packageVersion  = deployUnit.version,
-            that            = this;
+            that       = this;
 
         if (!this.mapper.hasObject(deployUnit.path())) {
-            // install deployUnit
-            npm.load({}, function (err) {
+            var bootstrapper = that.node.getKevoreeCore().getBootstrapper();
+            bootstrapper.bootstrap(deployUnit, function (err) {
                 if (err) {
-                    // npm load error
-                    callback.call(that, new Error('AddDeployUnit error: unable to load npm module'));
+                    callback(err);
                     return;
                 }
 
-                // load success
-                var modulesPath = that.node.getKevoreeCore().getModulesPath();
-                npm.commands.install(modulesPath, [packageName+'@'+packageVersion], function (er) {
-                    if (er) {
-                        // failed to load package:version
-                        callback.call(that, new Error('AddDeployUnit failed to install '+packageName+':'+packageVersion));
-                        return;
-                    }
-
-                    // install success: add deployUnit typeDef name & packageName into instanceManager map
-                    that.mapper.addEntry(deployUnit.path(), packageName);
-                    callback.call(that, null);
-                    return;
-                });
+                // bootstrap success: add deployUnit path & packageName into mapper
+                that.mapper.addEntry(deployUnit.path(), deployUnit.unitName);
+                callback(null);
+                return;
             });
+
         } else {
             // this deploy unit is already installed, move on
             callback.call(that, null);

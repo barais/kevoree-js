@@ -1,5 +1,5 @@
 var AbstractComponent   = require('kevoree-entities').AbstractComponent,
-    KevoreeLogger       = require('kevoree-utils').KevoreeLogger;
+    KevoreeLogger       = require('kevoree-commons').KevoreeLogger;
 
 var HelloWorldComponent = AbstractComponent.extend({
     toString: 'HelloWorldComponent',

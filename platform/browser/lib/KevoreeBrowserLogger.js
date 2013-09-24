@@ -1,4 +1,4 @@
-var KevoreeLogger = require('kevoree-utils').KevoreeLogger;
+var KevoreeLogger = require('kevoree-commons').KevoreeLogger;
 
 var logDOM  = document.getElementById('log-console'),
     ERROR   = 0,

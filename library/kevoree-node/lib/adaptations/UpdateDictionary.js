@@ -1,10 +1,7 @@
-var AdaptationPrimitive = require('./AdaptationPrimitive'),
-    log                 = require('npmlog'),
-
-    TAG                 = 'UpdateDictionary';
+var AdaptationPrimitive = require('./AdaptationPrimitive');
 
 module.exports = AdaptationPrimitive.extend({
-    toString: TAG,
+    toString: 'UpdateDictionary',
 
     construct: function () {
         this.oldDictionary = this.node.getDictionary().clone();

@@ -19,8 +19,7 @@
     "devDependencies": {},
     "optionalDependencies": {},
     "dependencies": {
-        "pseudoclass": "0.2.6",
-        "npmlog": "0.0.4"
+        "pseudoclass": "0.2.6"
     },
     "license": "LGPL-3.0"
 }

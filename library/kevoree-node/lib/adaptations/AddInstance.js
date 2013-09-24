@@ -2,7 +2,6 @@ var AdaptationPrimitive = require('./AdaptationPrimitive'),
     RemoveInstance      = require('./RemoveInstance'),
     kevoree             = require('kevoree-library').org.kevoree,
     Port                = require('kevoree-entities').Port,
-    npm                 = require('npm'),
     path                = require('path');
 
 /**

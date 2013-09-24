@@ -1,14 +1,14 @@
-var Core            = require('kevoree-core'),
-    kLib            = require('kevoree-library'),
-    config          = require('./config.json'),
-    modelJson       = require(config.model),
-    NPMBootstrapper = require('kevoree-commons').NPMBootstrapper,
-    KevoreeLogger   = require('kevoree-utils').KevoreeLogger;
+var Core                = require('kevoree-core'),
+    kLib                = require('kevoree-library'),
+    config              = require('./config.json'),
+    modelJson           = require(config.model),
+    NodeJSBootstrapper  = require('./lib/NodeJSBootstrapper'),
+    KevoreeLogger       = require('kevoree-commons').KevoreeLogger;
 
 var log             = new KevoreeLogger('KevoreeNodeJSRuntime'),
     kevoreeCore     = new Core(__dirname, log),
     jsonLoader      = new kLib.org.kevoree.loader.JSONModelLoader(),
-    bootstrapper    = new NPMBootstrapper(__dirname),
+    bootstrapper    = new NodeJSBootstrapper(__dirname),
     nodeName        = config.nodeName;
 
 kevoreeCore.on('started', function () {

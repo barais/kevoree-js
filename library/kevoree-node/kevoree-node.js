@@ -1,15 +1,10 @@
 var AbstractNode        = require('kevoree-entities').AbstractNode,
-    AdaptationEngine    = require('./lib/AdaptationEngine'),
-    log                 = require('npmlog'),
-
-    TAG                 = 'JavascriptNode';
+    AdaptationEngine    = require('./lib/AdaptationEngine');
 
 var JavascriptNode = AbstractNode.extend({
-    toString: TAG,
+    toString: 'JavascriptNode',
 
     construct: function () {
-        log.heading = 'kevoree';
-
         this.adaptationEngine = new AdaptationEngine(this);
     },
 

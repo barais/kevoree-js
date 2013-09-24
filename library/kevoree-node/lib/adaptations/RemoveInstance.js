@@ -1,7 +1,5 @@
 var AdaptationPrimitive = require('./AdaptationPrimitive'),
-    AddInstance         = require('./AddInstance'),
-    npm                 = require('npm'),
-    path                = require('path');
+    AddInstance         = require('./AddInstance');
 
 /**
  * RemoveInstance Adaptation command

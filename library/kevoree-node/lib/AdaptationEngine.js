@@ -1,12 +1,10 @@
 var Class               = require('pseudoclass'),
     kLib                = require('kevoree-library'),
-    Kotlin              = require('kevoree-library').Kotlin,
     ModelObjectMapper   = require('./ModelObjectMapper'),
-    log                 = require('npmlog');
+    KevoreeLogger       = require('kevoree-commons').KevoreeLogger;
 
 // CONSTANTS
-var TAG = 'AdaptationEngine',
-    ADD_INSTANCE_TRACE  = [
+var ADD_INSTANCE_TRACE  = [
         'org.kevoree.Group',
         'org.kevoree.Node',
         'org.kevoree.ComponentInstance',
@@ -38,11 +36,10 @@ var TAG = 'AdaptationEngine',
  * @type {AdaptationEngine}
  */
 var AdaptationEngine = Class({
-    toString: TAG,
+    toString: 'AdaptationEngine',
 
     construct: function (node) {
-        log.heading = 'kevoree';
-//        log.level = 'silly'; // TODO CHANGE THAT
+        this.log = new KevoreeLogger(this.toString());
 
         this.node = node;
         this.modelObjMapper = new ModelObjectMapper();

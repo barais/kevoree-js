@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "kevoree-entities": "0.0.1",
-        "kevoree-utils":    "0.0.1",
+        "kevoree-commons":    "0.0.1",
         "pseudoclass":      "0.2.6"
     },
     "devDependencies": {},

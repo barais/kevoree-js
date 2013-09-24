@@ -21,9 +21,7 @@
     "dependencies": {
         "kevoree-library": "0.0.2",
         "kevoree-entities": "0.0.1",
-        "npm": "1.3.11",
-        "path": "0.4.9",
-        "npmlog": "0.0.4",
+        "kevoree-commons": "0.0.1",
         "pseudoclass": "0.2.6"
     },
     "devDependencies": {},
