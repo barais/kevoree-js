@@ -1,4 +1,4 @@
-var HTTPBootstrapper = require('../lib/HTTPBootstrapper');
+var HTTPBootstrapper = require('../lib/BrowserBootstrapper');
 
 var bsp = new HTTPBootstrapper('../');
 

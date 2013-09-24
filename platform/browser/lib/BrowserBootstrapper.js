@@ -1,27 +1,17 @@
 var Bootstrapper    = require('kevoree-commons').Bootstrapper,
-    KevoreeLogger   = require('kevoree-commons').KevoreeLogger,
-    NPMResolver     = require('./NPMResolver'),
-    path            = require('path');
+    GITResolver     = require('./GITResolver');
 
-var FILE    = 'file',
-    GIT     = 'git',
-    NPM     = 'npm';
+var GIT     = 'git',
+    FILE    = 'file';
 
-/**
- *
- * @type {NPMBootstrapper}
- */
-module.exports = Bootstrapper.extend({
-    toString: "NodeJSBootstrapper",
+var BrowserBootstrapper = Bootstrapper.extend({
+    toString: 'BrowserBootstrapper',
 
-    /**
-     *
-     */
     construct: function (modulesPath) {
-        this.log = new KevoreeLogger(this.toString());
+        this.modulesPath = modulesPath;
 
         this.resolvers = {};
-        this.resolvers[NPM] = new NPMResolver(modulesPath);
+        this.resolvers[GIT] = new GITResolver(modulesPath);
     },
 
     /**
@@ -68,11 +58,13 @@ module.exports = Bootstrapper.extend({
             this.log.warn("File resolver not implemented yet");
 
         } else if (deployUnit.url.startsWith(GIT)) {
-//            this.resolvers[GIT][action](deployUnit, callback);
+            this.resolvers[GIT][action](deployUnit, callback);
             this.log.warn("Git resolver not implemented yet");
 
         } else {
-            this.resolvers[NPM][action](deployUnit, callback);
+            console.warn("BrowserBootstrapper only knows file: & git: deployUnit urls. Can't process "+deployUnit.url);
         }
     }
 });
+
+module.exports = BrowserBootstrapper;
