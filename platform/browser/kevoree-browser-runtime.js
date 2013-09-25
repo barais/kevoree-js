@@ -37,7 +37,6 @@ kevoreeCore.on('error', function (err) {
     try {
         // try to stop Kevoree Core on error
         kevoreeCore.stop();
-        console.log("PMOTATO");
     } catch (err) {
         started = false;
     }

@@ -170,40 +170,25 @@ module.exports = GITResolver;
 },{"kevoree-commons":6}],4:[function(require,module,exports){
 var KevoreeLogger = require('kevoree-commons').KevoreeLogger;
 
-var logDOM  = document.getElementById('log-console'),
+var logDOM  = document.querySelector('#log-console'),
     ERROR   = 0,
     WARN    = 1,
     DEBUG   = 2,
     INFO    = 3;
 
-var KevoreeBrowserLogger = KevoreeLogger.extend({
-    toString: 'KevoreeBrowserLogger',
-
-    info: function (_super, msg) {
-        addLogToDOM(INFO, this.tag, msg);
-    },
-
-    warn: function (_super, msg) {
-        addLogToDOM(WARN, this.tag, msg);
-    },
-
-    debug: function (_super, msg) {
-        addLogToDOM(DEBUG, this.tag, msg);
-    },
-
-    error: function (_super, msg) {
-        addLogToDOM(ERROR, this.tag, msg);
-    }
-});
-
-var addLogToDOM = function (level, tag, msg) {
+/**
+ * DOM logger
+ * @param level
+ * @param tag
+ * @param msg
+ */
+var addLogToDOM = function addLogToDOM(level, tag, msg) {
     var tr      = document.createElement('tr'),
         timeTd  = document.createElement('td'),
         tagTd   = document.createElement('td'),
         msgTd   = document.createElement('td');
 
     switch (level) {
-        // TODO add level
         case DEBUG:
             tr.className += ' primary';
             break;
@@ -233,6 +218,66 @@ var addLogToDOM = function (level, tag, msg) {
     tr.appendChild(msgTd);
     logDOM.appendChild(tr);
 }
+
+/**
+ * Console logger
+ * @param level
+ * @param tag
+ * @param msg
+ */
+var addLogToConsole = function addLogToConsole(level, tag, msg) {
+    switch (level) {
+        case DEBUG:
+            console.info(tag+': '+msg);
+            break;
+
+        case INFO:
+            console.log(tag+': '+msg);
+            break;
+
+        case ERROR:
+            console.error(tag+': '+msg);
+            break;
+
+        case WARN:
+            console.warn(tag+': '+msg);
+            break;
+    }
+}
+
+// determine which logger to use
+var logger = (function () {
+    if (logDOM != null) {
+        return addLogToDOM;
+    } else {
+        return addLogToConsole;
+    }
+})();
+
+/**
+ * KevoreeBrowserLogger redefines KevoreeLogger in order to show logs wether in browser's console
+ * or by finding a #log-console ID in the DOM.
+ * @type {KevoreeBrowserLogger} extend KevoreeLogger
+ */
+var KevoreeBrowserLogger = KevoreeLogger.extend({
+    toString: 'KevoreeBrowserLogger',
+
+    info: function (_super, msg) {
+        logger(INFO, this.tag, msg);
+    },
+
+    warn: function (_super, msg) {
+        logger(WARN, this.tag, msg);
+    },
+
+    debug: function (_super, msg) {
+        logger(DEBUG, this.tag, msg);
+    },
+
+    error: function (_super, msg) {
+        logger(ERROR, this.tag, msg);
+    }
+});
 
 var getTimeFormatted = function getTimeFormatted() {
     var time = new Date;
