@@ -1,4 +1,5 @@
 var Bootstrapper    = require('kevoree-commons').Bootstrapper,
+    KevoreeLogger   = require('./KevoreeBrowserLogger'),
     GITResolver     = require('./GITResolver');
 
 var GIT     = 'git',
@@ -12,6 +13,8 @@ var BrowserBootstrapper = Bootstrapper.extend({
 
         this.resolvers = {};
         this.resolvers[GIT] = new GITResolver(modulesPath);
+
+        this.log = new KevoreeLogger(this.toString());
     },
 
     /**
@@ -55,14 +58,13 @@ var BrowserBootstrapper = Bootstrapper.extend({
 
         if (deployUnit.url.startsWith(FILE)) {
 //            this.resolvers[FILE][action](deployUnit, callback);
-            this.log.warn("File resolver not implemented yet");
+            callback(new Error("File resolver not implemented yet"));
 
         } else if (deployUnit.url.startsWith(GIT)) {
             this.resolvers[GIT][action](deployUnit, callback);
-            this.log.warn("Git resolver not implemented yet");
 
         } else {
-            console.warn("BrowserBootstrapper only knows file: & git: deployUnit urls. Can't process "+deployUnit.url);
+            callback(new Error("BrowserBootstrapper only knows 'file' & 'git' url types. Can't process '"+deployUnit.url+"' url"));
         }
     }
 });

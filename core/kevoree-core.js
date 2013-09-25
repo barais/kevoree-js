@@ -53,7 +53,7 @@ module.exports = Class({
         // starting loop function
         this.intervalId = setInterval(function () {}, 1e8);
 
-        this.log.info("Platform started: '%s'", nodeName);
+        this.log.info("Platform started: "+nodeName);
 
         this.emitter.emit('started');
     },
@@ -77,7 +77,9 @@ module.exports = Class({
             clearInterval(this.intervalId);
             this.intervalId = null;
             this.currentModel = null;
-            this.log.debug('Stopped');
+
+            this.log.info("Platform stopped: "+this.nodeName);
+            this.emitter.emit('stopped');
         }
     },
 
@@ -155,13 +157,13 @@ module.exports = Class({
                         async.eachSeries(adaptations, executeCommand, function (err) {
                             if (err) {
                                 // something went wrong while processing adaptations
-                                core.log.error(err.stack);
+                                core.log.error(err.message);
 
                                 // rollback process
                                 async.eachSeries(cmdStack, rollbackCommand, function (er) {
                                     if (er) {
                                         // something went wrong while rollbacking
-                                        core.log.error(er.stack);
+                                        core.log.error(er.message);
                                         core.emitter.emit('error', new Error("Something went wrong while rollbacking..."));
                                         return;
                                     }
@@ -206,7 +208,7 @@ module.exports = Class({
             var core = this;
             this.bootstrapper.bootstrapNodeType(this.nodeName, model, function (err, AbstractNode) {
                 if (err) {
-                    core.log.error(err.stack);
+                    core.log.error(err.message);
                     callback.call(core, new Error("Unable to bootstrap '"+core.nodeName+"'! Start process aborted."));
                     return;
                 }

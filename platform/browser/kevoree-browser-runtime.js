@@ -29,6 +29,7 @@ kevoreeCore.on('deployed', function (err, model) {
 kevoreeCore.on('stopped', function (err, model) {
     log.info("KevoreeCore stopped");
     started = false;
+    startBtn.className = startBtn.className.replace('disabled', '');
 });
 
 kevoreeCore.on('error', function (err) {
@@ -36,6 +37,7 @@ kevoreeCore.on('error', function (err) {
     try {
         // try to stop Kevoree Core on error
         kevoreeCore.stop();
+        console.log("PMOTATO");
     } catch (err) {
         started = false;
     }
