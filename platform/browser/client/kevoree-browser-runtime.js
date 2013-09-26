@@ -59,11 +59,11 @@ startBtn.addEventListener('click', function () {
 
 deployBtn.addEventListener('click', function () {
     if (started) {
-        try {
+//        try {
             kevoreeCore.deploy(model);
-        } catch (err) {
-            log.error(err.message);
-        }
+//        } catch (err) {
+//            log.error(err.message);
+//        }
 
     } else log.warn("Can't deploy model: you must start Kevoree Runtime first.");
 });

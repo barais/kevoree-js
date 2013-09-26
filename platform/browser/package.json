@@ -8,7 +8,8 @@
     "grunt-contrib-jshint": "~0.6.3",
     "grunt-contrib-nodeunit": "~0.2.0",
     "grunt-contrib-uglify": "~0.2.2",
-    "grunt-browserify": "~1.2.5"
+    "grunt-browserify": "~1.2.5",
+    "grunt-contrib-copy": "~0.4.1"
   },
   "license": "LGPL-3.0"
 }
