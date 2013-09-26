@@ -13,3 +13,8 @@ cd ..
 npm install
 grunt
 ```
+
+By doing so, __Grunt__ will run two tasks:
+
+*  __browserifying__ client/kevoree-browser-runtime.js into dist/kevoree-browser-runtime.browserify.js
+*  __uglyfiying__ dist/kevoree-browser-runtime.browserify.js into site/js/kevoree-browser-runtime.min.js
