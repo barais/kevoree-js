@@ -1,0 +1,14 @@
+{
+  "name": "kevoree-browser-runtime",
+  "version": "0.0.1",
+  "author": "Maxime Tricoire <max.tricoire@gmail.com>",
+  "dependencies": {
+    "kevoree-core": "0.0.2",
+    "kevoree-library": "0.0.2",
+    "kevoree-commons": "0.0.1",
+    "pseudoclass": "0.2.6",
+    "zlib-browserify": "0.0.1"
+  },
+  "devDependencies": {},
+  "license": "LGPL-3.0"
+}

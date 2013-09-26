@@ -92,19 +92,19 @@ var logger = (function () {
 var KevoreeBrowserLogger = KevoreeLogger.extend({
     toString: 'KevoreeBrowserLogger',
 
-    info: function (_super, msg) {
+    info: function (msg) {
         logger(INFO, this.tag, msg);
     },
 
-    warn: function (_super, msg) {
+    warn: function (msg) {
         logger(WARN, this.tag, msg);
     },
 
-    debug: function (_super, msg) {
+    debug: function (msg) {
         logger(DEBUG, this.tag, msg);
     },
 
-    error: function (_super, msg) {
+    error: function (msg) {
         logger(ERROR, this.tag, msg);
     }
 });
