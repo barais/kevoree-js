@@ -1,9 +1,11 @@
 var Bootstrapper    = require('kevoree-commons').Bootstrapper,
     KevoreeLogger   = require('./KevoreeBrowserLogger'),
-    GITResolver     = require('./GITResolver');
+    GITResolver     = require('./GITResolver'),
+    NPMResolver     = require('./NPMResolver');
 
 var GIT     = 'git',
-    FILE    = 'file';
+    FILE    = 'file',
+    NPM     = 'npm';
 
 var BrowserBootstrapper = Bootstrapper.extend({
     toString: 'BrowserBootstrapper',
@@ -13,6 +15,7 @@ var BrowserBootstrapper = Bootstrapper.extend({
 
         this.resolvers = {};
         this.resolvers[GIT] = new GITResolver(modulesPath);
+        this.resolvers[NPM] = new NPMResolver(modulesPath);
 
         this.log = new KevoreeLogger(this.toString());
     },
@@ -64,7 +67,7 @@ var BrowserBootstrapper = Bootstrapper.extend({
             this.resolvers[GIT][action](deployUnit, callback);
 
         } else {
-            callback(new Error("BrowserBootstrapper only knows 'file' & 'git' url types. Can't process '"+deployUnit.url+"' url"));
+            this.resolvers[NPM][action](deployUnit, callback);
         }
     }
 });

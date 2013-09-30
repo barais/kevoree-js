@@ -6,8 +6,7 @@
     "kevoree-core": "0.0.2",
     "kevoree-library": "0.0.2",
     "kevoree-commons": "0.0.1",
-    "pseudoclass": "0.2.6",
-    "zlib-browserify": "0.0.1"
+    "pseudoclass": "0.2.6"
   },
   "devDependencies": {},
   "license": "LGPL-3.0"

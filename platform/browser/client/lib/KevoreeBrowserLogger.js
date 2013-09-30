@@ -20,11 +20,11 @@ var addLogToDOM = function addLogToDOM(level, tag, msg) {
 
     switch (level) {
         case DEBUG:
-            tr.className += ' primary';
+            tr.className += ' success';
             break;
 
         case INFO:
-            tr.className += ' success';
+            tr.className += ' primary';
             break;
 
         case ERROR:

@@ -1,6 +1,5 @@
 var Resolver        = require('kevoree-commons').Resolver,
-    KevoreeLogger   = require('./KevoreeBrowserLogger'),
-    http            = require('browserver-client').http;
+    KevoreeLogger   = require('./KevoreeBrowserLogger');
 
 var GITResolver = Resolver.extend({
     toString: 'GITResolver',

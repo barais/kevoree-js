@@ -1,3 +1,5 @@
+var path = require('path');
+
 module.exports = function (grunt) {
 
     // Project configuration.
@@ -10,7 +12,7 @@ module.exports = function (grunt) {
             },
             build: {
                 src: 'dist/<%= cli_pkg.name %>.browserify.js',
-                dest: 'site/js/<%= cli_pkg.name %>.min.js'
+                dest: 'site/public/js/<%= cli_pkg.name %>.min.js'
             }
         },
         browserify: {
@@ -23,23 +25,33 @@ module.exports = function (grunt) {
         copy: {
             main: {
                 src: 'dist/<%= cli_pkg.name %>.browserify.js',
-                dest: 'site/js/<%= cli_pkg.name %>.min.js'
+                dest: 'site/public/js/<%= cli_pkg.name %>.min.js'
+            }
+        },
+        express: {
+            custom: {
+                options: {
+                    hostname: 'localhost',
+                    port: 42042,
+                    server: path.resolve('./server'),
+                    watchChanges: true
+                }
             }
         }
     });
 
-    // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-express');
 
     // Default task
     // => browserify runtime and output it to dist/
     // => uglify browserified runtime and move it to site/js/
-    grunt.registerTask('default', ['browserify', 'uglify']);
+    grunt.registerTask('default', ['browserify', 'uglify', 'express', 'express-keepalive']);
 
     // Dev task
     // => browserify runtime and output it to dist/
     // => copy file to site/js (without uglifying it = more readable in dev)
-    grunt.registerTask('dev', ['browserify', 'copy']);
+    grunt.registerTask('dev', ['browserify', 'copy', 'express', 'express-keepalive']);
 };
