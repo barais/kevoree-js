@@ -3,6 +3,21 @@ var Class               = require('pseudoclass'),
     ModelObjectMapper   = require('./ModelObjectMapper'),
     KevoreeLogger       = require('kevoree-commons').KevoreeLogger;
 
+// Adaptation Primitives
+var AddInstance         = require('./adaptations/AddInstance'),
+    AddBinding          = require('./adaptations/AddBinding'),
+    AddDeployUnit       = require('./adaptations/AddDeployUnit'),
+    AddTypeDef          = require('./adaptations/AddTypeDef'),
+    Noop                = require('./adaptations/Noop'),
+    RemoveBinding       = require('./adaptations/RemoveBinding'),
+    RemoveDeployUnit    = require('./adaptations/RemoveDeployUnit'),
+    RemoveInstance      = require('./adaptations/RemoveInstance'),
+    RemoveTypeDef       = require('./adaptations/RemoveTypeDef'),
+    StartInstance       = require('./adaptations/StartInstance'),
+    StopInstance        = require('./adaptations/StopInstance'),
+    UpdateDictionary    = require('./adaptations/UpdateDictionary');
+
+
 // CONSTANTS
 var ADD_INSTANCE_TRACE  = [
         'org.kevoree.Group',
@@ -67,7 +82,7 @@ var AdaptationEngine = Class({
     /**
      *
      * @param trace
-     * @returns {AdaptationPrimitive}
+     * @returns {AddInstance, AddDeployUnit, AddBinding, AdaptationPrimitive, Noop, UpdateDictionary}
      */
     processTrace: function (trace, model) {
         //console.log(JSON.stringify(JSON.parse(trace), null, 2));
@@ -76,30 +91,25 @@ var AdaptationEngine = Class({
         if (isType(trace, kLib.org.kevoree.modeling.api.trace.ModelAddTrace)) {
             if (ADD_INSTANCE_TRACE.indexOf(trace.typeName) != -1) {
                 // Add instance
-                AdaptationPrimitive = this.getCommand('AddInstance');
-                return new AdaptationPrimitive(this.node, this.modelObjMapper, model, trace);
+                return new AddInstance(this.node, this.modelObjMapper, model, trace);
 
             } else if (ADD_DEPLOY_UNIT.indexOf(trace.typeName) != -1) {
                 // Add deploy unit
-                AdaptationPrimitive = this.getCommand('AddDeployUnit');
-                return new AdaptationPrimitive(this.node, this.modelObjMapper, model, trace);
+                return new AddDeployUnit(this.node, this.modelObjMapper, model, trace);
 
             } else if (trace.refName == 'mBindings') {
                 // Add binding
-                AdaptationPrimitive = this.getCommand('AddBinding');
-                return new AdaptationPrimitive(this.node, this.modelObjMapper, model, trace);
+                return new AddBinding(this.node, this.modelObjMapper, model, trace);
             }
 
         // SET TRACES HANDLING
         } else if (isType(trace, kLib.org.kevoree.modeling.api.trace.ModelSetTrace)) {
             if (trace.refName && trace.refName == "started") {
-                var startOrStopInstance = (trace.content == 'true') ? 'StartInstance' : 'StopInstance';
-                AdaptationPrimitive = this.getCommand(startOrStopInstance);
+                var AdaptationPrimitive = (trace.content == 'true') ? StartInstance : StopInstance;
                 return new AdaptationPrimitive(this.node, this.modelObjMapper, model, trace);
 
             } else if (trace.refName && trace.refName == 'value') {
-                AdaptationPrimitive = this.getCommand('UpdateDictionary');
-                return new AdaptationPrimitive(this.node, this.modelObjMapper, model, trace);
+                return new UpdateDictionary(this.node, this.modelObjMapper, model, trace);
             }
 
         } else if (isType(trace, kLib.org.kevoree.modeling.api.trace.ModelRemoveTrace)) {
@@ -111,8 +121,7 @@ var AdaptationEngine = Class({
         }
 
         // Unhandled trace command
-        var AdaptationPrimitive = this.getCommand('Noop');
-        return new AdaptationPrimitive(this.node, this.modelObjMapper, model, trace);
+        return new Noop(this.node, this.modelObjMapper, model, trace);
     },
 
     sortCommands: function (list) {
@@ -123,18 +132,6 @@ var AdaptationEngine = Class({
         });
 
         return list;
-    },
-
-    /**
-     * Load or retrieve from cache command by name
-     * @param name
-     * @returns {AdaptationPrimitive}
-     */
-    getCommand: function (name) {
-        if (this.commandsCache[name]) return this.commandsCache[name];
-
-        this.commandsCache[name] = require('./adaptations/'+name+'.js');
-        return this.commandsCache[name];
     }
 });
 

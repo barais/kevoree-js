@@ -98,7 +98,7 @@ module.exports = Class({
      */
     deploy: function (model) {
         if (model.findNodesByID(this.nodeName) == null) {
-            this.emitter.emit('error', new Error('Deploy model failure: unable to find %s in given model', this.nodeName));
+            this.emitter.emit('error', new Error('Deploy model failure: unable to find '+this.nodeName+' in given model'));
             return;
 
         } else {
@@ -204,7 +204,7 @@ module.exports = Class({
         callback = callback || function () {};
 
         if (this.nodeInstance == undefined || this.nodeInstance == null) {
-            this.log.info("Start '%s' bootstrapping...", this.nodeName);
+            this.log.info("Start '"+this.nodeName+"' bootstrapping...");
             var core = this;
             this.bootstrapper.bootstrapNodeType(this.nodeName, model, function (err, AbstractNode) {
                 if (err) {
@@ -218,7 +218,7 @@ module.exports = Class({
                 core.nodeInstance.setName(core.nodeName);
                 core.nodeInstance.start();
 
-                core.log.info("'%s' instance started successfully", core.nodeName);
+                core.log.info("'"+core.nodeName+"' instance started successfully");
 
                 callback.call(core, null);
                 return

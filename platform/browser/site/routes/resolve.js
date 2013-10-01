@@ -1,10 +1,16 @@
-var http   = require('http'),
-    fs     = require('fs'),
-    path   = require('path'),
-    zlib   = require('zlib'),
-    tar    = require('tar'),
-    AdmZip = require('adm-zip'),
-    rimraf = require('rimraf');
+var http       = require('http'),
+    fs         = require('fs'),
+    path       = require('path'),
+    zlib       = require('zlib'),
+    tar        = require('tar'),
+    AdmZip     = require('adm-zip'),
+    rimraf     = require('rimraf'),
+    browserify = require('browserify'),
+    npm        = require('npm');
+
+
+var BROWSER_MODULES = 'browser_modules',
+    BROWSER_TAG     = '-kbrowser';
 
 /**
  * GET /resolve
@@ -21,56 +27,58 @@ var http   = require('http'),
 module.exports = function(req, res) {
     if (req.query.type == 'npm') {
 
-        var filename     = req.query.name+'-'+req.query.version,
-            fullpath     = path.resolve('site', 'public', 'libraries', filename),
-            downloadLink = '/libraries/'+filename+'.zip';
+        var installDir        = path.resolve('site', 'public', 'libraries'),
+            modulePath        = path.resolve(installDir, 'node_modules', req.query.name),
+            browserModulePath = path.resolve(installDir, BROWSER_MODULES, req.query.name+BROWSER_TAG),
+            downloadLink      = '/libraries/'+BROWSER_MODULES+'/'+req.query.name+BROWSER_TAG+'.zip';
 
-        var options = {
-            host: 'registry.npmjs.org',
-            path: '/'+req.query.name+'/'+req.query.version
-        };
+        // install module with npm
+        npm.load({}, function (err) {
+            if (err) {
+                res.send(500, 'Unable to load npm module');
+                return;
+            }
 
-        // request JSON definition from registry.npmjs.org in order to find .zip url
-        http.get(options, function (resp) {
-            resp.setEncoding('utf8');
-            var packageDefJson = '';
+            // load success
+            npm.commands.install(installDir, [req.query.name+'@'+req.query.version], function installCallback(err) {
+                if (err) {
+                    res.send(500, 'npm failed to install package %s:%s', req.query.name, req.query.version);
+                    return;
+                }
 
-            resp.on('data', function (chunk) {
-                packageDefJson += chunk;
-            });
+                // installation succeeded
+                var modulePackageJson = require(path.resolve(modulePath, 'package.json'));
 
-            resp.on('end', function () {
-                var jsonResp = JSON.parse(packageDefJson);
+                fs.mkdir(browserModulePath, function () {
+                    // browserify module
+                    var b = browserify();
+                    var bundleFile = fs.createWriteStream(path.resolve(browserModulePath, req.query.name+'-bundle.js'));
 
-                // request .tgz from npmjs
-                http.get(jsonResp.dist.tarball, function (response) {
-                    var extractOpts = { type: "Directory", path: fullpath, strip: 1 }
+                    b.require(modulePath, {expose: req.query.name})
+                        .bundle()
+                        .pipe(bundleFile)
+                        .on('finish', function () {
+                            // zip browser-bundled folder
+                            var zip = new AdmZip();
+                            zip.addLocalFolder(browserModulePath);
+                            zip.writeZip(browserModulePath+'.zip');
 
-                    // gunzip .tgz && untar .tar to fullpath folder
-                    response.pipe(zlib.Unzip()).pipe(tar.Extract(extractOpts));
+                            // remove browserModulePath folder from server
+                            rimraf(browserModulePath, function (err) {
+                                if (err) console.error("Unable to delete %s folder :/", browserModulePath);
+                            });
 
-                    response.on('end', function () {
-                        // zip fullpath folder
-                        var zip = new AdmZip();
-                        zip.addLocalFolder(fullpath);
-                        zip.writeZip(fullpath+'.zip');
+                            // send response
+                            res.json({
+                                zipPath: downloadLink,
+                                zipName: req.query.name+'@'+req.query.version,
+                                requireName: modulePath
+                            });
 
-                        // remove fullpath folder from server
-//                        rimraf(fullpath, function (err) {
-//                            if (err) console.error("Unable to delete %s folder :/", fullpath);
-//                        });
-
-                        // send response
-                        res.json({
-                            zipPath: downloadLink,
-                            zipName: filename
-                        });
+                            return;
                     });
                 });
             });
-
-        }).on('error', function(e) {
-            console.log("GET /resolve route error:" + e.message);
         });
 
     } else {

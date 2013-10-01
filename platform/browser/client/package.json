@@ -6,7 +6,8 @@
     "kevoree-core": "0.0.2",
     "kevoree-library": "0.0.2",
     "kevoree-commons": "0.0.1",
-    "pseudoclass": "0.2.6"
+    "pseudoclass": "0.2.6",
+    "async": "~0.2.9"
   },
   "devDependencies": {},
   "license": "LGPL-3.0"

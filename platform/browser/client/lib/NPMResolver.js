@@ -1,6 +1,7 @@
 var Resolver        = require('kevoree-commons').Resolver,
     KevoreeLogger   = require('./KevoreeBrowserLogger'),
-    FileSystem      = require('kevoree-commons').FileSystem;
+    FileSystem      = require('kevoree-commons').FileSystem,
+    async           = require('async');
 
 /**
  * Retrieves module content from zip from server
@@ -15,8 +16,6 @@ var NPMResolver = Resolver.extend({
     },
 
     resolve: function (deployUnit, callback) {
-        var resolver = this;
-
         // forward resolving request to server
         $.ajax({
             type: 'GET',
@@ -29,14 +28,20 @@ var NPMResolver = Resolver.extend({
             success: function (resp) {
                 // server response contains a zipPath & name of the requested module package
                 // (retrieved server-side from npm registry)
-                installZip(resp.zipPath, resp.zipName, function (err, KClass) {
+                installZip(resp.zipPath, resp.zipName, function (err) {
                     if (err) {
+                        errorHandler(err);
                         callback(err);
                         return;
                     }
 
-                    // unpacking tarball to browser filesystem done
-                    callback(null, KClass);
+                    console.log("zip installed");
+                    // zip installed successfully
+                    $.getScript('filesystem:'+window.location.origin+'/persistent/kev_libraries/'+deployUnit.unitName+'@'+deployUnit.version+'/'+deployUnit.unitName+'-bundle.js', function () {
+                        console.log("Module loaded!");
+                        var ModuleEntry = require(deployUnit.unitName);
+                        callback(null, ModuleEntry);
+                    });
                 });
             },
             error: function (err) {
@@ -49,7 +54,6 @@ var NPMResolver = Resolver.extend({
     },
 
     uninstall: function (deployUnit, callback) {
-        var resolver = this;
         callback(new Error("NPMResolver: Not implemented yet"));
         // TODO
     }
@@ -73,33 +77,49 @@ var installZip = function installZip(zipPath, zipName, callback) {
                 zip.createReader(new zip.HttpReader(zipPath), function(reader) {
                     reader.getEntries(function(entries) {
                         // process all entries from the zip
-                        processEntries(entries, zipDir);
+                        processEntries(entries, zipDir, callback);
                     });
-                }, function(error) {
-                    // onerror callback
-                });
-            }, fsErrorHandler);
-        }, fsErrorHandler);
+                }, callback);
+            }, callback);
+        }, callback);
     });
-    callback(new Error("NPMResolver: unpack tarball not implemented yet"));
 }
 
 /**
  * Only processes 'file' entries in zip
  * @param entries
  * @param zipDir
+ * @param callback
  */
-var processEntries = function processEntries(entries, zipDir) {
-    var fileEntries = [];
+var processEntries = function processEntries(entries, zipDir, callback) {
+    var asyncTasks = [];
 
     // check entries type (dir, file)
     for (var i in entries) {
-        if (entries[i].directory == false) fileEntries.push(entries[i]);
+        if (entries[i].directory == false) {
+            asyncTasks.push(function (taskCallback) {
+                processFileEntry(entries[i], zipDir, function (err) {
+                    if (err) {
+                        taskCallback(err);
+                        return;
+                    }
+
+                    taskCallback(null);
+                });
+            });
+        }
     }
 
-    console.log("File entries", fileEntries);
-    // process file entries
-    for (var i in fileEntries) processFileEntry(fileEntries[i], zipDir);
+    // execute each task asynchronously
+    async.parallel(asyncTasks, function (err) {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        // all tasks run without error : cool =)
+        callback(null);
+    });
 }
 
 /**
@@ -109,8 +129,9 @@ var processEntries = function processEntries(entries, zipDir) {
  * to create a new directory foo, then bar, then call a file create into that 'bar' directory
  * @param entry
  * @param zipDir
+ * @param callback
  */
-var processFileEntry = function processFileEntry(entry, zipDir) {
+var processFileEntry = function processFileEntry(entry, zipDir, callback) {
     getDir(entry.filename, zipDir, function (dir) {
         var splittedName = entry.filename.split('/'),
             cleanName    = splittedName[splittedName.length-1];
@@ -119,27 +140,25 @@ var processFileEntry = function processFileEntry(entry, zipDir) {
            fileEntry.createWriter(function(fileWriter) {
 
                fileWriter.onwriteend = function(e) {
-                   console.log('Write completed: '+entry.filename);
-
+                   console.log('Write completed: '+entry.filename, zipDir);
+                   callback(null, fileEntry);
                };
 
                fileWriter.onerror = function(e) {
                    console.log('Write failed: ' + e.toString());
+                   callback(e);
                };
 
                entry.getData(new zip.TextWriter(), function(text) {
                    // Create a new Blob and write it to log.txt.
                    var blob = new Blob([text], {type: 'text/plain'});
                    fileWriter.write(blob);
-
-               }, function(current, total) {
-                   // onprogress callback
                });
 
            });
 
-       }, fsErrorHandler);
-    }, fsErrorHandler);
+       }, callback);
+    }, callback);
 }
 
 /**
@@ -161,11 +180,11 @@ var getDir = function getDir(path, dir, callback, errorCallback) {
     } else {
         dir.getDirectory(splittedPath[0], {create: true, exclusive: false}, function (newDir) {
             getDir(splittedPath.slice(1, splittedPath.length).join('/'), newDir, callback);
-        }, fsErrorHandler);
+        }, errorHandler);
     }
 }
 
-var fsErrorHandler = function fsErrorHandler(e) {
+var errorHandler = function errorHandler(e) {
        var msg = '';
        switch (e.code) {
          case FileError.QUOTA_EXCEEDED_ERR:
