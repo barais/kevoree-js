@@ -26014,4 +26014,8 @@ Kotlin.PrimitiveHashSet = Kotlin.$createClass(Kotlin.AbstractCollection, {
   });
   Kotlin.defineModule('org.kevoree.model.js', _);
 }());
-if(typeof(module)!='undefined'){module.exports = Kotlin.modules['org.kevoree.model.js'];}
+if (typeof(module) != 'undefined') {
+    module.exports = Kotlin.modules['org.kevoree.model.js'];
+}
+
+if (document) document.Kotlin = Kotlin;

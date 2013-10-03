@@ -4,6 +4,21 @@ var AdaptationPrimitive = require('./AdaptationPrimitive'),
     Port                = require('kevoree-entities').Port,
     path                = require('path');
 
+var isType = function isType(object, type) {
+    if (object === null || object === undefined) {
+        return false;
+    }
+
+    var proto = Object.getPrototypeOf(object);
+    // todo test nested class
+    //noinspection RedundantIfStatementJS
+    if (proto == type.proto) {
+        return true;
+    }
+
+    return false;
+}
+
 /**
  * AddInstance Adaptation command
  *
@@ -118,15 +133,3 @@ module.exports = AdaptationPrimitive.extend({
         }
     }
 });
-
-var isType = function (object, type) {
-    if (object === null || object === undefined) {
-        return false;
-    }
-
-    var proto = Object.getPrototypeOf(object);
-    if (proto == type.proto) {
-        return true;
-    }
-    return false;
-}

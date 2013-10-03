@@ -2,7 +2,7 @@ var Core                    = require('kevoree-core'),
     JSONModelLoader         = require('kevoree-library').org.kevoree.loader.JSONModelLoader,
     KevoreeBrowserLogger    = require('./lib/KevoreeBrowserLogger'),
     HTTPBootstrapper        = require('./lib/BrowserBootstrapper'),
-    jsonModel               = require('./model.json');
+    jsonModel               = require('./testModel.json');
 
 var log = new KevoreeBrowserLogger('Runtime');
 
@@ -60,12 +60,11 @@ startBtn.addEventListener('click', function () {
 
 deployBtn.addEventListener('click', function () {
     if (started) {
-//        try {
-
+        try {
             kevoreeCore.deploy(model);
-//        } catch (err) {
-//            log.error(err.message);
-//        }
+        } catch (err) {
+            log.error(err.message);
+        }
 
     } else log.warn("Can't deploy model: you must start Kevoree Runtime first.");
 });

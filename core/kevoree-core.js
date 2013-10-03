@@ -117,7 +117,6 @@ module.exports = Class({
                         // given model is defined and not null
                         var diffSeq = core.compare.diff(core.currentModel, model);
                         var adaptations = core.nodeInstance.processTraces(diffSeq.traces, model);
-
                         // list of adaptation commands retrieved
                         var cmdStack = [];
 
@@ -201,7 +200,7 @@ module.exports = Class({
     },
 
     checkBootstrapNode: function (model, callback) {
-        callback = callback || function () {};
+        callback = callback || function () { console.warn('No callback defined for checkBootstrapNode(model, cb) in KevoreeCore'); };
 
         if (this.nodeInstance == undefined || this.nodeInstance == null) {
             this.log.info("Start '"+this.nodeName+"' bootstrapping...");
@@ -209,7 +208,7 @@ module.exports = Class({
             this.bootstrapper.bootstrapNodeType(this.nodeName, model, function (err, AbstractNode) {
                 if (err) {
                     core.log.error(err.message);
-                    callback.call(core, new Error("Unable to bootstrap '"+core.nodeName+"'! Start process aborted."));
+                    callback(new Error("Unable to bootstrap '"+core.nodeName+"'! Start process aborted."));
                     return;
                 }
 
@@ -220,12 +219,12 @@ module.exports = Class({
 
                 core.log.info("'"+core.nodeName+"' instance started successfully");
 
-                callback.call(core, null);
+                callback();
                 return
             });
 
         } else {
-            callback.call(this, null);
+            callback();
             return;
         }
     },

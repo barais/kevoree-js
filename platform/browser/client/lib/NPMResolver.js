@@ -16,6 +16,9 @@ var NPMResolver = Resolver.extend({
     },
 
     resolve: function (deployUnit, callback) {
+        var resolver = this;
+        // TODO do not ask for server resolving if we already have the version locally
+
         // forward resolving request to server
         $.ajax({
             type: 'GET',
@@ -28,6 +31,7 @@ var NPMResolver = Resolver.extend({
             success: function (resp) {
                 // server response contains a zipPath & name of the requested module package
                 // (retrieved server-side from npm registry)
+
                 installZip(resp.zipPath, resp.zipName, function (err) {
                     if (err) {
                         errorHandler(err);
@@ -35,10 +39,9 @@ var NPMResolver = Resolver.extend({
                         return;
                     }
 
-                    console.log("zip installed");
                     // zip installed successfully
                     $.getScript('filesystem:'+window.location.origin+'/persistent/kev_libraries/'+deployUnit.unitName+'@'+deployUnit.version+'/'+deployUnit.unitName+'-bundle.js', function () {
-                        console.log("Module loaded!");
+                        resolver.log.info("Zip '"+deployUnit.unitName+"' installed and module loaded successfully");
                         var ModuleEntry = require(deployUnit.unitName);
                         callback(null, ModuleEntry);
                     });
@@ -71,16 +74,32 @@ var installZip = function installZip(zipPath, zipName, callback) {
     fsapi.getFileSystem(5*1024*1024*1024, function (err, fs) {
         // create a root directory called "kev_libraries" in this fs
         fs.root.getDirectory('kev_libraries', { create: true, exclusive: false }, function (rootDir) {
-            // create a new directory for the current zip
-            rootDir.getDirectory(zipName, { create: true, exclusive: false }, function (zipDir) {
-                // read zip content
-                zip.createReader(new zip.HttpReader(zipPath), function(reader) {
-                    reader.getEntries(function(entries) {
-                        // process all entries from the zip
-                        processEntries(entries, zipDir, callback);
-                    });
-                }, callback);
-            }, callback);
+            rootDir.getDirectory(zipName, { create: true, exclusive: false}, function (zipDir) {
+                // remove dir content before re-writing
+                zipDir.removeRecursively(function () {
+                    // dir content removed
+                    fillDir();
+                }, function () {
+                    // error (meaning that the directory does not exist, so create it)
+                    fillDir();
+                });
+
+                /**
+                 * Fill directory "zipDir" with zip content
+                 */
+                function fillDir() {
+                    // create a new directory for the current zip
+                    rootDir.getDirectory(zipName, { create: true, exclusive: false }, function (zipDir) {
+                        // read zip content
+                        zip.createReader(new zip.HttpReader(zipPath), function(reader) {
+                            reader.getEntries(function(entries) {
+                                // process all entries from the zip
+                                processEntries(entries, zipDir, callback);
+                            });
+                        }, callback);
+                    }, callback);
+                }
+            });
         }, callback);
     });
 }
@@ -140,7 +159,7 @@ var processFileEntry = function processFileEntry(entry, zipDir, callback) {
            fileEntry.createWriter(function(fileWriter) {
 
                fileWriter.onwriteend = function(e) {
-                   console.log('Write completed: '+entry.filename, zipDir);
+                   console.log('Write completed: ', zipDir);
                    callback(null, fileEntry);
                };
 
