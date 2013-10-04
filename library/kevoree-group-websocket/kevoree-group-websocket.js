@@ -1,11 +1,13 @@
 var AbstractGroup   = require('kevoree-entities').AbstractGroup,
     KevoreeLogger   = require('kevoree-commons').KevoreeLogger,
+    kevoree         = require('kevoree-library').org.kevoree,
     WSClient        = require('ws'),
     WSServer        = require('ws').Server,
 
     PULL        = 0,
     PUSH        = 1,
-    REGISTER    = 3;
+    REGISTER    = 3,
+    PULL_JSON   = 42;
 
 /**
  * WebSocketGroup: Kevoree group that handles model transfers through WebSocket protocol
@@ -20,6 +22,7 @@ var WebSocketGroup = AbstractGroup.extend({
 
         this.server = null;
         this.client = null;
+        this.connectedNodes = {};
     },
 
     start: function (_super) {
@@ -29,10 +32,10 @@ var WebSocketGroup = AbstractGroup.extend({
         this.checkNoMultipleMasterServer();
 
         if (this.dictionary.getValue('port') != undefined) {
-            this.server = startWSServer(this.log, this.dictionary.getValue('port'));
+            this.server = this.startWSServer(this.dictionary.getValue('port'));
         } else {
-            this.log.warn("There is no 'port' attribute defined: trying with default 8000");
-            this.server = startWSServer(this.log, 8000);
+            this.log.warn("There is no 'port' attribute defined: client node");
+            this.client = this.startWSClient();
         }
     },
 
@@ -82,28 +85,123 @@ var WebSocketGroup = AbstractGroup.extend({
                 throw new Error("WebSocketGroup error: multiple master server defined. You are not supposed to specify more than ONE port attribute on this group sub nodes.");
             }
         }
+    },
+
+    startWSServer: function (port) {
+        // create a WebSocket server on specified port
+        var server = new WSServer({port: port});
+        this.log.info("WebSocket server started: %s:%s", server.options.host, port);
+
+        server.on('connection', function(ws) {
+            ws.on('message', function(data, flag) {
+                if (flag.binary == undefined) {
+                    // received data is a String
+                    this.processMessage(ws, data);
+
+                } else {
+                    // received data is binary
+                    this.processMessage(ws, String.fromCharCode.apply(null, new Uint8Array(data)));
+                }
+            });
+        });
+
+        return server;
+    },
+
+    startWSClient: function () {
+        var masterServerAddress = this.getMasterServerAddress();
+        if (masterServerAddress != null) {
+            var group = this;
+
+            var ws = new WebSocket('ws://'+masterServerAddress);
+            ws.on('open', function() {
+                ws.send(REGISTER+group.getNodeName());
+            });
+
+            ws.on('message', function (data) {
+                var jsonLoader = new kevoree.loader.JSONModelLoader();
+                var model = jsonLoader.loadModelFromString(data);
+                group.kCore.deploy(model);
+            });
+
+            ws.on('close', function () {
+                group.log.debug("WebSocketGroup client: connection closed with ws://"+masterServerAddress);
+            })
+        } else {
+            throw new Error("There is no master server in your model. You must specify a master server by giving a value to one port attribute.");
+        }
+    },
+
+    getMasterServerAddress: function () {
+        // TODO
+//        var kGroup = this.getModelElement();
+//        for (var i=0; i < kGroup.subNodes.size(); i++) {
+//            var node = kGroup.subNodes.get(i);
+//
+//        }
+    },
+
+    processMessage: function (clientSocket, data) {
+        var controlByte = data[0],
+            realData    = data.slice(1, data.length);
+
+        switch (controlByte) {
+            case PUSH:
+                this.onMasterServerPush(clientSocket, realData);
+                break;
+
+            case PULL:
+                this.onMasterServerPull(clientSocket, realData);
+                break;
+
+            case PULL_JSON:
+                this.onMasterServerPullJSON(clientSocket, realData);
+                break;
+
+            case REGISTER:
+                this.onMasterServerRegister(clientSocket, realData);
+                break;
+
+            default:
+                this.log.error("Received control byte '"+controlByte+"': WebSocketGroup is unable to process this control byte");
+                break;
+        }
+    },
+
+    onMasterServerPush: function (clientSocket, strData) {
+        this.log.info("WebSocketGroup: "+clientSocket._socket.address()+" asked for a PUSH");
+
+        var jsonLoader = new kevoree.loader.JSONModelLoader();
+        var model = jsonLoader.loadModelFromString(strData).get(0);
+
+        this.kCore.deploy(model);
+
+        // broadcast model over all connected nodes
+        for (var nodeName in this.connectedNodes) {
+            this.connectedNodes[nodeName].send(strData);
+        }
+    },
+
+    onMasterServerPull: function (clientSocket, strData) {
+        this.log.info("WebSocketGroup: "+clientSocket._socket.address()+" asked for a PULL (xmi)");
+
+        var serializer = new kevoree.serializer.XMIModelSerializer();
+        var strModel = serializer.serialize(this.kCore.getCurrentModel());
+        clientSocket.send(strModel);
+    },
+
+    onMasterServerPullJSON: function (clientSocket, strData) {
+        this.log.info("WebSocketGroup: "+clientSocket._socket.address()+" asked for a PULL (json)");
+
+        var serializer = new kevoree.serializer.JSONModelSerializer();
+        var strModel = serializer.serialize(this.kCore.getCurrentModel());
+        clientSocket.send(strModel);
+    },
+
+    onMasterServerRegister: function (clientSocket, nodeName) {
+        this.connectedNodes[nodeName] = clientSocket;
+        this.log.info("WebSocketGroup: "+clientSocket._socket.address()+" new registered client.");
     }
 });
-
-var startWSServer = function startWSServer(log, port) {
-    // create a WebSocket server on specified port
-    var server = new WSServer({port: port});
-    log.info("WebSocket server started: %s:%s", server.options.host, port);
-
-    server.on('connection', function(ws) {
-        ws.on('message', function(data, flag) {
-            if (flag.binary == undefined) {
-                // received data is a String
-                log.info("received %s", data);
-
-            } else {
-                // received data is binary
-                log.info("received binary data");
-            }
-        });
-    });
-
-    return server;
-}
 
 module.exports = WebSocketGroup;

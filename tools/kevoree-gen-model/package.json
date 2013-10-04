@@ -1,0 +1,28 @@
+{
+  "name": "kevoree-gen-model",
+  "version": "0.0.1",
+  "description": "Kevoree Generate Model Tool - Generates a Kevoree model from a kevoree-entity like module",
+  "main": "kevoree-gen-model.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "kevoree-entities": "0.0.1",
+    "async": "~0.2.9"
+  },
+  "devDependencies": {
+    "pseudoclass": "0.2.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dukeboard/kevoree-js"
+  },
+  "keywords": [
+    "kevoree",
+    "tools",
+    "generator",
+    "model"
+  ],
+  "author": "Maxime Tricoire <max.tricoire@gmail.com>",
+  "license": "LGPL3.0"
+}

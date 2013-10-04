@@ -8,7 +8,11 @@ module.exports = function (grunt) {
         cli_pkg: grunt.file.readJSON('client/package.json'),
         uglify: {
             options: {
-                banner: '/*! <%= cli_pkg.name %> browserified <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '/*! <%= cli_pkg.name %> browserified <%= grunt.template.today("yyyy-mm-dd") %> */\n',
+                // do not minify _super keyword because 'pseudoclass' needs it
+                mangle: {
+                    except: ['_super']
+                }
             },
             build: {
                 src: 'dist/<%= cli_pkg.name %>.browserify.js',
