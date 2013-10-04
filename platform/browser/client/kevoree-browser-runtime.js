@@ -13,24 +13,31 @@ var kevoreeCore     = new Core(__dirname, log),
     bootstrapper    = new HTTPBootstrapper(__dirname);
 
 // init DOM objects
-var startBtn    = document.getElementById('start-btn'),
-    deployBtn   = document.getElementById('deploy-btn'),
-    started     = false;
+var startBtn    = $('#start-btn'),
+    deployBtn   = $('#deploy-btn'),
+    started     = false,
+    deployed    = false,
+    deploying   = false;
 
 kevoreeCore.on('started', function () {
     log.info("KevoreeCore started");
     started = true;
-    startBtn.className += " disabled";
+    startBtn.addClass("disabled");
+    deployBtn.removeClass("disabled");
 });
 
 kevoreeCore.on('deployed', function (err, model) {
+    deploying = false;
+    deployed = true;
+    deployBtn.popover('hide');
+    deployBtn.removeClass("disabled");
     log.info("KevoreeCore deployed");
 });
 
 kevoreeCore.on('stopped', function (err, model) {
     log.info("KevoreeCore stopped");
-    started = false;
-    startBtn.className = startBtn.className.replace('disabled', '');
+    started = deployed = deploying = false;
+    startBtn.removeClass("disabled");
 });
 
 kevoreeCore.on('error', function (err) {
@@ -39,7 +46,7 @@ kevoreeCore.on('error', function (err) {
         // try to stop Kevoree Core on error
         kevoreeCore.stop();
     } catch (err) {
-        started = false;
+        started = deployed = deploying = false;
     }
 });
 
@@ -47,7 +54,7 @@ kevoreeCore.on('error', function (err) {
 kevoreeCore.setBootstrapper(bootstrapper);
 
 // start Kevoree Core
-startBtn.addEventListener('click', function () {
+startBtn.on('click', function () {
     if (!started) {
         try {
             kevoreeCore.start('node0');
@@ -58,13 +65,38 @@ startBtn.addEventListener('click', function () {
     } else log.warn();
 });
 
-deployBtn.addEventListener('click', function () {
+deployBtn.on('click', function () {
     if (started) {
-        try {
-            kevoreeCore.deploy(model);
-        } catch (err) {
-            log.error(err.message);
+        if (!deploying) {
+            if (!deployed) {
+                try {
+                    deploying = true;
+                    deployBtn.addClass("disabled");
+                    deployBtn.popover({
+                        html: true,
+                        content: deployPopoverContent,
+                        placement: 'bottom',
+                        trigger: 'manual'
+                    });
+                    deployBtn.popover('show');
+                    kevoreeCore.deploy(model);
+                } catch (err) {
+                    log.error(err.message);
+                }
+            } else {
+                log.warn("Model is already deployed.");
+            }
+        } else {
+            log.warn("Already trying to deploy model, please wait...");
         }
-
-    } else log.warn("Can't deploy model: you must start Kevoree Runtime first.");
+    } else {
+        log.warn("Can't deploy model: you must start Kevoree Runtime first.");
+    }
 });
+
+var deployPopoverContent = function deployPopoverContent() {
+    return '<small>Please wait while deploying...</small>' +
+           '<div class="progress progress-striped active" style="margin-bottom: 0px">'+
+             '<div class="progress-bar progress-bar-info"  role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>' +
+           '</div>';
+}
