@@ -80,5 +80,13 @@
                 This project is used to create <strong>kevoree-library</strong> and <strong>kevoree-kotlin</strong> projects
             </td>
         </tr>
+        <tr>
+            <td>tools/</td>
+            <td>Contains kevoree-gen-model (to generate kevoree models from components sources)</td>
+        </tr>
+        <tr>
+            <td>extras/</td>
+            <td>Kevoree dependencies not found in npm</td>
+        </tr>
     </tbody>
 </table>
