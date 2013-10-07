@@ -32,54 +32,65 @@ module.exports = function(req, res) {
             browserModulePath = path.resolve(installDir, BROWSER_MODULES, req.query.name+BROWSER_TAG),
             downloadLink      = '/libraries/'+BROWSER_MODULES+'/'+req.query.name+BROWSER_TAG+'.zip';
 
-        // install module with npm
-        npm.load({}, function (err) {
-            if (err) {
-                res.send(500, 'Unable to load npm module');
-                return;
-            }
-
-            // load success
-            npm.commands.install(installDir, [req.query.name+'@'+req.query.version], function installCallback(err) {
+        // check if bundle as already been downloaded
+        if (!fs.existsSync(browserModulePath+'.zip')) {
+            // install module with npm
+            npm.load({}, function (err) {
                 if (err) {
-                    res.send(500, 'npm failed to install package %s:%s', req.query.name, req.query.version);
+                    res.send(500, 'Unable to load npm module');
                     return;
                 }
 
-                // installation succeeded
-                var modulePackageJson = require(path.resolve(modulePath, 'package.json'));
+                // load success
+                npm.commands.install(installDir, [req.query.name+'@'+req.query.version], function installCallback(err) {
+                    if (err) {
+                        res.send(500, 'npm failed to install package %s:%s', req.query.name, req.query.version);
+                        return;
+                    }
 
-                fs.mkdir(browserModulePath, function () {
-                    // browserify module
-                    var b = browserify();
-                    var bundleFile = fs.createWriteStream(path.resolve(browserModulePath, req.query.name+'-bundle.js'));
+                    // installation succeeded
+                    fs.mkdir(browserModulePath, function () {
+                        // browserify module
+                        var b = browserify();
+                        var bundleFile = fs.createWriteStream(path.resolve(browserModulePath, req.query.name+'-bundle.js'));
 
-                    b.require(modulePath, {expose: req.query.name})
-                        .bundle()
-                        .pipe(bundleFile)
-                        .on('finish', function () {
-                            // zip browser-bundled folder
-                            var zip = new AdmZip();
-                            zip.addLocalFolder(browserModulePath);
-                            zip.writeZip(browserModulePath+'.zip');
+                        b.require(path.resolve('client', 'node_modules', 'kevoree-library'), { external: true, expose: 'kevoree-library' })
+                            .require(path.resolve('client', 'node_modules', 'kevoree-kotlin'), { external: true, expose: 'kevoree-kotlin' })
+                            .require(modulePath, { expose: req.query.name })
+                            .bundle()
+                            .pipe(bundleFile)
+                            .on('finish', function () {
+                                // zip browser-bundled folder
+                                var zip = new AdmZip();
+                                zip.addLocalFolder(browserModulePath);
+                                zip.writeZip(browserModulePath+'.zip');
 
-                            // remove browserModulePath folder from server
-                            rimraf(browserModulePath, function (err) {
-                                if (err) console.error("Unable to delete %s folder :/", browserModulePath);
+                                // remove browserModulePath folder from server
+                                rimraf(browserModulePath, function (err) {
+                                    if (err) console.error("Unable to delete %s folder :/", browserModulePath);
+                                });
+
+                                // send response
+                                res.json({
+                                    zipPath: downloadLink,
+                                    zipName: req.query.name+'@'+req.query.version,
+                                    requireName: modulePath
+                                });
+                                return;
                             });
-
-                            // send response
-                            res.json({
-                                zipPath: downloadLink,
-                                zipName: req.query.name+'@'+req.query.version,
-                                requireName: modulePath
-                            });
-
-                            return;
                     });
                 });
             });
-        });
+
+        } else {
+            // send response
+            res.json({
+                zipPath: downloadLink,
+                zipName: req.query.name+'@'+req.query.version,
+                requireName: modulePath
+            });
+            return;
+        }
 
     } else {
         res.send(500, 'Sorry, for now Kevoree Browser Runtime server is only able to resolve "npm" packages.');

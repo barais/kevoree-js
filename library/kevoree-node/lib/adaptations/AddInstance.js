@@ -1,23 +1,9 @@
 var AdaptationPrimitive = require('./AdaptationPrimitive'),
     RemoveInstance      = require('./RemoveInstance'),
     kevoree             = require('kevoree-library').org.kevoree,
+    Kotlin              = require('kevoree-kotlin'),
     Port                = require('kevoree-entities').Port,
     path                = require('path');
-
-var isType = function isType(object, type) {
-    if (object === null || object === undefined) {
-        return false;
-    }
-
-    var proto = Object.getPrototypeOf(object);
-    // todo test nested class
-    //noinspection RedundantIfStatementJS
-    if (proto == type.proto) {
-        return true;
-    }
-
-    return false;
-}
 
 /**
  * AddInstance Adaptation command
@@ -43,21 +29,25 @@ module.exports = AdaptationPrimitive.extend({
             if (this.isRelatedToPlatform(kInstance)) {
                 var moduleName = this.findSuitableModuleName(kInstance);
                 if (moduleName != undefined && moduleName != null) {
-                    var modulesPath = this.node.getKevoreeCore().getModulesPath();
-                    var InstanceClass = require(path.resolve(modulesPath, 'node_modules', moduleName));
+                    try {
+                        var InstanceClass = require(moduleName);
+                        var instance = new InstanceClass();
+                        instance.setKevoreeCore(this.node.getKevoreeCore());
+                        instance.setName(kInstance.name);
+                        instance.setPath(kInstance.path());
+                        instance.setNodeName(this.node.getName());
 
-                    var instance = new InstanceClass();
-                    instance.setKevoreeCore(this.node.getKevoreeCore());
-                    instance.setName(kInstance.name);
-                    instance.setPath(kInstance.path());
-                    instance.setNodeName(this.node.getName());
+                        this.doSpecificTypeProcess(kInstance);
 
-                    this.doSpecificTypeProcess(kInstance);
+                        this.mapper.addEntry(kInstance.path(), instance);
 
-                    this.mapper.addEntry(kInstance.path(), instance);
+                        callback(null);
+                        return;
 
-                    callback.call(this, null);
-                    return;
+                    } catch (e) {
+                        callback(e);
+                        return;
+                    }
 
                 } else {
                     // there is no DeployUnit installed for this instance TypeDefinition
@@ -79,24 +69,24 @@ module.exports = AdaptationPrimitive.extend({
     },
 
     isRelatedToPlatform: function (kInstance) {
-        if (isType(kInstance.typeDefinition, kevoree.impl.ComponentTypeImpl)) {
+        if (Kotlin.isType(kInstance.typeDefinition, kevoree.impl.ComponentTypeImpl)) {
             // if parent is this node platform: it's ok
             return (kInstance.eContainer().name == this.node.getName());
 
-        } else if (isType(kInstance.typeDefinition, kevoree.impl.ChannelTypeImpl)) {
+        } else if (Kotlin.isType(kInstance.typeDefinition, kevoree.impl.ChannelTypeImpl)) {
             // if this channel has bindings with components hosted in this node platform: it's ok
             var bindings = kInstance.bindings;
             for (var i=0; i < bindings.size(); i++) {
                 if (bindings.get(i).port.eContainer().eContainer().name == this.node.getName()) return true;
             }
 
-        } else if (isType(kInstance.typeDefinition, kevoree.impl.GroupTypeImpl)) {
+        } else if (Kotlin.isType(kInstance.typeDefinition, kevoree.impl.GroupTypeImpl)) {
             var subNodes = kInstance.subNodes;
             for (var i=0; i < subNodes.size(); i++) {
                 if (subNodes.get(i).name == this.node.name) return true;
             }
 
-        } else if (isType(kInstance.typeDefinition, kevoree.impl.NodeTypeImpl)) {
+        } else if (Kotlin.isType(kInstance.typeDefinition, kevoree.impl.NodeTypeImpl)) {
             // TODO
             return true;
         }
@@ -112,7 +102,7 @@ module.exports = AdaptationPrimitive.extend({
     },
 
     doSpecificTypeProcess: function (kInstance) {
-        if (isType(kInstance.typeDefinition, kevoree.impl.ComponentTypeImpl)) {
+        if (Kotlin.isType(kInstance.typeDefinition, kevoree.impl.ComponentTypeImpl)) {
             var provided = kInstance.provided;
             for (var i=0; i < provided.size(); i++) {
                 this.mapper.addEntry(provided.get(i).path(), new Port(provided.get(i).portTypeRef.name, provided.get(i).path()));
@@ -123,12 +113,12 @@ module.exports = AdaptationPrimitive.extend({
                 this.mapper.addEntry(required.get(i).path(), new Port(required.get(i).portTypeRef.name, required.get(i).path()));
             }
 
-        } else if (isType(kInstance.typeDefinition, kevoree.impl.ChannelTypeImpl)) {
+        } else if (Kotlin.isType(kInstance.typeDefinition, kevoree.impl.ChannelTypeImpl)) {
 
-        } else if (isType(kInstance.typeDefinition, kevoree.impl.GroupTypeImpl)) {
+        } else if (Kotlin.isType(kInstance.typeDefinition, kevoree.impl.GroupTypeImpl)) {
 
 
-        } else if (isType(kInstance.typeDefinition, kevoree.impl.NodeTypeImpl)) {
+        } else if (Kotlin.isType(kInstance.typeDefinition, kevoree.impl.NodeTypeImpl)) {
 
         }
     }

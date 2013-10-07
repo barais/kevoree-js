@@ -19,7 +19,8 @@
         "url": "https://github.com/dukeboard/kevoree-js"
     },
     "dependencies": {
-        "kevoree-library": "0.0.2",
+        "kevoree-library": "0.0.3",
+        "kevoree-kotlin": "0.0.1",
         "kevoree-entities": "0.0.1",
         "kevoree-commons": "0.0.1",
         "pseudoclass": "0.2.6"

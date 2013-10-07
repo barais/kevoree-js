@@ -41,7 +41,10 @@ kevoreeCore.on('stopped', function (err, model) {
 });
 
 kevoreeCore.on('error', function (err) {
-    log.error("KevoreeCore "+err.message);
+    log.error(err.message);
+    deploying = deployed = false;
+    deployBtn.popover('hide');
+    deployBtn.removeClass("disabled");
     try {
         // try to stop Kevoree Core on error
         kevoreeCore.stop();

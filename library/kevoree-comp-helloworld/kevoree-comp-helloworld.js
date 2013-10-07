@@ -21,7 +21,7 @@ var HelloWorldComponent = AbstractComponent.extend({
 
         // print messages to std output when received from input port 'fake'
         this.addInputPort("fake", function (msg) {
-            self.log.info("Message received: %s", msg);
+            self.log.info("Message received: "+ msg);
         });
     },
 

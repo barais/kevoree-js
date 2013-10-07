@@ -13,7 +13,6 @@ module.exports = AdaptationPrimitive.extend({
             var instance = this.mapper.getObject(kInstance.path());
 
             if (instance != undefined && instance != null) {
-                instance.setKevoreeCore(this.node.getKevoreeCore());
                 instance.start();
                 callback.call(this, null);
                 return;

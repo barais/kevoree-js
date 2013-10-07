@@ -23,6 +23,16 @@ module.exports = function (grunt) {
             dist: {
                 files: {
                     'dist/<%= cli_pkg.name %>.browserify.js': ['client/<%= cli_pkg.name %>.js']
+                },
+                options: {
+                    alias: [
+                        // use browserify -r for kevoree-kotlin & kevoree-library
+                        // to provide them only once in browser runtime
+                        // When server will resolve a module with any of these dependence it will use
+                        // those 'modularized' ones instead of reloaded them in a new bundle
+                        path.resolve(__dirname, 'client', 'node_modules', 'kevoree-kotlin')+':kevoree-kotlin',
+                        path.resolve(__dirname, 'client', 'node_modules', 'kevoree-library')+':kevoree-library'
+                    ]
                 }
             }
         },

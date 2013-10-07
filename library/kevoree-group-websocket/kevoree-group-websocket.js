@@ -90,7 +90,7 @@ var WebSocketGroup = AbstractGroup.extend({
     startWSServer: function (port) {
         // create a WebSocket server on specified port
         var server = new WSServer({port: port});
-        this.log.info("WebSocket server started: %s:%s", server.options.host, port);
+        this.log.info("WebSocket server started: "+ server.options.host+":"+port);
 
         server.on('connection', function(ws) {
             ws.on('message', function(data, flag) {

@@ -57,7 +57,8 @@ var NPMResolver = Resolver.extend({
     },
 
     uninstall: function (deployUnit, callback) {
-        callback(new Error("NPMResolver: Not implemented yet"));
+        console.warn("NPMResolver.uninstall(...): Not implemented yet (I did NOT uninstall the module, but I told the bootstrapper that I did)");
+        callback();
         // TODO
     }
 });

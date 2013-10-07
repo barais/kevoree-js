@@ -7,32 +7,20 @@ var KevoreeLogger = Class({
         this.tag = tag;
     },
 
-    info: function () {
-        var template = '[INFO] %s: ' + (arguments[0] || '');
-        var args = [template, this.tag];
-        for (var i=1; i < arguments.length; i++) args.push(arguments[i]);
-        console.log.apply(this, args);
+    info: function (msg) {
+        console.log('[INFO] '+this.tag+': '+msg);
     },
 
     warn: function (msg) {
-        var template = '[WARN] %s: ' + (arguments[0] || '');
-        var args = [template, this.tag];
-        for (var i=1; i < arguments.length; i++) args.push(arguments[i]);
-        console.log.apply(this, args);
+        console.warn('[WARN] '+this.tag+': '+msg);
     },
 
     error: function (msg) {
-        var template = '[ERROR] %s: ' + (arguments[0] || '');
-        var args = [template, this.tag];
-        for (var i=1; i < arguments.length; i++) args.push(arguments[i]);
-        console.log.apply(this, args);
+        console.error('[ERROR] '+this.tag+': '+msg);
     },
 
     debug: function (msg) {
-        var template = '[DEBUG] %s: ' + (arguments[0] || '');
-        var args = [template, this.tag];
-        for (var i=1; i < arguments.length; i++) args.push(arguments[i]);
-        console.log.apply(this, args);
+        console.log('[DEBUG] '+this.tag+': '+msg);
     }
 });
 

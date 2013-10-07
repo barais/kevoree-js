@@ -76,7 +76,6 @@
                             <clearOutput>false</clearOutput>
                             <js>true</js>
                             <events>true</events>
-                            <ecma5>true</ecma5>
                         </configuration>
                     </execution>
                 </executions>

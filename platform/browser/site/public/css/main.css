@@ -1,8 +1,14 @@
-
-
 /* ==========================================================================
-   Author's custom styles
+   Kevoree Browser Runtime custom styles
    ========================================================================== */
+
+.navbar-header .navbar-brand {
+    padding: 0px;
+}
+
+.kevoree-logo {
+    padding: 8px;
+}
 
 .time-td {
     width: 100px;

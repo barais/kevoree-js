@@ -4,6 +4,7 @@ var Class               = require('pseudoclass'),
     ModelRemoveTrace    = require('kevoree-library').org.kevoree.modeling.api.trace.ModelRemoveTrace,
     ModelRemoveAllTrace = require('kevoree-library').org.kevoree.modeling.api.trace.ModelRemoveAllTrace,
     ModelAddAllTrace    = require('kevoree-library').org.kevoree.modeling.api.trace.ModelAddAllTrace,
+    Kotlin              = require('kevoree-kotlin'),
     ModelObjectMapper   = require('./ModelObjectMapper'),
     KevoreeLogger       = require('kevoree-commons').KevoreeLogger;
 
@@ -48,26 +49,6 @@ var ADD_INSTANCE_TRACE  = [
     };
 
 /**
- * @param object a JS instance
- * @param type a JS type
- * @returns {boolean}
- */
-var isType = function isType(object, type) {
-    if (object === null || object === undefined) {
-        return false;
-    }
-
-    var proto = Object.getPrototypeOf(object);
-    // todo test nested class
-    //noinspection RedundantIfStatementJS
-    if (proto == type.proto) {
-        return true;
-    }
-
-    return false;
-}
-
-/**
  * AdaptationEngine knows each AdaptationPrimitive command available
  * for JavascriptNode.
  * Plus, it handles model - object mapping
@@ -92,6 +73,9 @@ var AdaptationEngine = Class({
      * @returns {Array}
      */
     processTraces: function (traces, model) {
+        if (typeof document !== 'undefined') document.Kotlin = Kotlin;
+        if (typeof document !== 'undefined') document.traces = traces;
+
         var cmdList = [];
         for (var i=0; i < traces.size(); i++) {
             cmdList.push(this.processTrace(traces.get(i), model));
@@ -107,7 +91,7 @@ var AdaptationEngine = Class({
      */
     processTrace: function (trace, model) {
         // ADD - TRACES HANDLING
-        if (isType(trace, ModelAddTrace)) {
+        if (Kotlin.isType(trace, ModelAddTrace)) {
             if (ADD_INSTANCE_TRACE.indexOf(trace.typeName) != -1) {
                 // Add instance
                 return new AddInstance(this.node, this.modelObjMapper, model, trace);
@@ -122,7 +106,7 @@ var AdaptationEngine = Class({
             }
 
         // SET - TRACES HANDLING
-        } else if (isType(trace, ModelSetTrace)) {
+        } else if (Kotlin.isType(trace, ModelSetTrace)) {
             if (trace.refName && trace.refName == "started") {
                 var AdaptationPrimitive = (trace.content == 'true') ? StartInstance : StopInstance;
                 return new AdaptationPrimitive(this.node, this.modelObjMapper, model, trace);
@@ -131,11 +115,11 @@ var AdaptationEngine = Class({
                 return new UpdateDictionary(this.node, this.modelObjMapper, model, trace);
             }
 
-        } else if (isType(trace, ModelRemoveTrace)) {
+        } else if (Kotlin.isType(trace, ModelRemoveTrace)) {
             // TODO
-        } else if (isType(trace, ModelAddAllTrace)) {
+        } else if (Kotlin.isType(trace, ModelAddAllTrace)) {
             // TODO
-        } else if (isType(trace, ModelRemoveAllTrace)) {
+        } else if (Kotlin.isType(trace, ModelRemoveAllTrace)) {
             // TODO
         }
 
