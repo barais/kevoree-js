@@ -15,7 +15,7 @@
             <td>core/</td>
             <td>
                 Kevoree Core bundled as a NodeJS npm module<br/>
-                v0.0.1
+                v0.0.3
             </td>
         </tr>
         <tr>
@@ -35,7 +35,7 @@
                         </tr>
                         <tr>
                             <td>kevoree-library</td>
-                            <td>0.0.1</td>
+                            <td>0.0.3</td>
                             <td>Kevoree Library bundled as a NodeJS npm module</td>
                         </tr>
                         <tr>
