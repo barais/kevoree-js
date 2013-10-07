@@ -63,7 +63,7 @@
                     <tbody>
                         <tr>
                             <td>browser</td>
-                            <td>NOT IMPLEMENTED YET</td>
+                            <td>Kevoree Runtime in your browser (Google Chrome only)</td>
                         </tr>
                         <tr>
                             <td>nodejs</td>
@@ -77,7 +77,7 @@
             <td>org.kevoree.model.js/</td>
             <td>
                 Maven project allowing you to compile Kevoree model to JS easily<br/>
-                This project is used to update <strong>kevoree-library.js</strong> in <strong>library/kevoree-library</strong>
+                This project is used to create <strong>kevoree-library</strong> and <strong>kevoree-kotlin</strong> projects
             </td>
         </tr>
     </tbody>

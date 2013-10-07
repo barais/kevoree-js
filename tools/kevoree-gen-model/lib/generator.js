@@ -92,6 +92,7 @@ var processFile = function (file, callback) {
             if (obj instanceof KevoreeEntity) {
                 // this Class is a KevoreeEntity
                 console.log("Processing '"+file+"'...");
+                // TODO
                 return callback();
 
             } else {
