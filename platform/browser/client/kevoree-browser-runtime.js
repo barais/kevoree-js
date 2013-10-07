@@ -2,7 +2,7 @@ var Core                    = require('kevoree-core'),
     JSONModelLoader         = require('kevoree-library').org.kevoree.loader.JSONModelLoader,
     KevoreeBrowserLogger    = require('./lib/KevoreeBrowserLogger'),
     HTTPBootstrapper        = require('./lib/BrowserBootstrapper'),
-    jsonModel               = require('./testModel.json');
+    jsonModel               = require('./model.json');
 
 var log = new KevoreeBrowserLogger('Runtime');
 

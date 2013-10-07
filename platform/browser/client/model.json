@@ -131,72 +131,6 @@
             ]
         },
         {
-            "eClass": "org.kevoree.GroupType",
-            "abstract": "false",
-            "bean": "kevoree-group-websocket",
-            "name": "WebSocketGroup",
-            "factoryBean": "org.kevoree.library.WebSocketGroupFactory",
-            "deployUnits": [
-                "deployUnits[89918001378813344621]"
-            ],
-            "dictionaryType": [
-                {
-                    "eClass": "org.kevoree.DictionaryType",
-                    "generated_KMF_ID": "267671911378812807634",
-                    "attributes": [
-                        {
-                            "eClass": "org.kevoree.DictionaryAttribute",
-                            "fragmentDependant": "true",
-                            "optional": "true",
-                            "name": "port",
-                            "state": "false"
-                        },
-                        {
-                            "eClass": "org.kevoree.DictionaryAttribute",
-                            "fragmentDependant": "false",
-                            "optional": "false",
-                            "name": "ssl",
-                            "state": "false",
-                            "datatype": "enum=true,false"
-                        },
-                        {
-                            "eClass": "org.kevoree.DictionaryAttribute",
-                            "fragmentDependant": "true",
-                            "optional": "true",
-                            "name": "ip",
-                            "state": "false"
-                        }
-                    ],
-                    "defaultValues": [
-                        {
-                            "eClass": "org.kevoree.DictionaryValue",
-                            "generated_KMF_ID": "119116231378812807634",
-                            "value": "8000",
-                            "attribute": [
-                                "typeDefinitions[WebSocketGroup]/dictionaryType[267671911378812807634]/attributes[port]"
-                            ]
-                        },
-                        {
-                            "eClass": "org.kevoree.DictionaryValue",
-                            "generated_KMF_ID": "252579701378812807634",
-                            "value": "false",
-                            "attribute": [
-                                "typeDefinitions[WebSocketGroup]/dictionaryType[267671911378812807634]/attributes[ssl]"
-                            ]
-                        },
-                        {
-                            "eClass": "org.kevoree.DictionaryValue",
-                            "generated_KMF_ID": "129125821378812807634",
-                            "value": "0.0.0.0",
-                            "attribute": [
-                                "typeDefinitions[WebSocketGroup]/dictionaryType[267671911378812807634]/attributes[ip]"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "eClass": "org.kevoree.ComponentType",
             "abstract": "false",
             "bean": "kevoree-comp-helloworld",
@@ -280,24 +214,11 @@
             "name": "Javascript",
             "subTypes": [
                 "typeDefinitions[JavascriptNode]",
-                "typeDefinitions[WebSocketGroup]",
                 "typeDefinitions[HelloWorld]"
             ]
         }
     ],
     "deployUnits": [
-        {
-            "eClass": "org.kevoree.DeployUnit",
-            "groupName": "",
-            "unitName": "kevoree-group-websocket",
-            "generated_KMF_ID": "89918001378813344621",
-            "hashcode": "201309101342309",
-            "type": "npm",
-            "version": "0.0.2",
-            "targetNodeType": [
-                "typeDefinitions[JavascriptNode]"
-            ]
-        },
         {
             "eClass": "org.kevoree.DeployUnit",
             "groupName": "",
@@ -369,58 +290,6 @@
             ],
             "hub": [
                 "hubs[chan0]"
-            ]
-        }
-    ],
-    "groups": [
-        {
-            "eClass": "org.kevoree.Group",
-            "name": "sync",
-            "started": "true",
-            "metaData": "x=138,y=109",
-            "typeDefinition": [
-                "typeDefinitions[WebSocketGroup]"
-            ],
-            "subNodes": [
-                "nodes[node0]"
-            ],
-            "dictionary": [
-                {
-                    "eClass": "org.kevoree.Dictionary",
-                    "generated_KMF_ID": "0.22895467001944781378909271335",
-                    "values": [
-                        {
-                            "eClass": "org.kevoree.DictionaryValue",
-                            "generated_KMF_ID": "0.58561423048377041378909273197",
-                            "value": "false",
-                            "attribute": [
-                                "typeDefinitions[WebSocketGroup]/dictionaryType[267671911378812807634]/attributes[ssl]"
-                            ]
-                        },
-                        {
-                            "eClass": "org.kevoree.DictionaryValue",
-                            "generated_KMF_ID": "0.33476619888097051378909273197",
-                            "value": "8000",
-                            "attribute": [
-                                "typeDefinitions[WebSocketGroup]/dictionaryType[267671911378812807634]/attributes[port]"
-                            ],
-                            "targetNode": [
-                                "nodes[node0]"
-                            ]
-                        },
-                        {
-                            "eClass": "org.kevoree.DictionaryValue",
-                            "generated_KMF_ID": "0.26305797277018431378909273198",
-                            "value": "0.0.0.0",
-                            "attribute": [
-                                "typeDefinitions[WebSocketGroup]/dictionaryType[267671911378812807634]/attributes[ip]"
-                            ],
-                            "targetNode": [
-                                "nodes[node0]"
-                            ]
-                        }
-                    ]
-                }
             ]
         }
     ]
