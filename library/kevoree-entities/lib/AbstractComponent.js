@@ -1,6 +1,9 @@
 var KevoreeEntity   = require('./KevoreeEntity'),
     Port            = require('./Port');
 
+var IN_PORT  = 'in_',
+    OUT_PORT = 'out_';
+
 /**
  * AbstractComponent entity
  *
@@ -14,17 +17,19 @@ module.exports = KevoreeEntity.extend({
         this.outputs = {};
     },
 
-    addInputPort: function (name, callback) {
-        if (this.inputs[name]) this.inputs[name].setCallback(callback);
-        else console.error("Unable to find provided port '%s' (AddBinding failed?)", name);
-    },
-
     send: function (name, msg) {
-        this.outputs[name].process(msg);
+        if (typeof (this.outputs[name]) === 'undefined') {
+            console.error("Output port '"+name+"' does not exist. You should define a 'out_"+name+"' variable in your component in order for Kevoree to create it.");
+        } else {
+            this.outputs[name].process(msg);
+        }
     },
 
     addInternalInputPort: function (port) {
         this.inputs[port.getName()] = port;
+        if (typeof(this[IN_PORT+port.getName()]) === 'undefined') {
+            throw new Error("Unable to find provided port '"+IN_PORT+port.getName()+"' (Function defined in class?)");
+        } else port.setCallback(this[IN_PORT+port.getName()]);
     },
 
     addInternalOutputPort: function (port) {

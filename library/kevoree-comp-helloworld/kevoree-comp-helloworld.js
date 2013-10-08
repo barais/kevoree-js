@@ -18,16 +18,19 @@ var HelloWorldComponent = AbstractComponent.extend({
             // send a message through output port 'sendText' every 2 seconds
             self.send('sendText', "hello world "+(new Date));
         }, 2000);
-
-        // print messages to std output when received from input port 'fake'
-        this.addInputPort("fake", function (msg) {
-            self.log.info("Message received: "+ msg);
-        });
     },
 
     stop: function () {
         clearInterval(this.id);
         this.id = null;
+    },
+
+    // define an output port called "sendText" (you can put whatever you want in this variable it's not used)
+    out_sendText: null,
+
+    // print messages to std output when received from input port 'fake'
+    in_fake: function (msg) {
+        this.log.info("Message received: "+ msg);
     }
 });
 

@@ -1,5 +1,9 @@
 var Class = require('pseudoclass');
 
+/**
+ * You are not supposed to create Port object (unless you are an AdaptationPrimitive)
+ * @type {*}
+ */
 module.exports = Class({
     toString: 'Port',
 
