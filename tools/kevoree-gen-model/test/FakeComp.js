@@ -1,4 +1,4 @@
-var AbstractComponent = require('kevoree-entities').KevoreeEntity;
+var AbstractComponent = require('kevoree-entities').AbstractComponent;
 
 var FakeComp = AbstractComponent.extend({
     toString: 'FakeComp',
@@ -9,6 +9,16 @@ var FakeComp = AbstractComponent.extend({
 
     stop: function () {
         console.log("fake comp stop");
+    },
+
+    out_potato: null,
+
+    in_fake: function (msg) {
+
+    },
+
+    in_receiver: function (msg) {
+
     }
 });
 

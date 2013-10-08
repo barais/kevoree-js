@@ -1,22 +1,37 @@
-var fs            = require('fs'),
-    path          = require('path'),
-    KevoreeEntity = require('kevoree-entities').KevoreeEntity,
-    async         = require('async');
+var fs                = require('fs'),
+    path              = require('path'),
+    KevoreeEntity     = require('kevoree-entities').KevoreeEntity,
+    AbstractChannel   = require('kevoree-entities').AbstractChannel,
+    AbstractComponent = require('kevoree-entities').AbstractComponent,
+    AbstractGroup     = require('kevoree-entities').AbstractGroup,
+    AbstractNode      = require('kevoree-entities').AbstractNode,
+    async             = require('async'),
+    genComponent      = require('./genComponent'),
+    genChannel        = require('./genChannel'),
+    genGroup          = require('./genGroup'),
+    genNode           = require('./genNode'),
+    kevoree           = require('kevoree-library').org.kevoree;
+
+var quiet = false;
 
 /**
  *
  * @param dirPath
  * @param callback
  */
-var generator = function generator(dirPath, callback) {
+var generator = function generator(dirPath, quiet_, callback) {
     if (dirPath == undefined) throw new Error("dirPath undefined");
+
+    quiet = quiet_;
 
     // get every file path recursively
     walk(dirPath, ['node_modules'], function (err, files) {
+        var factory = new kevoree.impl.DefaultKevoreeFactory();
+        var model = factory.createContainerRoot();
         var tasks = [];
         files.forEach(function (file) {
             tasks.push(function (taskCallback) {
-                processFile(file, function (err) {
+                processFile(file, model, function (err) {
                     if (err) {
                         taskCallback(err);
                         return;
@@ -28,13 +43,13 @@ var generator = function generator(dirPath, callback) {
         });
 
         // execute each tasks asynchronously
-        async.parallel(tasks, function (err, results) {
+        async.parallel(tasks, function (err) {
             if (err) {
                 return callback(err);
             }
 
             // each file has been processed successfully
-            callback();
+            callback(null, model);
         });
     });
 };
@@ -75,7 +90,9 @@ var walk = function(dir, excludes, done) {
                         if (!--pending) done(null, results);
                     });
                 } else {
-                    results.push(file);
+                    if (getExtension(file) == '.js') {
+                        results.push(file);
+                    }
                     if (!--pending) done(null, results);
                 }
             });
@@ -83,29 +100,35 @@ var walk = function(dir, excludes, done) {
     });
 };
 
-var processFile = function (file, callback) {
-    var Class = require(file);
+var processFile = function (file, model, callback) {
+    try {
+        var Class = require(file);
 
-    if (typeof(Class) === 'function') {
-        try {
+        if (typeof Class == 'function') {
             var obj = new Class();
             if (obj instanceof KevoreeEntity) {
                 // this Class is a KevoreeEntity
-                console.log("Processing '"+file+"'...");
-                // TODO
-                return callback();
+                console.log("\nProcessing:\n\tFile: '%s'", file);
+                if      (obj instanceof AbstractComponent) genComponent(obj, model, callback);
+                else if (obj instanceof AbstractChannel)   genChannel(obj, model, callback);
+                else if (obj instanceof AbstractGroup)     genGroup(obj, model, callback);
+                else if (obj instanceof AbstractNode)      genNode(obj, model, callback);
 
             } else {
                 // this is not the Class you are looking for
-//            console.log("Ignoring '"+file+"'.");
+                if (!quiet) console.log("\nIgnored:\n\tFile: '%s'\n\tReason: Not a KevoreeEntity", file);
                 return callback();
             }
-
-        } catch (e) {
-            console.log("Unable to create a new object by requiring '%s' (ignored)\n\tError: %s", file, e.message);
-            return callback();
         }
+    } catch (e) {
+        if (!quiet) console.log("\nIgnored:\n\tFile: '%s'\n\tReason: Unable to create a new object\n\tError: %s", file, e.message);
+        return callback();
     }
+}
+
+function getExtension(filename) {
+    var i = filename.lastIndexOf('.');
+    return (i < 0) ? '' : filename.substr(i);
 }
 
 /**
