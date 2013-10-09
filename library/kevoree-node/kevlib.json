@@ -1,81 +1,39 @@
 {
     "eClass": "org.kevoree.ContainerRoot",
-    "generated_KMF_ID": "101205821378461125909",
+    "generated_KMF_ID": "0.134167078649625181381312556311",
+    "nodes": [],
     "typeDefinitions": [
         {
             "eClass": "org.kevoree.NodeType",
-            "abstract": "false",
-            "bean": "kevoree-node",
             "name": "JavascriptNode",
             "deployUnits": [
-                "deployUnits[142023381378461125966]"
+                "deployUnits[0.69696377287618821381312556311]"
             ],
-            "dictionaryType": [
-                {
-                    "eClass": "org.kevoree.DictionaryType",
-                    "generated_KMF_ID": "313116901378461125995",
-                    "attributes": [
-                        {
-                            "eClass": "org.kevoree.DictionaryAttribute",
-                            "fragmentDependant": "false",
-                            "optional": "true",
-                            "name": "coreLogLevel",
-                            "state": "false",
-                            "datatype": "enum=INFO,WARN,DEBUG,ERROR,FINE"
-                        },
-                        {
-                            "eClass": "org.kevoree.DictionaryAttribute",
-                            "fragmentDependant": "false",
-                            "optional": "true",
-                            "name": "logLevel",
-                            "state": "false",
-                            "datatype": "enum=INFO,WARN,DEBUG,ERROR,FINE"
-                        }
-                    ],
-                    "defaultValues": [
-                        {
-                            "eClass": "org.kevoree.DictionaryValue",
-                            "generated_KMF_ID": "235633931378461125995",
-                            "value": "WARN",
-                            "attribute": [
-                                "typeDefinitions[JavascriptNode]/dictionaryType[313116901378461125995]/attributes[coreLogLevel]"
-                            ]
-                        },
-                        {
-                            "eClass": "org.kevoree.DictionaryValue",
-                            "generated_KMF_ID": "214293611378461125995",
-                            "value": "INFO",
-                            "attribute": [
-                                "typeDefinitions[JavascriptNode]/dictionaryType[313116901378461125995]/attributes[logLevel]"
-                            ]
-                        }
-                    ]
-                }
-            ]
+            "superTypes": [],
+            "managedPrimitiveTypes": [],
+            "dictionaryType": [],
+            "managedPrimitiveTypeRefs": []
         }
     ],
     "repositories": [],
-    "libraries": [
-        {
-            "eClass": "org.kevoree.TypeLibrary",
-            "name": "Javascript",
-            "subTypes": [
-                "typeDefinitions[JavascriptNode]"
-            ]
-        }
-    ],
+    "dataTypes": [],
+    "libraries": [],
+    "hubs": [],
+    "mBindings": [],
     "deployUnits": [
         {
             "eClass": "org.kevoree.DeployUnit",
-            "groupName": "",
             "unitName": "kevoree-node",
-            "generated_KMF_ID": "142023381378461125966",
-            "hashcode": "201309061152488",
+            "generated_KMF_ID": "0.69696377287618821381312556311",
             "type": "npm",
             "version": "0.0.6",
+            "requiredLibs": [],
             "targetNodeType": [
                 "typeDefinitions[JavascriptNode]"
             ]
         }
-    ]
+    ],
+    "nodeNetworks": [],
+    "groups": [],
+    "adaptationPrimitiveTypes": []
 }

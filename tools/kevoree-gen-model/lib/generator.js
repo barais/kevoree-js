@@ -44,47 +44,69 @@ var generator = function generator(dirPath, quiet_, callback) {
             // walk succeed - create a new ContainerRoot
             var model = factory.createContainerRoot();
 
-            // retrieve 'kevoree-node' from npm registry
-            npm.load({}, function (err) {
-                if (err) return callback(err);
-
-                // load success - install kevoree-node locally in order to retrieve kevlib.json
-                npm.commands.install(['kevoree-node'], function installCallback(err) {
+            if (projectPackageJson.name != 'kevoree-node') {
+                // retrieve 'kevoree-node' from npm registry
+                npm.load({}, function (err) {
                     if (err) return callback(err);
 
-                    // installation succeeded
-                    var kevlib       = require(path.resolve('node_modules', 'kevoree-node', 'kevlib.json')),
-                        jsonLoader   = new kevoree.loader.JSONModelLoader(),
-                        kevNodeModel = jsonLoader.loadModelFromString(JSON.stringify(kevlib)).get(0),
-                        jsNodeTD     = kevNodeModel.findTypeDefinitionsByID('JavascriptNode'),
-                        jsNodeDU     = kevNodeModel.deployUnits.get(0);
+                    // load success - install kevoree-node locally in order to retrieve kevlib.json
+                    npm.commands.install(['kevoree-node'], function installCallback(err) {
+                        if (err) return callback(err);
 
-                    // add javascriptNode TypeDefinition & DeployUnit to the model
-                    model.addTypeDefinitions(jsNodeTD);
-                    model.addDeployUnits(jsNodeDU);
+                        // installation succeeded
+                        var kevlib       = require(path.resolve('node_modules', 'kevoree-node', 'kevlib.json')),
+                            jsonLoader   = new kevoree.loader.JSONModelLoader(),
+                            kevNodeModel = jsonLoader.loadModelFromString(JSON.stringify(kevlib)).get(0),
+                            jsNodeTD     = kevNodeModel.findTypeDefinitionsByID('JavascriptNode'),
+                            jsNodeDU     = kevNodeModel.deployUnits.get(0);
 
-                    // create a javascript library for the model
-                    var library = factory.createTypeLibrary();
-                    library.name = 'Javascript';
-                    library.addSubTypes(jsNodeTD);
-                    model.addLibraries(library);
+                        // add javascriptNode TypeDefinition & DeployUnit to the model
+                        model.addTypeDefinitions(jsNodeTD);
+                        model.addDeployUnits(jsNodeDU);
 
-                    // create the project deployUnit
-                    var deployUnit = factory.createDeployUnit();
-                    deployUnit.unitName = projectPackageJson.name;
-                    deployUnit.version = projectPackageJson.version;
-                    deployUnit.type = 'npm';
-                    deployUnit.targetNodeType = jsNodeTD;
-                    model.addDeployUnits(deployUnit);
+                        // create a javascript library for the model
+                        var library = factory.createTypeLibrary();
+                        library.name = 'Javascript';
+                        library.addSubTypes(jsNodeTD);
+                        model.addLibraries(library);
 
-                    // for each file, update model
-                    files.forEach(function (file) {
-                        processFile(file, deployUnit, model);
+                        // create the project deployUnit
+                        var deployUnit = factory.createDeployUnit();
+                        deployUnit.unitName = projectPackageJson.name;
+                        deployUnit.version = projectPackageJson.version;
+                        deployUnit.type = 'npm';
+                        deployUnit.targetNodeType = jsNodeTD;
+                        model.addDeployUnits(deployUnit);
+
+                        // for each file, update model
+                        files.forEach(function (file) {
+                            processFile(file, deployUnit, model);
+                        });
+
+                        return callback(null, model);
                     });
-
-                    return callback(null, model);
                 });
-            });
+            } else {
+                // create the project deployUnit
+                var deployUnit = factory.createDeployUnit();
+                deployUnit.unitName = projectPackageJson.name;
+                deployUnit.version = projectPackageJson.version;
+                deployUnit.type = 'npm';
+
+                // for each file, update model
+                files.forEach(function (file) {
+                    var td = processFile(file, deployUnit, model);
+                    if (typeof td !== 'undefined' && td != null && typeof(td.name) !== 'undefined') {
+                        if (td.name == 'JavascriptNode') {
+                            deployUnit.targetNodeType = td;
+                        }
+                    }
+                });
+
+                model.addDeployUnits(deployUnit);
+
+                return callback(null, model);
+            }
         });
 
     } catch (err) {
@@ -148,10 +170,10 @@ var processFile = function (file, deployUnit, model) {
                 // this Class is a KevoreeEntity
                 console.log("\nProcessing:\n\tFile: '%s'", file);
 
-                if      (obj instanceof AbstractComponent) genComponent(deployUnit, obj, model);
-                else if (obj instanceof AbstractChannel)   genChannel(deployUnit, obj, model);
-                else if (obj instanceof AbstractGroup)     genGroup(deployUnit, obj, model);
-                else if (obj instanceof AbstractNode)      genNode(deployUnit, obj, model);
+                if      (obj instanceof AbstractComponent) return genComponent(deployUnit, obj, model);
+                else if (obj instanceof AbstractChannel)   return genChannel(deployUnit, obj, model);
+                else if (obj instanceof AbstractGroup)     return genGroup(deployUnit, obj, model);
+                else if (obj instanceof AbstractNode)      return genNode(deployUnit, obj, model);
 
             } else {
                 // this is not the Class you are looking for

@@ -11,7 +11,7 @@ module.exports = function (deployUnit, obj, model) {
     var factory = new kevoree.impl.DefaultKevoreeFactory();
 
     // create a new group type
-    var nodeType = factory.createContainerRoot();
+    var nodeType = factory.createNodeType();
     nodeType.name = obj.toString();
 
     // add super type if not AbstractGroup
@@ -22,4 +22,6 @@ module.exports = function (deployUnit, obj, model) {
     nodeType.addDeployUnits(deployUnit);
 
     model.addTypeDefinitions(nodeType);
+
+    return nodeType;
 }

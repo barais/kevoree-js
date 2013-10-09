@@ -22,4 +22,6 @@ module.exports = function (deployUnit, obj, model) {
     chanType.addDeployUnits(deployUnit);
 
     model.addTypeDefinitions(chanType);
+
+    return chanType;
 }

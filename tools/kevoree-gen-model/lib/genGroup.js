@@ -22,4 +22,6 @@ module.exports = function (deployUnit, obj, model) {
     groupType.addDeployUnits(deployUnit);
 
     model.addTypeDefinitions(groupType);
+
+    return groupType;
 }

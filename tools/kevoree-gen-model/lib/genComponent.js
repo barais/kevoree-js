@@ -33,6 +33,8 @@ module.exports = function (deployUnit, obj, model) {
 
     // add component type to model
     model.addTypeDefinitions(compType);
+
+    return compType;
 }
 
 var addInputPort = function addInputPort(name, factory, compType) {
