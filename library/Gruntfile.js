@@ -35,14 +35,6 @@ module.exports = function (grunt) {
         versionTask
     );
 
-    grunt.registerTask('foo', "Le foo task", function () {
-        var done = this.async();
-        setTimeout(function () {
-            console.log("FOO FOO FOO");
-            done();
-        }, 10000);
-    });
-
     // task sets
     grunt.registerTask('default', ['clean', 'install']);
     grunt.registerTask('republish-all', ['clean', 'install', 'unpublish', 'publish']);
