@@ -23,6 +23,7 @@
   "license": "LGPL3.0",
   "dependencies": {
     "grunt": "~0.4.1",
-    "rimraf": "~2.2.2"
+    "rimraf": "~2.2.2",
+    "async": "~0.2.9"
   }
 }
