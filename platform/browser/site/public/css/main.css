@@ -2,6 +2,11 @@
    Kevoree Browser Runtime custom styles
    ========================================================================== */
 
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
 .navbar-header .navbar-brand {
     padding: 0px;
 }

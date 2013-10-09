@@ -1,18 +1,18 @@
 var fs                = require('fs'),
     path              = require('path'),
-    KevoreeEntity     = require('kevoree-entities').KevoreeEntity,
-    AbstractChannel   = require('kevoree-entities').AbstractChannel,
-    AbstractComponent = require('kevoree-entities').AbstractComponent,
-    AbstractGroup     = require('kevoree-entities').AbstractGroup,
-    AbstractNode      = require('kevoree-entities').AbstractNode,
-    async             = require('async'),
+    npm               = require('npm'),
     genComponent      = require('./genComponent'),
     genChannel        = require('./genChannel'),
     genGroup          = require('./genGroup'),
     genNode           = require('./genNode'),
     kevoree           = require('kevoree-library').org.kevoree;
 
+// init Kevoree entities types
+var KevoreeEntity, AbstractComponent, AbstractGroup, AbstractChannel, AbstractNode;
+// init quiet mode to false
 var quiet = false;
+// init Kevoree factory
+var factory = new kevoree.impl.DefaultKevoreeFactory();
 
 /**
  *
@@ -22,36 +22,74 @@ var quiet = false;
 var generator = function generator(dirPath, quiet_, callback) {
     if (dirPath == undefined) throw new Error("dirPath undefined");
 
+    // retrieve kevoree-entities types from the project path
+    var kePath = path.resolve(dirPath, 'node_modules', 'kevoree-entities'); // TODO add this path in command-line argument ?
+    KevoreeEntity     = require(kePath).KevoreeEntity;
+    AbstractComponent = require(kePath).AbstractComponent;
+    AbstractGroup     = require(kePath).AbstractGroup;
+    AbstractChannel   = require(kePath).AbstractChannel;
+    AbstractNode      = require(kePath).AbstractNode;
+
+    // set quiet mode
     quiet = quiet_;
 
-    // get every file path recursively
-    walk(dirPath, ['node_modules'], function (err, files) {
-        var factory = new kevoree.impl.DefaultKevoreeFactory();
-        var model = factory.createContainerRoot();
-        var tasks = [];
-        files.forEach(function (file) {
-            tasks.push(function (taskCallback) {
-                processFile(file, model, function (err) {
-                    if (err) {
-                        taskCallback(err);
-                        return;
-                    }
+    try {
+        // get project version for deployUnits
+        var projectPackageJson = require(path.resolve(dirPath, 'package.json'));
 
-                    taskCallback();
+        // get every file path recursively
+        walk(dirPath, ['node_modules'], function (err, files) {
+            if (err) return callback(err);
+
+            // walk succeed - create a new ContainerRoot
+            var model = factory.createContainerRoot();
+
+            // retrieve 'kevoree-node' from npm registry
+            npm.load({}, function (err) {
+                if (err) return callback(err);
+
+                // load success - install kevoree-node locally in order to retrieve kevlib.json
+                npm.commands.install(['kevoree-node'], function installCallback(err) {
+                    if (err) return callback(err);
+
+                    // installation succeeded
+                    var kevlib       = require(path.resolve('node_modules', 'kevoree-node', 'kevlib.json')),
+                        jsonLoader   = new kevoree.loader.JSONModelLoader(),
+                        kevNodeModel = jsonLoader.loadModelFromString(JSON.stringify(kevlib)).get(0),
+                        jsNodeTD     = kevNodeModel.findTypeDefinitionsByID('JavascriptNode'),
+                        jsNodeDU     = kevNodeModel.deployUnits.get(0);
+
+                    // add javascriptNode TypeDefinition & DeployUnit to the model
+                    model.addTypeDefinitions(jsNodeTD);
+                    model.addDeployUnits(jsNodeDU);
+
+                    // create a javascript library for the model
+                    var library = factory.createTypeLibrary();
+                    library.name = 'Javascript';
+                    library.addSubTypes(jsNodeTD);
+                    model.addLibraries(library);
+
+                    // create the project deployUnit
+                    var deployUnit = factory.createDeployUnit();
+                    deployUnit.unitName = projectPackageJson.name;
+                    deployUnit.version = projectPackageJson.version;
+                    deployUnit.type = 'npm';
+                    deployUnit.targetNodeType = jsNodeTD;
+                    model.addDeployUnits(deployUnit);
+
+                    // for each file, update model
+                    files.forEach(function (file) {
+                        processFile(file, deployUnit, model);
+                    });
+
+                    return callback(null, model);
                 });
             });
         });
 
-        // execute each tasks asynchronously
-        async.parallel(tasks, function (err) {
-            if (err) {
-                return callback(err);
-            }
-
-            // each file has been processed successfully
-            callback(null, model);
-        });
-    });
+    } catch (err) {
+        return callback(err);
+    }
 };
 
 /**
@@ -100,7 +138,7 @@ var walk = function(dir, excludes, done) {
     });
 };
 
-var processFile = function (file, model, callback) {
+var processFile = function (file, deployUnit, model) {
     try {
         var Class = require(file);
 
@@ -109,20 +147,19 @@ var processFile = function (file, model, callback) {
             if (obj instanceof KevoreeEntity) {
                 // this Class is a KevoreeEntity
                 console.log("\nProcessing:\n\tFile: '%s'", file);
-                if      (obj instanceof AbstractComponent) genComponent(obj, model, callback);
-                else if (obj instanceof AbstractChannel)   genChannel(obj, model, callback);
-                else if (obj instanceof AbstractGroup)     genGroup(obj, model, callback);
-                else if (obj instanceof AbstractNode)      genNode(obj, model, callback);
+
+                if      (obj instanceof AbstractComponent) genComponent(deployUnit, obj, model);
+                else if (obj instanceof AbstractChannel)   genChannel(deployUnit, obj, model);
+                else if (obj instanceof AbstractGroup)     genGroup(deployUnit, obj, model);
+                else if (obj instanceof AbstractNode)      genNode(deployUnit, obj, model);
 
             } else {
                 // this is not the Class you are looking for
                 if (!quiet) console.log("\nIgnored:\n\tFile: '%s'\n\tReason: Not a KevoreeEntity", file);
-                return callback();
             }
         }
     } catch (e) {
         if (!quiet) console.log("\nIgnored:\n\tFile: '%s'\n\tReason: Unable to create a new object\n\tError: %s", file, e.message);
-        return callback();
     }
 }
 

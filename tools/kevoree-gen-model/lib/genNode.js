@@ -1,3 +1,25 @@
-module.exports = function (obj, model, callback) {
+var AbstractNode = require('kevoree-entities').AbstractNode;
+var kevoree = require('kevoree-library').org.kevoree;
 
+/**
+ * Generates channel
+ * @param deployUnit
+ * @param obj
+ * @param model
+ */
+module.exports = function (deployUnit, obj, model) {
+    var factory = new kevoree.impl.DefaultKevoreeFactory();
+
+    // create a new group type
+    var nodeType = factory.createContainerRoot();
+    nodeType.name = obj.toString();
+
+    // add super type if not AbstractGroup
+    var superType = obj.superPrototype.toString();
+    if (superType != 'AbstractNode') nodeType.superTypes.add(superType);
+
+    // add deployUnit
+    nodeType.addDeployUnits(deployUnit);
+
+    model.addTypeDefinitions(nodeType);
 }

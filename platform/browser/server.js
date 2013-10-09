@@ -9,6 +9,7 @@ app.set('views', __dirname + '/site/views');
 // rendering engine (basic html renderer)
 app.engine('html', require('ejs').renderFile);
 
+
 // server routes
 app.get('/', routes.index);
 app.get('/resolve', routes.resolve);
