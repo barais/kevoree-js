@@ -168,12 +168,22 @@ var processFile = function (file, deployUnit, model) {
             var obj = new Class();
             if (obj instanceof KevoreeEntity) {
                 // this Class is a KevoreeEntity
-                console.log("\nProcessing:\n\tFile: '%s'", file);
+                if (obj instanceof AbstractComponent) {
+                    console.log("\nProcessing component:\n\tFile: '%s'", file);
+                    return genComponent(deployUnit, obj, model);
 
-                if      (obj instanceof AbstractComponent) return genComponent(deployUnit, obj, model);
-                else if (obj instanceof AbstractChannel)   return genChannel(deployUnit, obj, model);
-                else if (obj instanceof AbstractGroup)     return genGroup(deployUnit, obj, model);
-                else if (obj instanceof AbstractNode)      return genNode(deployUnit, obj, model);
+                } else if (obj instanceof AbstractChannel) {
+                    console.log("\nProcessing channel:\n\tFile: '%s'", file);
+                    return genChannel(deployUnit, obj, model);
+
+                } else if (obj instanceof AbstractGroup) {
+                    console.log("\nProcessing group:\n\tFile: '%s'", file);
+                    return genGroup(deployUnit, obj, model);
+
+                } else if (obj instanceof AbstractNode) {
+                    console.log("\nProcessing node:\n\tFile: '%s'", file);
+                    return genNode(deployUnit, obj, model);
+                }
 
             } else {
                 // this is not the Class you are looking for

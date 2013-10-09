@@ -1,5 +1,6 @@
 var AbstractComponent = require('kevoree-entities').AbstractComponent;
 var kevoree = require('kevoree-library').org.kevoree;
+var genDictionary = require('./genDictionary');
 
 /**
  * Generates component
@@ -30,6 +31,9 @@ module.exports = function (deployUnit, obj, model) {
         }
 
     }
+
+    // add dictionary
+    genDictionary(compType, obj);
 
     // add component type to model
     model.addTypeDefinitions(compType);

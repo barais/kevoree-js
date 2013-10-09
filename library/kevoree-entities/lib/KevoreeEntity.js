@@ -15,7 +15,7 @@ var Class       = require('pseudoclass'),
  *
  * @type {KevoreeEntity}
  */
-module.exports = Class({
+var KevoreeEntity = Class({
     toString: 'KevoreeEntity',
 
     construct: function () {
@@ -70,3 +70,6 @@ module.exports = Class({
         return this.kCore.getCurrentModel().findByPath(this.path);
     }
 });
+
+KevoreeEntity.DIC = 'dic_';
+module.exports = KevoreeEntity;

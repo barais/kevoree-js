@@ -19,6 +19,18 @@ var FakeComp = AbstractComponent.extend({
 
     in_receiver: function (msg) {
 
+    },
+
+    dic_attr0: {
+        optional: false,
+        fragmentDependant: true,
+        defaultValue: "foo"
+    },
+
+    dic_attr1: null,
+
+    dic_attr2: {
+        optional: true
     }
 });
 

@@ -1,5 +1,6 @@
 var AbstractGroup = require('kevoree-entities').AbstractGroup;
 var kevoree = require('kevoree-library').org.kevoree;
+var genDictionary = require('./genDictionary');
 
 /**
  * Generates group
@@ -20,6 +21,9 @@ module.exports = function (deployUnit, obj, model) {
 
     // add deployUnit
     groupType.addDeployUnits(deployUnit);
+
+    // add dictionary
+    genDictionary(groupType, obj);
 
     model.addTypeDefinitions(groupType);
 

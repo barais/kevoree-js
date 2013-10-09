@@ -1,5 +1,6 @@
 var AbstractNode = require('kevoree-entities').AbstractNode;
 var kevoree = require('kevoree-library').org.kevoree;
+var genDictionary = require('./genDictionary');
 
 /**
  * Generates channel
@@ -20,6 +21,9 @@ module.exports = function (deployUnit, obj, model) {
 
     // add deployUnit
     nodeType.addDeployUnits(deployUnit);
+
+    // add dictionary
+    genDictionary(nodeType, obj);
 
     model.addTypeDefinitions(nodeType);
 
