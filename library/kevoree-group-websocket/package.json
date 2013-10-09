@@ -3,6 +3,9 @@
     "version": "0.0.2",
     "main": "./kevoree-group-websocket.js",
     "description": "A Kevoree group that uses WebSocket to transfer models",
+    "scripts": {
+        "prepublish": "node node_modules/kevoree-gen-model"
+    },
     "keywords": [
         "kevoree",
         "component"
@@ -24,7 +27,9 @@
         "pseudoclass":      "0.2.6",
         "ws":               "0.4.30"
     },
-    "devDependencies": {},
+    "devDependencies": {
+        "kevoree-gen-model": "0.0.1"
+    },
     "optionalDependencies": {},
     "engines": {
         "node": "*"

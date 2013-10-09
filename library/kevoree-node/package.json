@@ -25,7 +25,9 @@
         "kevoree-commons": "0.0.1",
         "pseudoclass": "0.2.6"
     },
-    "devDependencies": {},
+    "devDependencies": {
+        "kevoree-gen-model": "0.0.1"
+    },
     "optionalDependencies": {},
     "engines": {
         "node": "*"

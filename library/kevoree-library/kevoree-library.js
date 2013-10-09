@@ -1,3 +1,4 @@
+var Kotlin = require('kevoree-kotlin');
 
 (function () {
   'use strict';
