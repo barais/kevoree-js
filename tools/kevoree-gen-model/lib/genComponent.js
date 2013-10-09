@@ -16,8 +16,10 @@ module.exports = function (deployUnit, obj, model) {
     compType.name = obj.toString();
 
     // add super type if not AbstractComponent
-    var superType = obj.superPrototype.toString();
-    if (superType != 'AbstractComponent') compType.superTypes.add(superType);
+    var superType = obj.constructor.prototype.superPrototype.toString();
+    if (superType != 'AbstractComponent') {
+        // TODO
+    }
 
     // add deployUnit
     compType.addDeployUnits(deployUnit);

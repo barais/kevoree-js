@@ -16,8 +16,10 @@ module.exports = function (deployUnit, obj, model) {
     groupType.name = obj.toString();
 
     // add super type if not AbstractGroup
-    var superType = obj.superPrototype.toString();
-    if (superType != 'AbstractGroup') groupType.superTypes.add(superType);
+    var superType = obj.constructor.prototype.superPrototype.toString();
+    if (superType != 'AbstractGroup') {
+        // TODO
+    }
 
     // add deployUnit
     groupType.addDeployUnits(deployUnit);

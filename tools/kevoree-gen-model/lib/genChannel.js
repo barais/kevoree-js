@@ -16,8 +16,10 @@ module.exports = function (deployUnit, obj, model) {
     chanType.name = obj.toString();
 
     // add super type if not AbstractGroup
-    var superType = obj.superPrototype.toString();
-    if (superType != 'AbstractChannel') chanType.superTypes.add(superType);
+    var superType = obj.constructor.prototype.superPrototype.toString();
+    if (superType != 'AbstractChannel') {
+        // TODO
+    }
 
     // add deployUnit
     chanType.addDeployUnits(deployUnit);
