@@ -11,15 +11,6 @@ var AbstractComponent = KevoreeEntity.extend({
 
     construct: function () {
         this.inputs = {};
-        this.outputs = {};
-    },
-
-    send: function (name, msg) {
-        if (typeof (this.outputs[name]) === 'undefined') {
-            console.error("Output port '"+name+"' does not exist. You should define a 'out_"+name+"' variable in your component in order for Kevoree to create it.");
-        } else {
-            this.outputs[name].process(msg);
-        }
     },
 
     addInternalInputPort: function (port) {
@@ -30,7 +21,9 @@ var AbstractComponent = KevoreeEntity.extend({
     },
 
     addInternalOutputPort: function (port) {
-        this.outputs[port.getName()] = port;
+        this[AbstractComponent.OUT_PORT+port.getName()] = function (msg) {
+            port.process.call(port, msg);
+        };
     }
 });
 
