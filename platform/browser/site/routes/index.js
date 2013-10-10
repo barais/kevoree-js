@@ -4,3 +4,4 @@ exports.index = function(req, res) {
 
 // exports other rules
 exports.resolve     = require('./resolve');
+exports.bootstrap   = require('./bootstrap');

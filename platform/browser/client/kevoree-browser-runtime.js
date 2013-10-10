@@ -1,15 +1,15 @@
-var Core                    = require('kevoree-core'),
+var KevoreeCore             = require('kevoree-core'),
     JSONModelLoader         = require('kevoree-library').org.kevoree.loader.JSONModelLoader,
     KevoreeBrowserLogger    = require('./lib/KevoreeBrowserLogger'),
-    HTTPBootstrapper        = require('./lib/BrowserBootstrapper'),
-    jsonModel               = require('./bootstrapModel.json');
+    HTTPBootstrapper        = require('./lib/BrowserBootstrapper');
+    //jsonModel               = require('./bootstrapModel.json');
 
 var log = new KevoreeBrowserLogger('Runtime');
 
 // init core objects
-var kevoreeCore     = new Core(__dirname, log),
-    jsonLoader      = new JSONModelLoader(),
-    model           = jsonLoader.loadModelFromString(JSON.stringify(jsonModel)).get(0),
+var kevoreeCore     = new KevoreeCore(__dirname, log),
+    //jsonLoader      = new JSONModelLoader(),
+    //model           = jsonLoader.loadModelFromString(JSON.stringify(jsonModel)).get(0),
     bootstrapper    = new HTTPBootstrapper(__dirname);
 
 // init DOM objects
@@ -58,11 +58,12 @@ kevoreeCore.on('error', function (err) {
 //set Kevoree bootstrapper
 kevoreeCore.setBootstrapper(bootstrapper);
 
-// start Kevoree Core
+// start Kevoree Core button clicked
 startBtn.on('click', function () {
     if (!started) {
         try {
-            kevoreeCore.start(nodeName.val());
+            var nodename = nodeName.val() || "node0";
+            kevoreeCore.start(cleanString(nodename));
         } catch (err) {
             log.error(err.message);
         }
@@ -70,6 +71,7 @@ startBtn.on('click', function () {
     } else log.warn();
 });
 
+// deploy button clicked
 deployBtn.on('click', function () {
     if (started) {
         if (!deploying) {
@@ -84,7 +86,23 @@ deployBtn.on('click', function () {
                         trigger: 'manual'
                     });
                     deployBtn.popover('show');
-                    kevoreeCore.deploy(model);
+
+                    $.ajax({
+                        type: 'GET',
+                        url: '/bootstrap',
+                        success: function (model) {
+                            kevoreeCore.deploy(model);
+                        },
+                        error: function (err) {
+                            console.error(err);
+                            log.error('Unable to retrieve bootstrap model from server. Aborting deploy.');
+                            deploying = false;
+                            deployBtn.removeClass('disabled');
+                            deployBtn.popover('hide');
+                        }
+                    });
+
+
                 } catch (err) {
                     log.error(err.message);
                 }
@@ -104,4 +122,10 @@ var deployPopoverContent = function deployPopoverContent() {
            '<div class="progress progress-striped active" style="margin-bottom: 0px">'+
              '<div class="progress-bar progress-bar-info"  role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>' +
            '</div>';
+}
+
+var cleanString = function cleanString(str) {
+    str = str.replace(/\s/g, '');
+    str = str.replace(/[^\w\d]/g, '');
+    return str;
 }

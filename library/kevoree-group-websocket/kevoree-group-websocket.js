@@ -1,7 +1,6 @@
 var AbstractGroup   = require('kevoree-entities').AbstractGroup,
     KevoreeLogger   = require('kevoree-commons').KevoreeLogger,
     kevoree         = require('kevoree-library').org.kevoree,
-    WSClient        = require('ws'),
     WSServer        = require('ws').Server,
 
     PULL        = 0,

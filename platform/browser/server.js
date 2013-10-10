@@ -12,6 +12,7 @@ app.engine('html', require('ejs').renderFile);
 
 // server routes
 app.get('/', routes.index);
+app.get('/bootstrap', routes.bootstrap);
 app.get('/resolve', routes.resolve);
 
 module.exports = app;
