@@ -2,21 +2,18 @@ var KevoreeCore             = require('kevoree-core'),
     JSONModelLoader         = require('kevoree-library').org.kevoree.loader.JSONModelLoader,
     KevoreeBrowserLogger    = require('./lib/KevoreeBrowserLogger'),
     HTTPBootstrapper        = require('./lib/BrowserBootstrapper');
-    //jsonModel               = require('./bootstrapModel.json');
 
 var log = new KevoreeBrowserLogger('Runtime');
 
 // init core objects
 var kevoreeCore     = new KevoreeCore(__dirname, log),
     jsonLoader      = new JSONModelLoader(),
-    //model           = jsonLoader.loadModelFromString(JSON.stringify(jsonModel)).get(0),
     bootstrapper    = new HTTPBootstrapper(__dirname);
 
 // init DOM objects
 var startBtn    = $('#start-btn'),
     deployBtn   = $('#deploy-btn'),
     nodeName    = $('#node-name'),
-    selectedGrp = $('#selected-group'),
     started     = false,
     deployed    = false,
     deploying   = false;
