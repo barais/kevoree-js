@@ -6,17 +6,17 @@ var compare    = new kevoree.compare.DefaultModelCompare();
 var loader     = new kevoree.loader.JSONModelLoader();
 var factory    = new kevoree.impl.DefaultKevoreeFactory();
 
-module.exports = function (nodename, callback) {
+module.exports = function (nodename, modulesPath, callback) {
     try {
         // load npm
         npm.load({}, function (err) {
             if (err) return callback(err);
 
             // installation success
-            npm.commands.install(['kevoree-group-websocket'], function installKevWSGrpCb(err) {
+            npm.commands.install(modulesPath, ['kevoree-group-websocket'], function installKevWSGrpCb(err) {
                 if (err) return callback(err);
 
-                var wsGrpModelJson = require(path.resolve('node_modules', 'kevoree-group-websocket', 'kevlib.json'));
+                var wsGrpModelJson = require(path.resolve(modulesPath, 'node_modules', 'kevoree-group-websocket', 'kevlib.json'));
                 var wsGrpModel = loader.loadModelFromString(JSON.stringify(wsGrpModelJson)).get(0);
 
                 // create a node instance

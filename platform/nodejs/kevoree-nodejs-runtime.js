@@ -1,39 +1,38 @@
-var Core                = require('kevoree-core'),
-    config              = require('./config.json'),
-    NodeJSBootstrapper  = require('./lib/NodeJSBootstrapper'),
-    KevoreeLogger       = require('kevoree-commons').KevoreeLogger,
-    bootstrapHelper     = require('./lib/bootstrapHelper');
+var config        = require('./config.json'),
+    NodeJSRuntime = require('./lib/NodeJSRuntime'),
+    path          = require('path');
 
-var log             = new KevoreeLogger('KevoreeNodeJSRuntime'),
-    kevoreeCore     = new Core(__dirname, log),
-    bootstrapper    = new NodeJSBootstrapper(__dirname),
-    nodeName        = config.nodeName;
+// TODO enable install dir path in command-line
+var kRuntime = new NodeJSRuntime(path.resolve(__dirname, 'kevlibz'));
 
-kevoreeCore.on('started', function () {
-    bootstrapHelper(nodeName, function (err, model) {
-        if (err) return console.error("Unable to generate bootstrap model\n"+err.message);
+// Kevoree Runtime started event listener
+kRuntime.on('started', function (err) {
+    if (err) {
+        console.error(err.message);
+        process.exit(1);
+    }
 
-        kevoreeCore.deploy(model);
-    });
+    // Kevoree Core is started, deploy model
+    // TODO enable bootstrap model from path in command-line
+    kRuntime.deploy();
 });
 
-kevoreeCore.on('deployed', function (err, model) {
-    // deploy success
+// Kevoree Runtime deployed event listener
+kRuntime.on('deployed', function (err, model) {
+    if (err) {
+        console.error(err.message);
+        process.exit(1);
+    }
+
+    // Kevoree Core has deployed a new model successfully
 
 });
 
-kevoreeCore.on('stopped', function (err, model) {
-    // kevoree core stopped
+// Kevore Runtime error event listener
+kRuntime.on('error', function (err) {
+    console.error(err);
+    process.exit(1);
 });
 
-kevoreeCore.on('error', function (err) {
-    log.error(err.stack);
-    // try to stop Kevoree Core on error
-    kevoreeCore.stop();
-});
 
-// set Kevoree bootstrapper
-kevoreeCore.setBootstrapper(bootstrapper);
-
-// start Kevoree Core
-kevoreeCore.start(nodeName);
+kRuntime.start(config.nodeName);
