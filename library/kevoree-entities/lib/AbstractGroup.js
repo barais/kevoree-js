@@ -14,5 +14,5 @@ module.exports = KevoreeEntity.extend({
 
     push: function (model, targetNodeName) {},
 
-    pull: function (targetNodeName) {}
+    pull: function (targetNodeName, callback) {}
 });

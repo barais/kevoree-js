@@ -65,11 +65,60 @@ var WebSocketGroup = AbstractGroup.extend({
     },
 
     push: function (model, targetNodeName) {
-        //
+        if (targetNodeName == this.getMasterServerNodeName()) {
+            this.onServerPush(model, this.getMasterServerAddresses());
+        } else {
+            this.onClientPush(model, targetNodeName);
+        }
     },
 
-    pull: function (targetNodeName) {
-        // TODO
+    pull: function (targetNodeName, callback) {
+        if (targetNodeName == this.getMasterServerNodeName()) {
+            // pull request is for the master server, forward the request to it
+            this.onServerPull(this.getMasterServerAddresses(), callback);
+        } else {
+            // pull request is for a client node, forward the request to it
+            this.onClientPull(targetNodeName, callback);
+        }
+    },
+
+    onServerPush: function (model, addresses) {
+        var ws = new WebSocket('ws://'+addresses.get(0)); // TODO change that => to try each different addresses not only the first one
+        ws.on('open', function() {
+            var serializer = new kevoree.serializer.JSONModelSerializer();
+            var modelStr = serializer.serialize(model);
+            var binMsg = new Uint8Array(1+modelStr.length);
+            binMsg[0] = PUSH;
+            for (var i=0; i<modelStr.length; i++) binMsg[i+1] = modelStr.charCodeAt(i);
+            ws.send(binMsg);
+            ws.close();
+        });
+    },
+
+    onClientPush: function (model, targetNodeName) {
+        throw new Error("WebSocketGroup error: Push request can only be made on master server node (for now).");
+    },
+
+    onServerPull: function (addresses, callback) {
+        var ws = new WebSocket('ws://'+addresses.get(0)); // TODO change that => to try each different addresses not only the first one
+        ws.on('open', function() {
+            var binMsg = new Uint8Array(1);
+            binMsg[0] = PULL_JSON;
+            ws.send(binMsg);
+        });
+
+        ws.on('message', function (data) {
+            ws.close();
+
+            // load model and give it back to the callback
+            var jsonLoader = new kevoree.loader.JSONModelLoader();
+            var model = jsonLoader.loadModelFromString(data);
+            callback(null, model);
+        });
+    },
+
+    onClientPull: function (targetNodeName, callback) {
+        callback(new Error("WebSocketGroup error: Pull request can only be made on master server node (for now)."));
     },
 
     checkNoMultipleMasterServer: function () {
@@ -103,6 +152,7 @@ var WebSocketGroup = AbstractGroup.extend({
 
     startWSServer: function (port) {
         // create a WebSocket server on specified port
+        var self = this;
         var server = new WSServer({port: port});
         this.log.info("WebSocket server started: "+ server.options.host+":"+port);
 
@@ -110,11 +160,12 @@ var WebSocketGroup = AbstractGroup.extend({
             ws.on('message', function(data, flag) {
                 if (flag.binary == undefined) {
                     // received data is a String
-                    this.processMessage(ws, data);
+                    self.processMessage(ws, data);
 
                 } else {
                     // received data is binary
-                    this.processMessage(ws, String.fromCharCode.apply(null, new Uint8Array(data)));
+                    var bin = new Uint8Array(data);
+                    self.processMessage(ws, bin[0], String.fromCharCode.apply(null, bin.buffer.slice(1, bin.buffer.length)));
                 }
             });
         });
@@ -123,13 +174,18 @@ var WebSocketGroup = AbstractGroup.extend({
     },
 
     startWSClient: function () {
-        var masterServerAddress = this.getMasterServerAddress();
-        if (typeof(masterServerAddress) !== 'undefined' && masterServerAddress != null) {
+        var addresses = this.getMasterServerAddresses();
+        if (typeof(addresses) !== 'undefined' && addresses != null && addresses.length > 0) {
             var group = this;
 
-            var ws = new WebSocket('ws://'+masterServerAddress);
+            var ws = new WebSocket('ws://'+addresses.get(0)); // TODO change that => to try each different addresses not only the first one
             ws.on('open', function() {
-                ws.send(REGISTER+group.getNodeName());
+                var binMsg = new Uint8Array(group.getNodeName().length+1);
+                binMsg[0] = REGISTER;
+                for (var i=0; i<group.getNodeName().length; i++) {
+                    binMsg[i+1] = group.getNodeName().charCodeAt(i);
+                }
+                ws.send(binMsg);
             });
 
             ws.on('message', function (data) {
@@ -139,40 +195,36 @@ var WebSocketGroup = AbstractGroup.extend({
             });
 
             ws.on('close', function () {
-                group.log.debug("WebSocketGroup client: connection closed with ws://"+masterServerAddress);
-            })
+                group.log.debug("WebSocketGroup client: connection closed with ws://"+addresses.get(0));
+            });
         } else {
             throw new Error("There is no master server in your model. You must specify a master server by giving a value to one port attribute.");
         }
     },
 
-    getMasterServerAddress: function () {
+    getMasterServerAddresses: function () {
         var ret = [],
             port = null;
 
         var kGroup = this.getModelEntity();
         if (typeof(kGroup) !== 'undefined' && kGroup != null) {
-            var subNodes = kGroup.subNodes.iterator();
-            while (subNodes.hasNext()) {
-                var node = subNodes.next();
-                if (node.dictionary != null) {
-                    var values = node.dictionary.values.iterator();
-                    while (values.hasNext()) {
-                        var value = values.next();
-                        if (value.attribute.name == 'port') {
-                            port = value.value;
-                            var nodeNetworks = this.getDeployModel().nodeNetworks.iterator();
-                            while (nodeNetworks.hasNext()) {
-                                var links = nodeNetworks.next().link.iterator();
-                                while (links.hasNext()) {
-                                    var netProps = links.next().networksProperties.iterator();
-                                    while (netProps.hasNext()) {
-                                        ret.push(netProps.next().value+':'+port);
-                                    }
+            var values = kGroup.dictionary.values.iterator();
+            while (values.hasNext()) {
+                var value = values.next();
+                if (value.attribute.name == 'port') {
+                    port = value.value;
+                    if (typeof(port) !== 'undefined' && port != null && port.length > 0) {
+                        var nodeNetworks = this.getDeployModel().nodeNetworks.iterator();
+                        while (nodeNetworks.hasNext()) {
+                            var links = nodeNetworks.next().link.iterator();
+                            while (links.hasNext()) {
+                                var netProps = links.next().networksProperties.iterator();
+                                while (netProps.hasNext()) {
+                                    ret.push(netProps.next().value+':'+port);
                                 }
                             }
-                            break; // we don't need to process other attributes we were looking for 'port' that's all
                         }
+                        break; // we don't need to process other attributes we were looking for a valid 'port' that's all
                     }
                 }
             }
@@ -186,25 +238,40 @@ var WebSocketGroup = AbstractGroup.extend({
         return ret;
     },
 
-    processMessage: function (clientSocket, data) {
-        var controlByte = data[0],
-            realData    = data.slice(1, data.length);
+    getMasterServerNodeName: function () {
+        var ret = null;
+        var group = this.getModelEntity();
+        if (group != null) {
+            var dicVals = group.dictionary.values.iterator();
+            while (dicVals.hasNext()) {
+                var val = dicVals.next();
+                if (val.attribute.name == 'port') {
+                    if (typeof(val.value) !== 'undefined' && val.value != null && val.value.length > 0) {
+                        ret = val.targetNode.name;
+                        break; // we can stop the looping there, we found the master server node name
+                    }
+                }
+            }
+        }
+        return ret;
+    },
 
+    processMessage: function (clientSocket, controlByte, data) {
         switch (controlByte) {
             case PUSH:
-                this.onMasterServerPush(clientSocket, realData);
+                this.onMasterServerPush(clientSocket, data);
                 break;
 
             case PULL:
-                this.onMasterServerPull(clientSocket, realData);
+                this.onMasterServerPull(clientSocket, data);
                 break;
 
             case PULL_JSON:
-                this.onMasterServerPullJSON(clientSocket, realData);
+                this.onMasterServerPullJSON(clientSocket, data);
                 break;
 
             case REGISTER:
-                this.onMasterServerRegister(clientSocket, realData);
+                this.onMasterServerRegister(clientSocket, data);
                 break;
 
             default:
@@ -214,7 +281,7 @@ var WebSocketGroup = AbstractGroup.extend({
     },
 
     onMasterServerPush: function (clientSocket, strData) {
-        this.log.info("WebSocketGroup: "+clientSocket._socket.address()+" asked for a PUSH");
+        this.log.info("WebSocketGroup: "+clientSocket._socket.remoteAddress+":"+clientSocket._socket.remotePort+" asked for a PUSH");
 
         var jsonLoader = new kevoree.loader.JSONModelLoader();
         var model = jsonLoader.loadModelFromString(strData).get(0);
@@ -228,7 +295,7 @@ var WebSocketGroup = AbstractGroup.extend({
     },
 
     onMasterServerPull: function (clientSocket, strData) {
-        this.log.info("WebSocketGroup: "+clientSocket._socket.address()+" asked for a PULL (xmi)");
+        this.log.info("WebSocketGroup: "+clientSocket._socket.remoteAddress+":"+clientSocket._socket.remotePort+" asked for a PULL (xmi)");
 
         var serializer = new kevoree.serializer.XMIModelSerializer();
         var strModel = serializer.serialize(this.kCore.getCurrentModel());
@@ -236,7 +303,7 @@ var WebSocketGroup = AbstractGroup.extend({
     },
 
     onMasterServerPullJSON: function (clientSocket, strData) {
-        this.log.info("WebSocketGroup: "+clientSocket._socket.address()+" asked for a PULL (json)");
+        this.log.info("WebSocketGroup: "+clientSocket._socket.remoteAddress+":"+clientSocket._socket.remotePort+" asked for a PULL (json)");
 
         var serializer = new kevoree.serializer.JSONModelSerializer();
         var strModel = serializer.serialize(this.kCore.getCurrentModel());
@@ -245,7 +312,7 @@ var WebSocketGroup = AbstractGroup.extend({
 
     onMasterServerRegister: function (clientSocket, nodeName) {
         this.connectedNodes[nodeName] = clientSocket;
-        this.log.info("WebSocketGroup: "+clientSocket._socket.address()+" new registered client.");
+        this.log.info("WebSocketGroup: "+clientSocket._socket.remoteAddress+":"+clientSocket._socket.remotePort+" new registered client.");
     }
 });
 
