@@ -16,6 +16,7 @@
   "author": "Maxime Tricoire <max.tricoire@gmail.com>",
   "license": "LGPL3.0",
   "dependencies": {
+    "kevoree-library": "0.0.3",
     "express": "~3.4.0",
     "ejs": "~0.8.4",
     "adm-zip": "~0.4.3",

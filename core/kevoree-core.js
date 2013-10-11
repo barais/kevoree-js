@@ -21,8 +21,10 @@ module.exports = Class({
         this.factory = new kLib.org.kevoree.impl.DefaultKevoreeFactory();
         this.loader  = new kLib.org.kevoree.loader.JSONModelLoader();
         this.compare = new kLib.org.kevoree.compare.DefaultModelCompare();
+        this.cloner  = new kLib.org.kevoree.cloner.DefaultModelCloner();
 
         this.currentModel   = null;
+        this.deployModel    = null;
         this.models         = [];
         this.nodeName       = null;
         this.nodeInstance   = null;
@@ -115,8 +117,10 @@ module.exports = Class({
 
                     if (core.nodeInstance != undefined && core.nodeInstance != null) {
                         // given model is defined and not null
-                        var diffSeq = core.compare.diff(core.currentModel, model);
-                        var adaptations = core.nodeInstance.processTraces(diffSeq.traces, model);
+                        core.deployModel = core.cloner.clone(model, true);
+                        core.deployModel.setRecursiveReadOnly();
+                        var diffSeq = core.compare.diff(core.currentModel, core.deployModel);
+                        var adaptations = core.nodeInstance.processTraces(diffSeq.traces, core.deployModel);
                         // list of adaptation commands retrieved
                         var cmdStack = [];
 
@@ -180,8 +184,10 @@ module.exports = Class({
                             core.log.debug("Model deployed successfully.");
                             // save old model
                             pushInArray(core.models, core.currentModel);
-                            // set new model to be the current one
-                            core.currentModel = model;
+                            // set new model to be the current deployed one
+                            core.currentModel = model; // do not give core.deployModel here because it is a readOnly model
+                            // reset deployModel
+                            core.deployModel = null;
                             // all good :)
                             core.emitter.emit('deployed', core.currentModel);
                             return;
@@ -259,6 +265,14 @@ module.exports = Class({
 
     getModulesPath: function () {
         return this.modulesPath;
+    },
+
+    getDeployModel: function () {
+        return this.deployModel;
+    },
+
+    getNodeName: function () {
+        return this.nodeName;
     },
 
     on: function (event, callback) {

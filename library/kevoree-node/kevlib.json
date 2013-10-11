@@ -1,17 +1,24 @@
 {
     "eClass": "org.kevoree.ContainerRoot",
-    "generated_KMF_ID": "0.134167078649625181381312556311",
+    "generated_KMF_ID": "0.19728528452105821381486669449",
     "nodes": [],
     "typeDefinitions": [
         {
             "eClass": "org.kevoree.NodeType",
             "name": "JavascriptNode",
             "deployUnits": [
-                "deployUnits[0.69696377287618821381312556311]"
+                "deployUnits[0.65145139629021291381486669449]"
             ],
             "superTypes": [],
             "managedPrimitiveTypes": [],
-            "dictionaryType": [],
+            "dictionaryType": [
+                {
+                    "eClass": "org.kevoree.DictionaryType",
+                    "generated_KMF_ID": "0.82409289479255681381486669472",
+                    "attributes": [],
+                    "defaultValues": []
+                }
+            ],
             "managedPrimitiveTypeRefs": []
         }
     ],
@@ -24,7 +31,7 @@
         {
             "eClass": "org.kevoree.DeployUnit",
             "unitName": "kevoree-node",
-            "generated_KMF_ID": "0.69696377287618821381312556311",
+            "generated_KMF_ID": "0.65145139629021291381486669449",
             "type": "npm",
             "version": "0.0.6",
             "requiredLibs": [],

@@ -61,13 +61,13 @@ module.exports = Bootstrapper.extend({
     },
 
     resolver: function (action, deployUnit, callback) {
-        deployUnit.url = deployUnit.url || '';
+        var url = deployUnit.url || '';
 
-        if (deployUnit.url.startsWith(FILE)) {
+        if (url.startsWith(FILE)) {
 //            this.resolvers[FILE][action](deployUnit, callback);
             this.log.warn("File resolver not implemented yet");
 
-        } else if (deployUnit.url.startsWith(GIT)) {
+        } else if (url.startsWith(GIT)) {
 //            this.resolvers[GIT][action](deployUnit, callback);
             this.log.warn("Git resolver not implemented yet");
 

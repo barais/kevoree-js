@@ -16,6 +16,13 @@ var AbstractGroup   = require('kevoree-entities').AbstractGroup,
 var WebSocketGroup = AbstractGroup.extend({
     toString: 'WebSocketGroup',
 
+    // START Dictionary attributes =====
+    dic_port: {
+        fragmentDependant: true,
+        optional: true
+    },
+    // END Dictionary attributes =====
+
     construct: function () {
         this.log = new KevoreeLogger(this.toString());
 
@@ -33,7 +40,7 @@ var WebSocketGroup = AbstractGroup.extend({
         if (this.dictionary.getValue('port') != undefined) {
             this.server = this.startWSServer(this.dictionary.getValue('port'));
         } else {
-            this.log.warn("There is no 'port' attribute defined: client node");
+            this.log.debug("There is no 'port' attribute defined: starting a WebSocket client on this node");
             this.client = this.startWSClient();
         }
     },
@@ -69,21 +76,29 @@ var WebSocketGroup = AbstractGroup.extend({
         var group = this.getModelEntity();
         if (group != null) {
             var portDefined = 0;
-            for (var i=0; i < group.subNodes.size(); i++) {
-                var node        = group.subNodes.get(i),
-                    dicValues   = node.dictionary.values;
-                for (var j=0; j < dicValues.size(); j++) {
-                    if (dicValues.get(j).attribute.name == 'port') {
-                        var val = dicValues.get(j).value;
-                        if (val && val != null && val.length > 0) portDefined++;
+            var dicVals = group.dictionary.values.iterator();
+            while (dicVals.hasNext()) {
+                var val = dicVals.next();
+                if (val.attribute.name == 'port') {
+                    if (typeof(val.value) !== 'undefined' && val.value != null && val.value.length > 0) {
+                        portDefined++;
                     }
                 }
             }
 
             if (portDefined > 1) {
                 throw new Error("WebSocketGroup error: multiple master server defined. You are not supposed to specify more than ONE port attribute on this group sub nodes.");
+
+            } else if (portDefined == 0) {
+                throw new Error("WebSocketGroup error: no master server defined. You should specify a node to be the master server (in order to do that, give to a node a value to its 'port' attribute)");
+
+            } else {
+                // all good
+                return;
             }
         }
+
+        throw new Error("WebSocketGroup error: Unable to find group instance in model (??)");
     },
 
     startWSServer: function (port) {
@@ -109,7 +124,7 @@ var WebSocketGroup = AbstractGroup.extend({
 
     startWSClient: function () {
         var masterServerAddress = this.getMasterServerAddress();
-        if (masterServerAddress != null) {
+        if (typeof(masterServerAddress) !== 'undefined' && masterServerAddress != null) {
             var group = this;
 
             var ws = new WebSocket('ws://'+masterServerAddress);
@@ -132,12 +147,43 @@ var WebSocketGroup = AbstractGroup.extend({
     },
 
     getMasterServerAddress: function () {
-        // TODO
-//        var kGroup = this.getModelElement();
-//        for (var i=0; i < kGroup.subNodes.size(); i++) {
-//            var node = kGroup.subNodes.get(i);
-//
-//        }
+        var ret = [],
+            port = null;
+
+        var kGroup = this.getModelEntity();
+        if (typeof(kGroup) !== 'undefined' && kGroup != null) {
+            var subNodes = kGroup.subNodes.iterator();
+            while (subNodes.hasNext()) {
+                var node = subNodes.next();
+                if (node.dictionary != null) {
+                    var values = node.dictionary.values.iterator();
+                    while (values.hasNext()) {
+                        var value = values.next();
+                        if (value.attribute.name == 'port') {
+                            port = value.value;
+                            var nodeNetworks = this.getDeployModel().nodeNetworks.iterator();
+                            while (nodeNetworks.hasNext()) {
+                                var links = nodeNetworks.next().link.iterator();
+                                while (links.hasNext()) {
+                                    var netProps = links.next().networksProperties.iterator();
+                                    while (netProps.hasNext()) {
+                                        ret.push(netProps.next().value+':'+port);
+                                    }
+                                }
+                            }
+                            break; // we don't need to process other attributes we were looking for 'port' that's all
+                        }
+                    }
+                }
+            }
+        } else {
+            throw new Error("WebSocketGroup error: Unable to find group instance in model (??)");
+        }
+
+        // if no address found, give it a try locally
+        if (ret.length == 0) ret.push('127.0.0.1:'+port);
+
+        return ret;
     },
 
     processMessage: function (clientSocket, data) {

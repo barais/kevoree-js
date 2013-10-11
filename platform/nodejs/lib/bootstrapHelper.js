@@ -1,30 +1,20 @@
-var kevoree = require('kevoree-library').org.kevoree,
-    npm     = require('npm'),
-    path    = require('path');
+var npm     = require('npm'),
+    path    = require('path'),
+    kevoree = require('kevoree-library').org.kevoree;
 
 var compare    = new kevoree.compare.DefaultModelCompare();
 var loader     = new kevoree.loader.JSONModelLoader();
-var serializer = new kevoree.serializer.JSONModelSerializer();
 var factory    = new kevoree.impl.DefaultKevoreeFactory();
 
-/**
- * GET /bootstrap
- * Returns a Kevoree bootstrap model for browser platform
- * @param req
- * @param res
- */
-module.exports = function (req, res) {
+module.exports = function (nodename, callback) {
     try {
-        // default nodename will be node0 if none given in GET request
-        var nodename = req.query.nodename || "node0";
-
         // load npm
         npm.load({}, function (err) {
-            if (err) return res.send(500, 'Unable to load npm module');
+            if (err) return callback(err);
 
             // installation success
             npm.commands.install(['kevoree-group-websocket'], function installKevWSGrpCb(err) {
-                if (err) return res.send(500, 'npm failed to install "kevoree-group-websocket" module');
+                if (err) return callback(err);
 
                 var wsGrpModelJson = require(path.resolve('node_modules', 'kevoree-group-websocket', 'kevlib.json'));
                 var wsGrpModel = loader.loadModelFromString(JSON.stringify(wsGrpModelJson)).get(0);
@@ -39,14 +29,29 @@ module.exports = function (req, res) {
                 var grpInstance = factory.createGroup();
                 grpInstance.name = "sync";
                 grpInstance.typeDefinition = wsGrpModel.findTypeDefinitionsByID('WebSocketGroup');
+                grpInstance.dictionary = factory.createDictionary();
+                var portVal = factory.createDictionaryValue();
+                var portAttr = null;
+                var attrs = wsGrpModel.findTypeDefinitionsByID('WebSocketGroup').dictionaryType.attributes.iterator();
+                while (attrs.hasNext()) {
+                    var attr = attrs.next();
+                    if (attr.name == 'port') {
+                        portAttr = attr;
+                        break;
+                    }
+                }
+                portVal.attribute = portAttr;
+
+                portVal.value = '8000';
+                portVal.targetNode = nodeInstance;
+                grpInstance.dictionary.addValues(portVal);
                 grpInstance.addSubNodes(nodeInstance);
                 wsGrpModel.addGroups(grpInstance);
 
-                // serialize new model
-                return res.json({model: serializer.serialize(wsGrpModel)});
+                callback(null, wsGrpModel);
             });
         });
     } catch (err) {
-        return res.send(500, "Unable to create bootstrap model: "+err.message);
+        return callback(err);
     }
-}
+};

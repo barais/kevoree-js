@@ -25,14 +25,14 @@ module.exports = AdaptationPrimitive.extend({
                 dictionary.setEntry(dicValue.attribute.name, dicValue.value);
             }
 
-            callback.call(this, null);
+            callback();
             return;
         }
 
 
         // NEED SOMETHING THERE because I can't get the related instance from mapper with the trace
         // change kev metamodel ? oO
-        callback.call(this, null);
+        callback();
         return;
     },
 
@@ -43,12 +43,12 @@ module.exports = AdaptationPrimitive.extend({
         if (instance != null) {
             var dictionary = instance.getDictionary();
             dictionary.setMap(this.oldDictionary);
-            callback.call(this, null);
+            callback();
 
         }
 
         // TODO handle default and stuff
-        callback.call(this, null);
+        callback();
     },
 
     findEntityInstance: function () {

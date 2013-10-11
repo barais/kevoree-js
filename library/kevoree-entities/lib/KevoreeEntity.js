@@ -67,7 +67,7 @@ var KevoreeEntity = Class({
     },
 
     getModelEntity: function () {
-        return this.kCore.getCurrentModel().findByPath(this.path);
+        return this.kCore.getDeployModel().findByPath(this.path);
     }
 });
 

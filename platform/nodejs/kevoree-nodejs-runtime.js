@@ -1,21 +1,20 @@
 var Core                = require('kevoree-core'),
-    kLib                = require('kevoree-library'),
     config              = require('./config.json'),
-    modelJson           = require(config.model),
     NodeJSBootstrapper  = require('./lib/NodeJSBootstrapper'),
-    KevoreeLogger       = require('kevoree-commons').KevoreeLogger;
+    KevoreeLogger       = require('kevoree-commons').KevoreeLogger,
+    bootstrapHelper     = require('./lib/bootstrapHelper');
 
 var log             = new KevoreeLogger('KevoreeNodeJSRuntime'),
     kevoreeCore     = new Core(__dirname, log),
-    jsonLoader      = new kLib.org.kevoree.loader.JSONModelLoader(),
     bootstrapper    = new NodeJSBootstrapper(__dirname),
     nodeName        = config.nodeName;
 
 kevoreeCore.on('started', function () {
-    var bootstrapModel = jsonLoader.loadModelFromString(JSON.stringify(modelJson)).get(0);
-    // TODO check if there is a JavascriptNode and a Group in this model
-    // otherwise there is no point in deploy this model cause it won't bootstrap
-    kevoreeCore.deploy(bootstrapModel);
+    bootstrapHelper(nodeName, function (err, model) {
+        if (err) return console.error("Unable to generate bootstrap model\n"+err.message);
+
+        kevoreeCore.deploy(model);
+    });
 });
 
 kevoreeCore.on('deployed', function (err, model) {

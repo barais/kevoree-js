@@ -8,7 +8,7 @@ var log = new KevoreeBrowserLogger('Runtime');
 
 // init core objects
 var kevoreeCore     = new KevoreeCore(__dirname, log),
-    //jsonLoader      = new JSONModelLoader(),
+    jsonLoader      = new JSONModelLoader(),
     //model           = jsonLoader.loadModelFromString(JSON.stringify(jsonModel)).get(0),
     bootstrapper    = new HTTPBootstrapper(__dirname);
 
@@ -64,6 +64,7 @@ startBtn.on('click', function () {
         try {
             var nodename = nodeName.val() || "node0";
             kevoreeCore.start(cleanString(nodename));
+            nodeName.prop('disabled', 'disabled');
         } catch (err) {
             log.error(err.message);
         }
@@ -90,8 +91,9 @@ deployBtn.on('click', function () {
                     $.ajax({
                         type: 'GET',
                         url: '/bootstrap',
-                        success: function (model) {
-                            kevoreeCore.deploy(model);
+                        data: {nodename: kevoreeCore.getNodeName()},
+                        success: function (data) {
+                            kevoreeCore.deploy(jsonLoader.loadModelFromString(data.model).get(0));
                         },
                         error: function (err) {
                             console.error(err);
@@ -101,8 +103,6 @@ deployBtn.on('click', function () {
                             deployBtn.popover('hide');
                         }
                     });
-
-
                 } catch (err) {
                     log.error(err.message);
                 }

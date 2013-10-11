@@ -73,9 +73,6 @@ var AdaptationEngine = Class({
      * @returns {Array}
      */
     processTraces: function (traces, model) {
-        if (typeof document !== 'undefined') document.Kotlin = Kotlin;
-        if (typeof document !== 'undefined') document.traces = traces;
-
         var cmdList = [];
         for (var i=0; i < traces.size(); i++) {
             cmdList.push(this.processTrace(traces.get(i), model));
@@ -103,6 +100,7 @@ var AdaptationEngine = Class({
             } else if (trace.refName == 'mBindings') {
                 // Add binding
                 return new AddBinding(this.node, this.modelObjMapper, model, trace);
+
             }
 
         // SET - TRACES HANDLING

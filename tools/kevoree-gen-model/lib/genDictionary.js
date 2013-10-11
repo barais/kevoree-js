@@ -26,14 +26,20 @@ module.exports = function (typeDef, obj) {
             attr.datatype           = objAttr.datatype;
             attr.fragmentDependant  = objAttr.fragmentDependant || false;
 
-            // create a dictionary default value
-            var defaultVal = factory.createDictionaryValue();
-            defaultVal.value = objAttr.defaultValue;
-            defaultVal.attribute = attr;
-
-            // add attr & defaultVal to dictionary
+            // add attribute to dictionary
             dictionary.addAttributes(attr);
-            dictionary.addDefaultValues(defaultVal);
+
+            // add a defaultValue to attribute only if defined by user
+            // 'null' is a defaultValue, but "undefined" is not a defaultValue =)
+            if (typeof(objAttr.defaultValue) !== 'undefined') {
+                // create a dictionary default value
+                var defaultVal = factory.createDictionaryValue();
+                defaultVal.value = objAttr.defaultValue;
+                defaultVal.attribute = attr;
+
+                // add defaultVal to dictionary
+                dictionary.addDefaultValues(defaultVal);
+            }
         }
     }
 
