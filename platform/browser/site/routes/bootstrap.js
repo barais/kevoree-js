@@ -1,6 +1,7 @@
-var kevoree = require('kevoree-library').org.kevoree,
-    npm     = require('npm'),
-    path    = require('path');
+var kevoree          = require('kevoree-library').org.kevoree,
+    kevNodeJSRuntime = require('kevoree-nodejs-runtime'),
+    npm              = require('npm'),
+    path             = require('path');
 
 var compare    = new kevoree.compare.DefaultModelCompare();
 var loader     = new kevoree.loader.JSONModelLoader();
