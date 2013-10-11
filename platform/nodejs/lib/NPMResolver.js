@@ -30,8 +30,8 @@ var NPMResolver = Resolver.extend({
                 }
 
                 // install sucess
-                var AbstractNode = require(path.resolve(resolver.modulesPath, 'node_modules', packageName));
-                callback(null, AbstractNode);
+                var KClass = require(path.resolve(resolver.modulesPath, 'node_modules', packageName));
+                callback(null, KClass);
                 return;
             });
         });

@@ -1,9 +1,8 @@
 var config        = require('./config.json'),
-    NodeJSRuntime = require('./lib/NodeJSRuntime'),
-    path          = require('path');
+    NodeJSRuntime = require('./lib/NodeJSRuntime');
 
 // TODO enable install dir path in command-line
-var kRuntime = new NodeJSRuntime(path.resolve(__dirname, 'kevlibz'));
+var kRuntime = new NodeJSRuntime();
 
 // Kevoree Runtime started event listener
 kRuntime.on('started', function (err) {

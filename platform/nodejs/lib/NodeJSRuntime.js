@@ -9,8 +9,8 @@ var Class           = require('pseudoclass'),
 var NodeJSRuntime = Class({
     toString: 'NodeJSRuntime',
 
-    construct: function (modulesPath) {
-        this.modulesPath = modulesPath || path.resolve(__dirname, '..', 'kevlibz');
+    construct: function () {
+        this.modulesPath = path.resolve(__dirname, '..');
         this.log = new KevoreeLogger(this.toString());
         this.kCore = new KevoreeCore(this.modulesPath, this.log);
         this.bootstrapper = new Bootstrapper(this.modulesPath);
@@ -59,7 +59,7 @@ var NodeJSRuntime = Class({
     },
 
     on: function (event, callback) {
-        this.emitter.on(event, callback);
+        this.emitter.addListener(event, callback);
     }
 });
 
