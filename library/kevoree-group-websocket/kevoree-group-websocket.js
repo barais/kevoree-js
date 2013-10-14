@@ -246,9 +246,11 @@ var WebSocketGroup = AbstractGroup.extend({
             while (nodeNetworks.hasNext()) {
               var links = nodeNetworks.next().link.iterator();
               while (links.hasNext()) {
-                var netProps = links.next().networksProperties.iterator();
-                while (netProps.hasNext()) {
-                  ret.push(netProps.next().value+':'+port);
+                if (typeof(links.next().networksProperties) !== 'undefined') {
+                  var netProps = links.next().networksProperties.iterator();
+                  while (netProps.hasNext()) {
+                    ret.push(netProps.next().value+':'+port);
+                  }
                 }
               }
             }
