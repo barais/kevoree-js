@@ -49,6 +49,10 @@ var installGroupType = function installGroupType(model, targetNodeName, kGrp, ca
   npm.commands.install([packageName+'@'+versionName], function installKevWSGrpCb(err) {
     if (err) return callback(new Error('npm failed to install "'+packageName+'@'+versionName+'" module'));
 
+    // DOING SOME NASTY STUFFS THERE
+    // this is the only way (for now) to let the user
+    // call push() and pull()
+    // it's like bootstrapping a fake KevoreeCore platform
     var kCore = new KevoreeCore();
     kCore.deployModel = model; // omg
     kCore.currentModel = model; // omg
