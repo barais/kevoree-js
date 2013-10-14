@@ -1,6 +1,6 @@
 var kevoree   = require('kevoree-library').org.kevoree,
-    pullModel = require('./../lib/pullModel'),
-    pushModel = require('./../lib/pushModel'),
+    pullModel = require('kevoree-model-sync').pullModel,
+    pushModel = require('kevoree-model-sync').pushModel,
     config    = require('./../config'),
     path      = require('path');
 

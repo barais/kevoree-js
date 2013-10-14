@@ -6,13 +6,11 @@ var bootstrapHelper = require('./bootstrapHelper');
  * @param targetNodeName
  * @param callback
  */
-module.exports = function pullModel(model, targetNodeName, callback) {
+module.exports = function pushModel(model, targetNodeName, callback) {
   bootstrapHelper(model, targetNodeName, function (err, grp) {
     if (err) return callback(err);
 
-    grp.pull(targetNodeName, function (err, model) {
-      if (err) return callback(err);
-      return callback(null, model);
-    });
+    grp.push(model, targetNodeName);
+    return callback();
   });
 }

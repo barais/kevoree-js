@@ -174,8 +174,6 @@ var WebSocketGroup = AbstractGroup.extend({
 
     server.on('connection', function(ws) {
       ws.on('message', function(data, flag) {
-        console.log("server received data");
-        console.log(data);
         if (flag.binary == undefined) {
           // received data is a String
           self.processMessage(ws, data);
