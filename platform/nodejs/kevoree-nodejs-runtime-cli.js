@@ -5,24 +5,14 @@ var config        = require('./config.json'),
 var kRuntime = new NodeJSRuntime();
 
 // Kevoree Runtime started event listener
-kRuntime.on('started', function (err) {
-    if (err) {
-        console.error(err.message);
-        process.exit(1);
-    }
-
+kRuntime.on('started', function () {
     // Kevoree Core is started, deploy model
     // TODO enable bootstrap model from path in command-line
     kRuntime.deploy();
 });
 
 // Kevoree Runtime deployed event listener
-kRuntime.on('deployed', function (err, model) {
-    if (err) {
-        console.error(err.message);
-        process.exit(1);
-    }
-
+kRuntime.on('deployed', function (model) {
     // Kevoree Core has deployed a new model successfully
 
 });

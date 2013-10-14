@@ -6,13 +6,28 @@ var KevoreeEntity = require('./KevoreeEntity');
  * @type {AbstractGroup} extends KevoreeEntity
  */
 module.exports = KevoreeEntity.extend({
-    toString: 'AbstractGroup',
+  toString: 'AbstractGroup',
 
-    updateModel: function (model) {
-        this.kCore.deploy(model);
-    },
+  /**
+   *
+   * @param model
+   */
+  updateModel: function (model) {
+    this.kCore.deploy(model);
+  },
 
-    push: function (model, targetNodeName) {},
+  /**
+   *
+   * @param model
+   * @param targetNodeName
+   */
+  push: function (model, targetNodeName) {},
 
-    pull: function (targetNodeName, callback) {}
+  /**
+   * Local PULL API
+   * Should define a way to 'contact' targetNodeName and retrieve its current model
+   * @param targetNodeName
+   * @param callback function(err, model)
+   */
+  pull: function (targetNodeName, callback) {}
 });

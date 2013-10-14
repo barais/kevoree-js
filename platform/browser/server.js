@@ -1,6 +1,8 @@
-var express = require('express'),
-    routes  = require('./site/routes'),
-    clean   = require('./lib/cleanBrowserLibz');
+var express        = require('express'),
+    path           = require('path'),
+    routes         = require('./routes'),
+    clean          = require('./lib/cleanBrowserLibz'),
+    kevNodeJSPlat  = require('./lib/nodeJSPlatform');
 
 var app = express();
 
@@ -12,6 +14,9 @@ app.engine('html', require('ejs').renderFile);
 
 // clean browserified libraries on server start-up
 clean();
+
+// start a kevoree nodejs platform server-side
+kevNodeJSPlat(path.resolve(__dirname));
 
 // server routes
 app.get('/', routes.index);

@@ -31,13 +31,11 @@ var BrowserBootstrapper = Bootstrapper.extend({
         this.resolver('resolve', deployUnit, function (err, EntityClass) {
             if (err) {
                 bootstrapper.log.error(err.message);
-                callback(new Error("'"+deployUnit.unitName+"' bootstrap failed!"));
-                return;
+                return callback(new Error("'"+deployUnit.unitName+"' bootstrap failed!"));
             }
 
             // install success
-            callback(null, EntityClass);
-            return;
+            return callback(null, EntityClass);
         });
     },
 
@@ -46,24 +44,22 @@ var BrowserBootstrapper = Bootstrapper.extend({
         this.resolver('uninstall', deployUnit, function (err) {
             if (err) {
                 bootstrapper.log.error(err.message);
-                callback(new Error("'"+deployUnit.unitName+"' uninstall failed!"));
-                return;
+                return callback(new Error("'"+deployUnit.unitName+"' uninstall failed!"));
             }
 
             // uninstall success
-            callback(null);
-            return;
+            return callback(null);
         });
     },
 
     resolver: function (action, deployUnit, callback) {
-        deployUnit.url = deployUnit.url || '';
+        var url = deployUnit.url || '';
 
-        if (deployUnit.url.startsWith(FILE)) {
+        if (url.startsWith(FILE)) {
 //            this.resolvers[FILE][action](deployUnit, callback);
-            callback(new Error("File resolver not implemented yet"));
+            return callback(new Error("File resolver not implemented yet"));
 
-        } else if (deployUnit.url.startsWith(GIT)) {
+        } else if (url.startsWith(GIT)) {
             this.resolvers[GIT][action](deployUnit, callback);
 
         } else {

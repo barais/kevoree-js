@@ -51,13 +51,13 @@ module.exports = AdaptationPrimitive.extend({
 
                 } else {
                     // there is no DeployUnit installed for this instance TypeDefinition
-                    callback.call(this, new Error("No DeployUnit installed for "+this.instance.path()));
+                    callback(new Error("No DeployUnit installed for "+this.instance.path()));
                     return;
                 }
             }
         }
 
-        callback.call(this, null);
+        callback(null);
     },
 
     undo: function (_super, callback) {
@@ -66,32 +66,6 @@ module.exports = AdaptationPrimitive.extend({
         var cmd = new RemoveInstance(this.node, this.mapper, this.adaptModel, this.trace);
         cmd.execute(callback);
         return;
-    },
-
-    isRelatedToPlatform: function (kInstance) {
-        if (Kotlin.isType(kInstance.typeDefinition, kevoree.impl.ComponentTypeImpl)) {
-            // if parent is this node platform: it's ok
-            return (kInstance.eContainer().name == this.node.getName());
-
-        } else if (Kotlin.isType(kInstance.typeDefinition, kevoree.impl.ChannelTypeImpl)) {
-            // if this channel has bindings with components hosted in this node platform: it's ok
-            var bindings = kInstance.bindings;
-            for (var i=0; i < bindings.size(); i++) {
-                if (bindings.get(i).port.eContainer().eContainer().name == this.node.getName()) return true;
-            }
-
-        } else if (Kotlin.isType(kInstance.typeDefinition, kevoree.impl.GroupTypeImpl)) {
-            var subNodes = kInstance.subNodes;
-            for (var i=0; i < subNodes.size(); i++) {
-                if (subNodes.get(i).name == this.node.name) return true;
-            }
-
-        } else if (Kotlin.isType(kInstance.typeDefinition, kevoree.impl.NodeTypeImpl)) {
-            // TODO
-            return true;
-        }
-
-        return false;
     },
 
     findSuitableModuleName: function (kInstance) {
