@@ -16,6 +16,8 @@ var factory    = new kevoree.impl.DefaultKevoreeFactory();
  * @param res
  */
 module.exports = function (req, res) {
+  // retrieve server-side platform current model (this model is automatically written to server's root folder
+  // everytime a new model is deployed on it (take a look at 'lib/nodeJSPlatform.js')
   var model = loader.loadModelFromString(JSON.stringify(require('./../model.json'))).get(0);
 
   pullModel(model, config.nodeJSPlatform.nodeName, function (err, serverModel) {

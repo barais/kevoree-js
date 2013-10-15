@@ -115,7 +115,12 @@ var WebSocketGroup = AbstractGroup.extend({
       ws.send(binMsg);
     }
 
-    var onMessage = function onMessage(data) {
+    var onMessage = function onMessage(e) {
+      var data = '';
+      if (typeof(e) === 'string') data = e;
+      else data = e.data;
+
+      // close client
       ws.close();
 
       // load model and give it back to the callback
@@ -205,7 +210,10 @@ var WebSocketGroup = AbstractGroup.extend({
         ws.send(binMsg);
       }
 
-      var onMessage = function onMessage(data) {
+      var onMessage = function onMessage(e) {
+        var data = '';
+        if (typeof(e) === 'string') data = e;
+        else data = e.data;
         var jsonLoader = new kevoree.loader.JSONModelLoader();
         var model = jsonLoader.loadModelFromString(data).get(0);
         group.kCore.deploy(model);

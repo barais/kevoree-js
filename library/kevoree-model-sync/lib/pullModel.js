@@ -10,9 +10,13 @@ module.exports = function pullModel(model, targetNodeName, callback) {
   bootstrapHelper(model, targetNodeName, function (err, grp) {
     if (err) return callback(err);
 
-    grp.pull(targetNodeName, function (err, model) {
-      if (err) return callback(err);
-      return callback(null, model);
-    });
+    try {
+      grp.pull(targetNodeName, function (err, model) {
+        if (err) return callback(err);
+        return callback(null, model);
+      });
+    } catch (err) {
+      return callback(err);
+    }
   });
 }

@@ -80,7 +80,11 @@ var generator = function generator(dirPath, quiet_, callback) {
 
                         // for each file, update model
                         files.forEach(function (file) {
-                            processFile(file, deployUnit, model);
+                            var typeDef = processFile(file, deployUnit, model);
+                            if (typeof(typeDef) !== 'undefined' && typeDef != null) {
+                              // set every generated typedefinition to be in the Javascript library
+                              library.addSubTypes(typeDef);
+                            }
                         });
 
                         return callback(null, model);

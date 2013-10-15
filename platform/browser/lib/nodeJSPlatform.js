@@ -5,6 +5,7 @@ var KevNodeJSRuntime = require('kevoree-nodejs-runtime'),
   kevoree            = require('kevoree-library').org.kevoree;
 
 var serializer = new kevoree.serializer.JSONModelSerializer();
+var serverSideModelPath = path.resolve('model.json');
 
 module.exports = function (modulesPath) {
   var knjs = new KevNodeJSRuntime(modulesPath);
@@ -14,12 +15,12 @@ module.exports = function (modulesPath) {
   });
 
   knjs.on('deployed', function (model) {
-    fs.writeFile(path.resolve('model.json'), JSON.stringify(JSON.parse(serializer.serialize(model)), null, 4), function (err) {
+    fs.writeFile(serverSideModelPath, JSON.stringify(JSON.parse(serializer.serialize(model)), null, 4), function (err) {
       if (err) {
-        return console.error("Unable to write deployed model to server root :/");
+        return console.error("Unable to write deployed model to server root :/ (tried path: %s)", serverSideModelPath);
       }
 
-      console.log(">>>> model deployed to server platform >>>>> model.json written in server's root folder");
+      console.log("New model deployed server-side : model.json (over)written at %s", serverSideModelPath);
     })
   });
 
