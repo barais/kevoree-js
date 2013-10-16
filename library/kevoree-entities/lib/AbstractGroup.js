@@ -17,14 +17,13 @@ module.exports = KevoreeEntity.extend({
   },
 
   /**
-   *
+   * Should define a way to 'contact' targetNodeName and give the given model to it
    * @param model
    * @param targetNodeName
    */
   push: function (model, targetNodeName) {},
 
   /**
-   * Local PULL API
    * Should define a way to 'contact' targetNodeName and retrieve its current model
    * @param targetNodeName
    * @param callback function(err, model)

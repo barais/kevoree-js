@@ -6,35 +6,40 @@ var KevoreeEntity = require('./KevoreeEntity');
  * @type {AbstractChannel} extends KevoreeEntity
  */
 module.exports = KevoreeEntity.extend({
-    toString: 'AbstractChannel',
+  toString: 'AbstractChannel',
 
-    construct: function () {
-        this.remoteNodes = {};
-        this.inputs = {};
-    },
+  construct: function () {
+    this.remoteNodes = {};
+    this.inputs = {};
+  },
 
-    internalSend: function (portPath, msg) {
-        var remoteNodeNames = this.remoteNodes[portPath];
-        for (var remoteNodeName in remoteNodeNames) {
-            this.onSend(remoteNodeName, msg);
-        }
-    },
-
-    onSend: function (remoteNodeName, msg) {
-
-    },
-
-    remoteCallback: function (msg) {
-        for (var name in this.inputs) {
-            this.inputs[name].getCallback().call(this, msg);
-        }
-    },
-
-    addInternalRemoteNodes: function (portPath, remoteNodes) {
-        this.remoteNodes[portPath] = remoteNodes;
-    },
-
-    addInternalInputPort: function (port) {
-        this.inputs[port.getName()] = port;
+  internalSend: function (portPath, msg) {
+    var remoteNodeNames = this.remoteNodes[portPath];
+    for (var remoteNodeName in remoteNodeNames) {
+      this.onSend(remoteNodeName, msg);
     }
+  },
+
+  /**
+   *
+   * @param remoteNodeName
+   * @param msg
+   */
+  onSend: function (remoteNodeName, msg) {
+
+  },
+
+  remoteCallback: function (msg) {
+    for (var name in this.inputs) {
+      this.inputs[name].getCallback().call(this, msg);
+    }
+  },
+
+  addInternalRemoteNodes: function (portPath, remoteNodes) {
+    this.remoteNodes[portPath] = remoteNodes;
+  },
+
+  addInternalInputPort: function (port) {
+    this.inputs[port.getName()] = port;
+  }
 });
