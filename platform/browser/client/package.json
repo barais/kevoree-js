@@ -1,5 +1,5 @@
 {
-  "name": "kevoree-browser-runtime",
+  "name": "kevoree-browser-runtime-client",
   "version": "0.0.1",
   "author": "Maxime Tricoire <max.tricoire@gmail.com>",
   "dependencies": {
