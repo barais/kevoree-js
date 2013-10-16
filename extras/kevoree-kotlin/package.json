@@ -2,7 +2,7 @@
   "name": "kevoree-kotlin",
   "version": "0.0.1",
   "description": "Kotlin as an npm module",
-  "main": "kevoree-kotlin.js",
+  "main": "./kevoree-kotlin.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
