@@ -33,7 +33,7 @@ Yay, now you have the __Kevoree Web Editor__ up and running on your machine. You
 In this example, I'll choose the browser platform.
 
 ```sh
-cd ../../kevoree-js
+cd ../..
 mkdir kevoree-browser-runtime
 cd $_
 npm install kevoree-browser-runtime
