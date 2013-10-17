@@ -2,6 +2,7 @@
   "name": "kevoree-browser-runtime-client",
   "version": "0.0.1",
   "author": "Maxime Tricoire <max.tricoire@gmail.com>",
+  "main": "./kevoree-browser-runtime-client.js",
   "dependencies": {
     "kevoree-core": "0.0.3",
     "kevoree-library": "0.0.3",
