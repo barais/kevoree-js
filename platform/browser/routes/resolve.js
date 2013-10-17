@@ -54,8 +54,8 @@ module.exports = function(req, res) {
             var b = browserify();
             var bundleFile = fs.createWriteStream(path.resolve(browserModulePath, req.query.name+'-bundle.js'));
 
-            b.require(path.resolve(process.cwd(), 'client', 'node_modules', 'kevoree-library'), { external: true })
-              .require(path.resolve(process.cwd(), 'client', 'node_modules', 'kevoree-kotlin'), { external: true })
+            b.external(path.resolve(process.cwd(), 'client', 'node_modules', 'kevoree-library'))
+              .external(path.resolve(process.cwd(), 'client', 'node_modules', 'kevoree-kotlin'))
               .require(modulePath, { expose: req.query.name })
               .bundle()
               .pipe(bundleFile)
