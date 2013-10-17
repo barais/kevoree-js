@@ -20,58 +20,60 @@
     <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
 </head>
 <body>
-<!--[if lt IE 7]>
-<p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
-<![endif]-->
-<div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#"><img src="img/kevoree-logo-small.png" alt="Kevoree Logo" class="kevoree-logo"></a>
-        </div>
-        <div class="navbar-form navbar-right">
-            <div class="form-group">
-                <input id="node-name" type="text" placeholder="node0" value="node0" class="form-control">
+    <!--[if lt IE 7]>
+    <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#"><img src="img/kevoree-logo-small.png" alt="Kevoree Logo" class="kevoree-logo"></a>
             </div>
-            <button id="start-btn" class="btn btn-success">Start</button>
-            <button id="deploy-btn" class="btn btn-info disabled">Deploy</button>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Runtime</a></li>
-            </ul>
-        </div><!--/.navbar-collapse -->
-    </div>
-</div>
-
-<hr>
-
-<div class="row">
-    <div class="col-lg-10 col-lg-offset-1">
-        <small>Console:</small>
-        <div class="well">
-            <table class="table table-hover table-condensed">
-                <tbody id="log-console"></tbody>
-            </table>
+            <div class="navbar-form navbar-right">
+                <div class="form-group">
+                    <input id="node-name" type="text" placeholder="node0" value="node0" class="form-control">
+                </div>
+                <button id="start-btn" class="btn btn-success">Start</button>
+                <button id="deploy-btn" class="btn btn-info disabled">Deploy</button>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="#">Runtime</a></li>
+                </ul>
+            </div><!--/.navbar-collapse -->
         </div>
     </div>
-</div> <!-- /container -->
-<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
 
-<script src="js/vendor/bootstrap.min.js"></script>
-<script src="js/vendor/zip/zip.js"></script>
-<script src="js/vendor/zip/zip-ext.js"></script>
-<script src="js/kevoree-browser-runtime-client.min.js"></script>
+    <hr>
 
-<!--<script>-->
-<!--var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];-->
-<!--(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];-->
-<!--g.src='//www.google-analytics.com/ga.js';-->
-<!--s.parentNode.insertBefore(g,s)}(document,'script'));-->
-<!--</script>-->
+    <div id="console-container" class="container">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <small>Console:</small>
+                <div class="well">
+                    <table class="table table-hover table-condensed">
+                        <tbody id="log-console"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
+
+    <script src="js/vendor/bootstrap.min.js"></script>
+    <script src="js/vendor/zip/zip.js"></script>
+    <script src="js/vendor/zip/zip-ext.js"></script>
+    <script src="js/kevoree-browser-runtime-client.min.js"></script>
+
+    <!--<script>-->
+    <!--var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];-->
+    <!--(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];-->
+    <!--g.src='//www.google-analytics.com/ga.js';-->
+    <!--s.parentNode.insertBefore(g,s)}(document,'script'));-->
+    <!--</script>-->
 </body>
 </html>

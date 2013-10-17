@@ -23,6 +23,12 @@ body {
     width: 150px;
 }
 
+@media (max-width: 768px) {
+    #console-container {
+        padding-top: 100px;
+    }
+}
+
 
 
 
