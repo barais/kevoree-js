@@ -25,7 +25,7 @@ npm install
 npm start
 ```
 
-Yay, now you have the __Kevoree Web Editor__ up and running on your machine. You can play with it at http://localhost:3000/ (by default)
+Yay, now you have the __Kevoree Web Editor__ up and running on your machine. You can play with it at http://localhost:3042/ (by default)
 
 ### Step2: kevoree-nodejs-runtime or kevoree-browser-runtime
 > This choice is up to you, you can either use NodeJS platform or your browser.
